@@ -64,7 +64,7 @@ root_container = VSplit([
 bindings = KeyBindings()
 bindings.add('tab')(focus_next)
 bindings.add('s-tab')(focus_previous)
-dd
+print('lolo')
 
 
 @bindings.add('c-c', eager=True)
