@@ -65,8 +65,6 @@ bindings = KeyBindings()
 bindings.add('tab')(focus_next)
 bindings.add('s-tab')(focus_previous)
 
-print('allo')
-
 @bindings.add('c-c', eager=True)
 @bindings.add('c-q', eager=True)
 def _(event):
