@@ -74,20 +74,31 @@ def serial_com_TM(ser, lock):
 
             tag, *data, CRC = [format(_, 'x') for _ in ser.read(data_lenght + 2)]
 
+            tag = str(tag) if len(str(tag)) > 1 else str(tag) + "0"
             try:
                 frame_name = BD[tag]['name']
                 frame_data = BD[tag]['data']
             except KeyError:
                 frame_name = 'Frame unrecognized'
-                frame_data = ''
+                frame_data = False
 
             test_buffer.text += format_frame(''.join(sync_word), format(data_lenght, 'x'), tag, ''.join(data), CRC, frame_name)
 
-            # test_buffer.text += ' '.join(frame_data)
+            if frame_data:
+                pointer = 0
+                for value in frame_data:
+                    field_lenght = int(value[0])
+                    field_name = value[1]
+
+                    test_buffer.text += ' ' + field_name + ': ' + ''.join(data[pointer:pointer+field_lenght])
+                    pointer = pointer + field_lenght
+
             test_buffer.text += '\n'
 
             if not get_app().layout.has_focus(TM_window):
                 test_buffer._set_cursor_position(len(test_buffer.text)-1)
+
+            sleep(0.01)
 
 
 
@@ -108,7 +119,7 @@ def serial_com_TC(ser, lock):
 
 root_container = VSplit([
     HSplit([
-        Frame(body=Label(text=HTML('                  <b>TC Management</b>\n\n Content')), width=50),
+        Frame(body=Label(text=HTML('        <b>TC Management</b>\n\n Content')), width=30),
         Frame(title='Clear Watchdog', body=watchdog_radio),
     ], height=D()),
     verticalline1,

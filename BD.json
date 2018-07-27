@@ -28,12 +28,12 @@
         "length": "06",
         "tag": "80",
         "data": [
-            {"1": "SRU reboot counter"}, 
-            {"1": "CPU reboot counter"}, 
-            {"1": "Watchdog disarming key"}, 
-            {"1": "Application loading status"}, 
-            {"1": "MRAM application CRC"}, 
-            {"1": "Application CRC computed"}
+            ["1", "SRU reboot counter"], 
+            ["1", "CPU reboot counter"], 
+            ["1", "Watchdog disarming key"], 
+            ["1", "App load status"], 
+            ["1", "MRAM app CRC"], 
+            ["1", "App CRC computed"]
         ],
         "CRC": ""
     }, 
