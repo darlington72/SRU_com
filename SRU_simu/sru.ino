@@ -1,0 +1,27 @@
+
+void setup() {
+
+  Serial.begin(115200);
+  
+
+}
+
+// TM_WDG_KEY_LOADING KO 0x12 0x34 0x01 0x82 0xFF 0x7B
+void loop() {
+
+  
+  byte message[] = {0x12, 0x34, 0x06, 0x80, 0xCA, 0xFE, 0xFE, 0xCA, 0xCA, 0xFF, 0x7B};
+
+
+
+  Serial.write(message, sizeof(message));
+  Serial.flush();
+  delay(1000);
+
+  
+
+
+
+
+  
+}

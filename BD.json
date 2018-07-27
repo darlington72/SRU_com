@@ -1,0 +1,50 @@
+{   
+    "00": {
+        "type": "TC",
+        "name": "TC REEBOT (without TM)",
+        "with_TM": "False",
+        "header": "1234",
+        "length": "00",
+        "tag": "00",
+        "data": "",
+        "CRC": "7C"
+    },
+
+    "81": {
+        "type": "TC",
+        "name": "TC REBOOT (with TM)",
+        "with_TM": "True",
+        "header": "1234",
+        "length": "00",
+        "tag": "80",
+        "data": "",
+        "CRC": "93"
+    },
+
+    "80": {
+        "type": "TM",
+        "name": "TM REBOOT",
+        "header": "1234",
+        "length": "06",
+        "tag": "80",
+        "data": [
+            {"1": "SRU reboot counter"}, 
+            {"1": "CPU reboot counter"}, 
+            {"1": "Watchdog disarming key"}, 
+            {"1": "Application loading status"}, 
+            {"1": "MRAM application CRC"}, 
+            {"1": "Application CRC computed"}
+        ],
+        "CRC": ""
+    }, 
+
+    "01": {
+        "type": "TC",
+        "name": "TC CLEAR_WDG without TM",
+        "header": "1234",
+        "length": "01",
+        "tag": "01",
+        "data": "63",
+        "CRC": "A7"
+    }
+}
