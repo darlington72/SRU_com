@@ -6,20 +6,7 @@ from prompt_toolkit.layout.containers import VSplit, HSplit
 from prompt_toolkit.layout.dimension import D
 from prompt_toolkit.layout.layout import Layout, Window
 from prompt_toolkit.styles import Style
-from prompt_toolkit.widgets import (
-    TextArea,
-    Label,
-    Frame,
-    Box,
-    Checkbox,
-    Dialog,
-    Button,
-    RadioList,
-    MenuContainer,
-    MenuItem,
-    ProgressBar,
-    VerticalLine,
-)
+from prompt_toolkit.widgets import Label, Frame, RadioList, VerticalLine
 from pygments.lexers.html import HtmlLexer
 from prompt_toolkit import HTML
 from prompt_toolkit.layout import FormattedTextControl
@@ -33,30 +20,16 @@ from huepy import *
 import json
 import sys
 from time import sleep
+import lib
 
 
-use_asyncio_event_loop()
-
-
-def do_exit():
-    get_app().exit(result=False)
-
-
-test_buffer = Buffer()
-
-
-TM_window = Window(BufferControl(buffer=test_buffer, focusable=True))
-
-
-verticalline1 = VerticalLine()
-
-watchdog_radio = RadioList(values=[(True, "True"), (False, "False")])
-
-
-def format_frame(*frame):
-    formatted_frame = " ".join(frame[:-1])
-    formatted_frame = f"{formatted_frame:30} {frame[-1]}"
-    return formatted_frame
+# use_asyncio_event_loop()
+try:
+    conf_file = open("conf.json", "r")
+    conf = json.load(conf_file)
+except OSError:
+    
+buffer_layout = Buffer()
 
 
 def serial_com_TM(ser, lock):
@@ -64,11 +37,11 @@ def serial_com_TM(ser, lock):
         BD = json.load(read_file)
 
         with lock:
-            test_buffer.text = "Waiting for sync word..."
+            buffer_layout.text = "Waiting for sync word..."
             while not ser.read(2).hex() in ("1234", "4321"):
                 pass
 
-            test_buffer.text += "found ! \n"
+            buffer_layout.text += "found ! \n"
 
             first_frame_data_lenght = int.from_bytes(ser.read(1), "big")
 
@@ -90,7 +63,7 @@ def serial_com_TM(ser, lock):
                 frame_name = "Frame unrecognized"
                 frame_data = False
 
-            test_buffer.text += format_frame(
+            buffer_layout.text += lib.format_frame(
                 "".join(sync_word), format(data_lenght, "x"), tag, "".join(data), CRC, frame_name
             )
 
@@ -100,15 +73,15 @@ def serial_com_TM(ser, lock):
                     field_lenght = int(value[0])
                     field_name = value[1]
 
-                    test_buffer.text += (
+                    buffer_layout.text += (
                         " " + field_name + ": " + "".join(data[pointer : pointer + field_lenght])
                     )
                     pointer = pointer + field_lenght
 
-            test_buffer.text += "\n"
+            buffer_layout.text += "\n"
 
             if not get_app().layout.has_focus(TM_window):
-                test_buffer._set_cursor_position(len(test_buffer.text) - 1)
+                buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
 
             sleep(0.01)
 
@@ -128,7 +101,7 @@ def serial_com_TC(ser, lock):
 
                 with lock:
                     ser.write(frame_to_be_sent.encode())
-                    test_buffer.text += format_frame(
+                    buffer_layout.text += lib.format_frame(
                         BD["01"]["header"],
                         BD["01"]["length"],
                         BD["01"]["tag"],
@@ -136,8 +109,17 @@ def serial_com_TC(ser, lock):
                         BD["01"]["CRC"],
                         BD["01"]["name"],
                     )
-                    test_buffer.text += "\n"
+                    buffer_layout.text += "\n"
                 sleep(1)
+
+
+TM_window = Window(BufferControl(buffer=buffer_layout, focusable=True))
+verticalline1 = VerticalLine()
+watchdog_radio = RadioList(values=[(True, "True"), (False, "False")])
+
+
+def do_exit():
+    get_app().exit(result=False)
 
 
 root_container = VSplit(
@@ -190,7 +172,7 @@ application = Application(
 
 
 def run_app():
-    result = application.run()
+    application.run()
     print("Bye bye.")
 
 
@@ -198,12 +180,16 @@ if __name__ == "__main__":
 
     lock = threading.Lock()
 
-    ser = serial.Serial("/dev/ttyUSB0", 115200)
-    thread1 = threading.Thread(target=serial_com_TM, args=(ser, lock))
-    thread1.daemon = True
-    thread1.start()
+    # ser = serial.Serial("/dev/ttyUSB0", 115200)
+    # thread1 = threading.Thread(target=serial_com_TM, args=(ser, lock))
+    # thread1.daemon = True
+    # thread1.start()
 
-    thread1 = threading.Thread(target=serial_com_TC, args=(ser, lock))
+    # thread1 = threading.Thread(target=serial_com_TC, args=(ser, lock))
+    # thread1.daemon = True
+    # thread1.start()
+
+    thread1 = threading.Thread(target=lib.fill_buffer_debug, args=(buffer_layout,))
     thread1.daemon = True
     thread1.start()
 

@@ -1,4 +1,7 @@
 {
-    "port": "ttyUSB0",
-    "baudrate": "115200"
+    "COM": {
+        "port": "ttyUSB0",
+        "baudrate": "115200"
+    },
+    "debug": "True"
 }
