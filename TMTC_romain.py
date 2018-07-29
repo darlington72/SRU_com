@@ -28,7 +28,9 @@ try:
     conf_file = open("conf.json", "r")
     conf = json.load(conf_file)
 except OSError:
-    
+    pass
+
+
 buffer_layout = Buffer()
 
 
