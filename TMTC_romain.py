@@ -21,114 +21,33 @@ import json
 import sys
 from time import sleep
 import lib
-
-
-# use_asyncio_event_loop()
-try:
-    conf_file = open("conf.json", "r")
-    conf = json.load(conf_file)
-except OSError:
-    pass
-
-
-buffer_layout = Buffer()
-
-
-def serial_com_TM(ser, lock):
-    with open("BD.json", "r") as read_file:
-        BD = json.load(read_file)
-
-        with lock:
-            buffer_layout.text = "Waiting for sync word..."
-            while not ser.read(2).hex() in ("1234", "4321"):
-                pass
-
-            buffer_layout.text += "found ! \n"
-
-            first_frame_data_lenght = int.from_bytes(ser.read(1), "big")
-
-            ser.read(first_frame_data_lenght + 2)
-
-        while True:
-            # TM
-
-            *sync_word, data_lenght = ser.read(3)  # for no reason ser.read returns int here..
-            sync_word = [format(_, "x") for _ in sync_word]
-
-            tag, *data, CRC = [format(_, "x") for _ in ser.read(data_lenght + 2)]
-
-            tag = str(tag) if len(str(tag)) > 1 else str(tag) + "0"
-            try:
-                frame_name = BD[tag]["name"]
-                frame_data = BD[tag]["data"]
-            except KeyError:
-                frame_name = "Frame unrecognized"
-                frame_data = False
-
-            buffer_layout.text += lib.format_frame(
-                "".join(sync_word), format(data_lenght, "x"), tag, "".join(data), CRC, frame_name
-            )
-
-            if frame_data:
-                pointer = 0
-                for value in frame_data:
-                    field_lenght = int(value[0])
-                    field_name = value[1]
-
-                    buffer_layout.text += (
-                        " " + field_name + ": " + "".join(data[pointer : pointer + field_lenght])
-                    )
-                    pointer = pointer + field_lenght
-
-            buffer_layout.text += "\n"
-
-            if not get_app().layout.has_focus(TM_window):
-                buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
-
-            sleep(0.01)
-
-
-def serial_com_TC(ser, lock):
-    with open("BD.json", "r") as read_file:
-        BD = json.load(read_file)
-        while True:
-            if watchdog_radio.current_value:
-                frame_to_be_sent = (
-                    BD["01"]["header"]
-                    + BD["01"]["length"]
-                    + BD["01"]["tag"]
-                    + BD["01"]["data"]
-                    + BD["01"]["CRC"]
-                )
-
-                with lock:
-                    ser.write(frame_to_be_sent.encode())
-                    buffer_layout.text += lib.format_frame(
-                        BD["01"]["header"],
-                        BD["01"]["length"],
-                        BD["01"]["tag"],
-                        BD["01"]["data"],
-                        BD["01"]["CRC"],
-                        BD["01"]["name"],
-                    )
-                    buffer_layout.text += "\n"
-                sleep(1)
-
-
-TM_window = Window(BufferControl(buffer=buffer_layout, focusable=True))
-verticalline1 = VerticalLine()
-watchdog_radio = RadioList(values=[(True, "True"), (False, "False")])
+from lib import BD, conf
+from serial_com import serial_com_TC, serial_com_TM
 
 
 def do_exit():
     get_app().exit(result=False)
 
 
+buffer_layout = Buffer()
+
+
+TM_window = Window(BufferControl(buffer=buffer_layout, focusable=True))
+verticalline1 = VerticalLine()
+watchdog_radio = RadioList(values=[(True, "True"), (False, "False")])
+
+TC_list = [BD[_] for _ in BD if BD[_]["type"] == "TC"]
+
+TC_management = "        \n<b>Liste des TC:</b> \n"
+for TC in TC_list:
+    TC_management += TC["name"] + "\n"
+
+
 root_container = VSplit(
     [
         HSplit(
             [
-                Frame(body=Label(text=HTML("        <b>TC Management</b>\n\n Content")), width=30),
+                Frame(body=Label(text=HTML(TC_management)), title="TC Management", width=30),
                 Frame(title="Clear Watchdog", body=watchdog_radio),
             ],
             height=D(),
@@ -157,7 +76,6 @@ style = Style.from_dict(
         "shadow": "bg:#222222",
         "window.border shadow": "#444444",
         "focused  button": "bg:#880000 #ffffff noinherit",
-        # Styling for Dialog widgets.
         "radiolist focused": "noreverse",
         "radiolist focused radio.selected": "reverse",
     }
@@ -176,18 +94,22 @@ application = Application(
 def run_app():
     application.run()
     print("Bye bye.")
+    lib.conf_file.close()
+    lib.BD_file.close()
 
 
 if __name__ == "__main__":
 
     lock = threading.Lock()
 
-    # ser = serial.Serial("/dev/ttyUSB0", 115200)
-    # thread1 = threading.Thread(target=serial_com_TM, args=(ser, lock))
+    # ser = serial.Serial("/dev/" + conf["COM"]["port"], conf["COM"]["baudrate"])
+    # thread1 = threading.Thread(target=serial_com_TM, args=(ser, lock, buffer_layout, TM_window))
     # thread1.daemon = True
     # thread1.start()
 
-    # thread1 = threading.Thread(target=serial_com_TC, args=(ser, lock))
+    # thread1 = threading.Thread(
+    #     target=serial_com_TC, args=(ser, lock, buffer_layout, watchdog_radio)
+    # )
     # thread1.daemon = True
     # thread1.start()
 
