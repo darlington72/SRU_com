@@ -38,7 +38,7 @@ watchdog_radio = RadioList(values=[(True, "True"), (False, "False")])
 
 TC_list = [BD[_] for _ in BD if BD[_]["type"] == "TC"]
 
-TC_management = "        \n<b>Liste des TC:</b> \n"
+TC_management = "        \n<b>TC list:</b> \n\n"
 for TC in TC_list:
     TC_management += TC["name"] + "\n"
 
@@ -101,21 +101,27 @@ def run_app():
 if __name__ == "__main__":
 
     lock = threading.Lock()
+    try:
+        ser = serial.Serial("/dev/" + conf["COM"]["port"], conf["COM"]["baudrate"])
+    except serial.serialutil.SerialException as msg:
+        print('Serial error. Please check connection:')
+        print(msg)
+        print('Both modules usbserial and ftdi_sio should be load (modprobe xx)')
+        sys.exit(0)
 
-    # ser = serial.Serial("/dev/" + conf["COM"]["port"], conf["COM"]["baudrate"])
-    # thread1 = threading.Thread(target=serial_com_TM, args=(ser, lock, buffer_layout, TM_window))
-    # thread1.daemon = True
-    # thread1.start()
-
-    # thread1 = threading.Thread(
-    #     target=serial_com_TC, args=(ser, lock, buffer_layout, watchdog_radio)
-    # )
-    # thread1.daemon = True
-    # thread1.start()
-
-    thread1 = threading.Thread(target=lib.fill_buffer_debug, args=(buffer_layout,))
+    thread1 = threading.Thread(target=serial_com_TM, args=(ser, lock, buffer_layout, TM_window))
     thread1.daemon = True
     thread1.start()
+
+    thread1 = threading.Thread(
+        target=serial_com_TC, args=(ser, lock, buffer_layout, watchdog_radio)
+    )
+    thread1.daemon = True
+    thread1.start()
+
+    # thread1 = threading.Thread(target=lib.fill_buffer_debug, args=(buffer_layout,))
+    # thread1.daemon = True
+    # thread1.start()
 
     run_app()
 

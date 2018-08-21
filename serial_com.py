@@ -9,8 +9,16 @@ from lib import BD
 def serial_com_TM(ser, lock, buffer_layout, TM_window):
     with lock:
         buffer_layout.text = "Waiting for sync word..."
-        while not ser.read(2).hex() in ("1234", "4321"):
-            pass
+        # while not ser.read(2).hex() in ("1234", "4321"):
+        #     pass
+
+
+        while True:
+            first_byte = ser.read(1).hex()
+            if first_byte in ("12", "43"):
+                second_byte = ser.read(1).hex()
+                if (first_byte == "12" and second_byte == "34") or (first_byte == "43" and second_byte == "21"):
+                    break
 
         buffer_layout.text += "found ! \n"
 
