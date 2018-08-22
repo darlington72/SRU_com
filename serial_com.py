@@ -113,7 +113,19 @@ def send_TC(ser, lock, buffer_layout, TC_list, verbose=False):
             + BD[TC_list.current_value]["CRC"]
         )
         ser.write(frame_to_be_sent.encode())
-        buffer_layout.text += BD[TC_list.current_value]['name'] + "\n"
+        if verbose:
+            buffer_layout.text += lib.format_frame(
+                BD[TC_list.current_value]["header"],
+                BD[TC_list.current_value]["length"],
+                BD[TC_list.current_value]["tag"],
+                BD[TC_list.current_value]["data"],
+                BD[TC_list.current_value]["CRC"],
+                BD[TC_list.current_value]["name"],
+            )
+        else:
+            buffer_layout.text += BD[TC_list.current_value]['name']
+        
+        buffer_layout.text  += "\n"
 
 
 
