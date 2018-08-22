@@ -8,7 +8,7 @@ specs.txt
 # Vscode
 *.code-workspace
 settings.json
-
+dev/
 # C extensions
 *.so
 
