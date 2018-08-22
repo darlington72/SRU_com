@@ -6,7 +6,8 @@ from prompt_toolkit.application.current import get_app
 from lib import BD
 
 
-def serial_com_TM(ser, lock, buffer_layout, TM_window):
+
+def serial_com_TM(ser, lock, buffer_layout, TM_window, verbose=False):
     with lock:
         buffer_layout.text = "Waiting for sync word..."
         # while not ser.read(2).hex() in ("1234", "4321"):
@@ -42,20 +43,27 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window):
             frame_name = "Frame unrecognized"
             frame_data = False
 
-        buffer_layout.text += lib.format_frame(
-            "".join(sync_word), format(data_lenght, "x"), tag, "".join(data), CRC, frame_name
-        )
+        if verbose:
+            buffer_layout.text += lib.format_frame(
+                "".join(sync_word), format(data_lenght, "x"), tag, "".join(data), CRC, frame_name
+            )
+        else:
+            buffer_layout.text += frame_name
 
         if frame_data:
             pointer = 0
-            for value in frame_data:
+            buffer_layout.text += " ("
+            for key, value in enumerate(frame_data):
+                if key != 0:
+                    buffer_layout.text += "|"
                 field_lenght = int(value[0])
                 field_name = value[1]
 
                 buffer_layout.text += (
-                    " " + field_name + ": " + "".join(data[pointer : pointer + field_lenght])
+                    field_name + "=0x" + "".join(data[pointer : pointer + field_lenght])
                 )
                 pointer = pointer + field_lenght
+            buffer_layout.text += ")"
 
         buffer_layout.text += "\n"
 
@@ -65,10 +73,10 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window):
         sleep(0.01)
 
 
-def serial_com_TC(ser, lock, buffer_layout, watchdog_radio):
+def serial_com_TC(ser, lock, buffer_layout, watchdog_radio, verbose=False):
     while True:
         if watchdog_radio.current_value:
-            frame_to_be_sent = (
+            frame_to_be_sent = (    
                 BD["01"]["header"]
                 + BD["01"]["length"]
                 + BD["01"]["tag"]
@@ -78,13 +86,49 @@ def serial_com_TC(ser, lock, buffer_layout, watchdog_radio):
 
             with lock:
                 ser.write(frame_to_be_sent.encode())
-                buffer_layout.text += lib.format_frame(
-                    BD["01"]["header"],
-                    BD["01"]["length"],
-                    BD["01"]["tag"],
-                    BD["01"]["data"],
-                    BD["01"]["CRC"],
-                    BD["01"]["name"],
-                )
+                if verbose:
+                    buffer_layout.text += lib.format_frame(
+                        BD["01"]["header"],
+                        BD["01"]["length"],
+                        BD["01"]["tag"],
+                        BD["01"]["data"],
+                        BD["01"]["CRC"],
+                        BD["01"]["name"],
+                    )
+                else:
+                    buffer_layout.text += BD["01"]["name"]
+
                 buffer_layout.text += "\n"
-            sleep(1)
+
+        sleep(1)
+
+
+def send_TC(ser, lock, buffer_layout, TC_list, verbose=False):
+    with lock:
+        frame_to_be_sent = (    
+            BD[TC_list.current_value]["header"]
+            + BD[TC_list.current_value]["length"]
+            + BD[TC_list.current_value]["tag"]
+            + BD[TC_list.current_value]["data"]
+            + BD[TC_list.current_value]["CRC"]
+        )
+        ser.write(frame_to_be_sent.encode())
+        buffer_layout.text += BD[TC_list.current_value]['name'] + "\n"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
