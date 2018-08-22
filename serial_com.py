@@ -7,18 +7,18 @@ from lib import BD
 
 
 
-def serial_com_TM(ser, lock, buffer_layout, TM_window, verbose=False):
+def serial_com_TM(ser, lock, buffer_layout, TM_window, verbose=False, loop_mode=False):
     with lock:
         buffer_layout.text = "Waiting for sync word..."
-        # while not ser.read(2).hex() in ("1234", "4321"):
-        #     pass
 
+        if loop_mode:
+            sleep(0.5)
 
         while True:
             first_byte = ser.read(1).hex()
             if first_byte in ("12", "43"):
                 second_byte = ser.read(1).hex()
-                if (first_byte == "12" and second_byte == "34") or (first_byte == "43" and second_byte == "21"):
+                if (first_byte == "12" and second_byte == "34")  or (first_byte == "43" and second_byte == "21"):
                     break
 
         buffer_layout.text += "found ! \n"
@@ -73,7 +73,17 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, verbose=False):
         sleep(0.01)
 
 
-def serial_com_TC(ser, lock, buffer_layout, watchdog_radio, verbose=False):
+def serial_com_TC(ser, lock, buffer_layout, watchdog_radio, verbose=False, loop_mode=False):
+    if loop_mode:
+        frame_to_be_sent = (    
+            BD["01"]["header"]
+            + BD["01"]["length"]
+            + BD["01"]["tag"]
+            + BD["01"]["data"]
+            + BD["01"]["CRC"]
+        )
+        ser.write(bytearray.fromhex(frame_to_be_sent))
+
     while True:
         if watchdog_radio.current_value:
             frame_to_be_sent = (    
@@ -85,7 +95,7 @@ def serial_com_TC(ser, lock, buffer_layout, watchdog_radio, verbose=False):
             )
 
             with lock:
-                ser.write(frame_to_be_sent.encode())
+                ser.write(bytearray.fromhex(frame_to_be_sent))
                 if verbose:
                     buffer_layout.text += lib.format_frame(
                         BD["01"]["header"],
@@ -103,16 +113,17 @@ def serial_com_TC(ser, lock, buffer_layout, watchdog_radio, verbose=False):
         sleep(1)
 
 
-def send_TC(ser, lock, buffer_layout, TC_list, verbose=False):
-    with lock:
-        frame_to_be_sent = (    
+def send_TC(ser, lock, buffer_layout, TC_list, TM_window, verbose=False):
+    frame_to_be_sent = (    
             BD[TC_list.current_value]["header"]
             + BD[TC_list.current_value]["length"]
             + BD[TC_list.current_value]["tag"]
             + BD[TC_list.current_value]["data"]
             + BD[TC_list.current_value]["CRC"]
         )
-        ser.write(frame_to_be_sent.encode())
+
+    with lock:  
+        ser.write(bytearray.fromhex(frame_to_be_sent))
         if verbose:
             buffer_layout.text += lib.format_frame(
                 BD[TC_list.current_value]["header"],
@@ -126,6 +137,9 @@ def send_TC(ser, lock, buffer_layout, TC_list, verbose=False):
             buffer_layout.text += BD[TC_list.current_value]['name']
         
         buffer_layout.text  += "\n"
+
+        if not get_app().layout.has_focus(TM_window):
+            buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
 
 
 

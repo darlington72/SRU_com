@@ -47,6 +47,7 @@ Parser
 '''
 parser = argparse.ArgumentParser(description='SRU Com')
 parser.add_argument('-v', '--verbose', action='store_true')
+parser.add_argument('-l', '--loop', action='store_true', help='Serial loop mode')
 args = parser.parse_args()
 
 
@@ -73,7 +74,7 @@ TC_list = [(_, BD[_]["name"]) for _ in BD if BD[_]["type"] == "TC"]
 TC_selectable_list = []
 
 def TC_send_handler():
-    send_TC(ser, lock, buffer_layout, TC_selectable_list, args.verbose)
+    send_TC(ser, lock, buffer_layout, TC_selectable_list, TM_window, args.verbose)
 
 
 
@@ -138,13 +139,14 @@ def run_app():
 
 if __name__ == "__main__":
 
-    thread1 = threading.Thread(target=serial_com_TM, args=(ser, lock, buffer_layout, TM_window, args.verbose))
+    thread1 = threading.Thread(
+        target=serial_com_TC, args=(ser, lock, buffer_layout, watchdog_radio, args.verbose, args.loop)
+    )
     thread1.daemon = True
     thread1.start()
 
-    thread2 = threading.Thread(
-        target=serial_com_TC, args=(ser, lock, buffer_layout, watchdog_radio, args.verbose)
-    )
+    thread2 = threading.Thread(target=serial_com_TM, args=(ser, lock, buffer_layout, TM_window, args.verbose, args.loop))
+
     thread2.daemon = True
     thread2.start()
 
