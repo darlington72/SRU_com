@@ -12,7 +12,7 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, verbose=False, loop_mode=
         buffer_layout.text = "Waiting for sync word..."
 
         if loop_mode:
-            sleep(0.5)
+            sleep(0.5) # In loop mode, we give a chance to serial_com_TC to send out one frame before looking for sync word.
 
         while True:
             first_byte = ser.read(1).hex()
@@ -24,11 +24,9 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, verbose=False, loop_mode=
         buffer_layout.text += "found ! \n"
 
         first_frame_data_lenght = int.from_bytes(ser.read(1), "big")
-
-        ser.read(first_frame_data_lenght + 2)
+        ser.read(first_frame_data_lenght + 2) # Let's read the first frame entirely, then we are properly synced
 
     while True:
-        # TM
         # FIXME read(1) call, and when it succeeds use read(inWaiting())
         *sync_word, data_lenght = ser.read(3)  # for no reason ser.read returns int here..
         sync_word = [format(_, "x") for _ in sync_word]

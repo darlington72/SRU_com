@@ -17,12 +17,12 @@ from prompt_toolkit.formatted_text import to_formatted_text
 import prompt_toolkit
 import threading
 import serial
-from huepy import *
 import json
 import sys
 from time import sleep
 import argparse
 from pprint import pprint
+
 # Custom lib
 import lib
 from lib import BD, conf
@@ -30,9 +30,8 @@ from serial_com import serial_com_TC, serial_com_TM, send_TC
 
 lock = threading.Lock()
 
-'''
-Serial
-''' 
+
+# Serial
 try:
     ser = serial.Serial("/dev/" + conf["COM"]["port"], conf["COM"]["baudrate"])
 except serial.serialutil.SerialException as msg:
@@ -42,9 +41,8 @@ except serial.serialutil.SerialException as msg:
     sys.exit(0)
 
 
-'''
-Parser 
-'''
+
+# Args parser 
 parser = argparse.ArgumentParser(description='SRU Com')
 parser.add_argument('-v', '--verbose', action='store_true')
 parser.add_argument('-l', '--loop', action='store_true', help='Serial loop mode')
@@ -52,31 +50,24 @@ args = parser.parse_args()
 
 
 
-
-'''
-UI
-'''
-
+# UI
 def do_exit():
     get_app().exit(result=False)
 
 
-buffer_layout = Buffer()
+buffer_layout = Buffer() # TM/TC live feed buffer
 
 
 TM_window = Window(BufferControl(buffer=buffer_layout, focusable=True))
 verticalline1 = VerticalLine()
 watchdog_radio = RadioList(values=[(False, "False"), (True, "True")])
 
-
-
+# TC list and sending 
 TC_list = [(_, BD[_]["name"]) for _ in BD if BD[_]["type"] == "TC"]
 TC_selectable_list = []
 
 def TC_send_handler():
     send_TC(ser, lock, buffer_layout, TC_selectable_list, TM_window, args.verbose)
-
-
 
 TC_selectable_list = SelectableList(values=TC_list, handler=TC_send_handler)
 
@@ -153,8 +144,6 @@ if __name__ == "__main__":
     # thread1 = threading.Thread(target=lib.fill_buffer_debug, args=(buffer_layout,))
     # thread1.daemon = True
     # thread1.start()
-
-
 
     run_app()
 
