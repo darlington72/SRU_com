@@ -51,8 +51,10 @@ args = parser.parse_args()
 
 
 # UI
-def do_exit():
-    get_app().exit(result=False)
+
+# TODO: delete if no error 
+# def do_exit():
+#     get_app().exit(result=False)
 
 
 buffer_layout = Buffer() # TM/TC live feed buffer
@@ -72,13 +74,14 @@ def TC_send_handler():
 TC_selectable_list = SelectableList(values=TC_list, handler=TC_send_handler)
 
 
-
+configuration = 
 root_container = VSplit(
     [
         HSplit(
             [
                 Frame(title="Clear Watchdog", body=watchdog_radio),
                 Frame(title="TC List", body=TC_selectable_list),
+                Frame(title="Configuration", body=configuration)
             ],
             height=D(), width=30
         ),
