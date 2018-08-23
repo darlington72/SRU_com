@@ -14,7 +14,9 @@ pip install -r requirements.txt
 
 
 ## To launch the script : 
-*You need to activate the virtual environnement before*
+*(You need to activate the virtual environnement before)*
 ```
 python SRU_com.py
 ```
+
+
