@@ -433,10 +433,10 @@ class Box(object):
 
 
 class Checkbox(object):
-    def __init__(self, text=''):
+    def __init__(self, text='', checked=True):
         assert is_formatted_text(text)
 
-        self.checked = True
+        self.checked = checked
 
         kb = KeyBindings()
 

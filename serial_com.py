@@ -4,10 +4,9 @@ import sys
 import lib
 from prompt_toolkit.application.current import get_app
 from lib import BD
+import UI
 
-
-
-def serial_com_TM(ser, lock, buffer_layout, TM_window, verbose=False, loop_mode=False):
+def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
     with lock:
         buffer_layout.text = "Waiting for sync word..."
 
@@ -41,7 +40,7 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, verbose=False, loop_mode=
             frame_name = "Frame unrecognized"
             frame_data = False
 
-        if verbose:
+        if UI.verbose.checked:
             buffer_layout.text += lib.format_frame(
                 "".join(sync_word), format(data_lenght, "x"), tag, "".join(data), CRC, frame_name
             )
@@ -71,7 +70,7 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, verbose=False, loop_mode=
         sleep(0.01)
 
 
-def serial_com_TC(ser, lock, buffer_layout, watchdog_radio, verbose=False, loop_mode=False):
+def serial_com_TC(ser, lock, buffer_layout, watchdog_radio, loop_mode=False):
     if loop_mode:
         frame_to_be_sent = (    
             BD["01"]["header"]
@@ -94,7 +93,7 @@ def serial_com_TC(ser, lock, buffer_layout, watchdog_radio, verbose=False, loop_
 
             with lock:
                 ser.write(bytearray.fromhex(frame_to_be_sent))
-                if verbose:
+                if UI.verbose.checked:
                     buffer_layout.text += lib.format_frame(
                         BD["01"]["header"],
                         BD["01"]["length"],
@@ -111,7 +110,7 @@ def serial_com_TC(ser, lock, buffer_layout, watchdog_radio, verbose=False, loop_
         sleep(1)
 
 
-def send_TC(ser, lock, buffer_layout, TC_list, TM_window, verbose=False):
+def send_TC(ser, lock, buffer_layout, TC_list, TM_window):
     frame_to_be_sent = (    
             BD[TC_list.current_value]["header"]
             + BD[TC_list.current_value]["length"]
@@ -122,7 +121,7 @@ def send_TC(ser, lock, buffer_layout, TC_list, TM_window, verbose=False):
 
     with lock:  
         ser.write(bytearray.fromhex(frame_to_be_sent))
-        if verbose:
+        if UI.verbose.checked:
             buffer_layout.text += lib.format_frame(
                 BD[TC_list.current_value]["header"],
                 BD[TC_list.current_value]["length"],
@@ -138,9 +137,6 @@ def send_TC(ser, lock, buffer_layout, TC_list, TM_window, verbose=False):
 
         if not get_app().layout.has_focus(TM_window):
             buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
-
-
-
 
 
 
