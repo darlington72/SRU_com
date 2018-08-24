@@ -1,7 +1,7 @@
-{   
-    "00": {
+{
+    "TC-00": {
         "type": "TC",
-        "name": "TC REEBOT (without TM)",
+        "name": "REBOOT (no TM)",
         "with_TM": "False",
         "header": "1234",
         "length": "00",
@@ -9,10 +9,9 @@
         "data": "",
         "CRC": "7C"
     },
-
-    "81": {
+    "TC-81": {
         "type": "TC",
-        "name": "TC REBOOT (with TM)",
+        "name": "REBOOT (no TM)",
         "with_TM": "True",
         "header": "1234",
         "length": "00",
@@ -20,27 +19,56 @@
         "data": "",
         "CRC": "93"
     },
-
-    "80": {
+    "TM-80": {
         "type": "TM",
         "name": "TM REBOOT",
         "header": "1234",
         "length": "06",
         "tag": "80",
         "data": [
-            ["1", "SRU reboot counter"], 
-            ["1", "CPU reboot counter"], 
-            ["1", "Watchdog disarming key"], 
-            ["1", "App load status"], 
-            ["1", "MRAM app CRC"], 
-            ["1", "App CRC computed"]
+            [
+                "1",
+                "SRU reboot counter"
+            ],
+            [
+                "1",
+                "CPU reboot counter"
+            ],
+            [
+                "1",
+                "Watchdog disarming key"
+            ],
+            [
+                "1",
+                "App load status"
+            ],
+            [
+                "1",
+                "MRAM app CRC"
+            ],
+            [
+                "1",
+                "App CRC computed"
+            ]
         ],
         "CRC": ""
-    }, 
-
-    "01": {
+    },
+    "TM-85": {
+        "type": "TM",
+        "name": "TEST",
+        "header": "4312",
+        "length": "01",
+        "tag": "85",
+        "data": [
+            [
+                "1",
+                "Field #1"
+            ]
+        ]
+    },
+    "TC-01": {
         "type": "TC",
-        "name": "TC CLEAR_WDG without TM",
+        "name": "CLEAR_WDG (no TM)",
         "header": "1234",
         "length": "01",
         "tag": "01",

@@ -12,6 +12,7 @@ from prompt_toolkit.widgets import (
     VerticalLine,
     SelectableList,
     Checkbox,
+    Label,
 )
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
@@ -50,6 +51,7 @@ buffer_layout = Buffer_()  # TM/TC live feed buffer
 
 verbose = Checkbox(text="Verbose", checked=False)
 
+
 TM_window = Window(
     BufferControl(
         buffer=buffer_layout, focusable=True, input_processors=[FormatText()]
@@ -60,6 +62,8 @@ TM_window = Window(
 verticalline1 = VerticalLine()
 
 watchdog_radio = RadioList(values=[(False, "False"), (True, "True")])
+watchdog_cleared = Label(text="")
+
 
 style = Style.from_dict(
     {
@@ -69,6 +73,9 @@ style = Style.from_dict(
         "focused  button": "bg:#880000 #ffffff noinherit",
         "radiolist focused": "noreverse",
         "radiolist focused radio.selected": "reverse",
+        "tc": "fg:#ffaf5f",
+        "tm": "fg:#ffffb0",
+        "data": "skyblue",
     }
 )
 

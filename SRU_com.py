@@ -2,6 +2,7 @@ import threading
 import sys
 import argparse
 import serial
+import datetime
 
 # Prompt_toolkit
 from prompt_toolkit.application import Application
@@ -36,6 +37,7 @@ lock = threading.Lock()
 parser = argparse.ArgumentParser(description="SRU Com " + __version__, prog="SRU_com")
 parser.add_argument("-l", "--loop", action="store_true", help="Serial loop mode")
 parser.add_argument("--version", action="version", version="%(prog)s " + __version__)
+# parser.add_argument("-f", "--file", help="Write output to file", default="output")
 args = parser.parse_args()
 
 
@@ -61,6 +63,7 @@ root_container = VSplit(
                 Frame(title="Clear Watchdog", body=UI.watchdog_radio),
                 Frame(title="TC List", body=TC_selectable_list),
                 Frame(title="Configuration", body=UI.verbose),
+                UI.watchdog_cleared
             ],
             height=D(),
             width=30,
@@ -114,8 +117,8 @@ if __name__ == "__main__":
         sys.exit(0)
 
     thread1 = threading.Thread(
-        target=serial_com_TC,
-        args=(ser, lock, UI.buffer_layout, UI.watchdog_radio, args.loop),
+        target=serial_com_watchdog,
+        args=(ser, lock, UI.buffer_layout, UI.TM_window, UI.watchdog_radio, args.loop),
     )
     thread1.daemon = True
     thread1.start()
