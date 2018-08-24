@@ -8,6 +8,7 @@ import UI
 
 
 def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
+
     with lock:
         buffer_layout.text = "Waiting for sync word..."
 
@@ -20,12 +21,13 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
             first_byte = ser.read(1).hex()
             if first_byte in ("12", "43"):
                 second_byte = ser.read(1).hex()
-                if (first_byte == "12" and second_byte == "34") or (
-                    first_byte == "43" and second_byte == "21"
+                if (first_byte == "12" and (second_byte == "34" or second_byte="43")) or (
+                    first_byte == "43" and (second_byte == "21" or second_byte="12")
                 ):
                     break
 
-        buffer_layout.text += "<seagreen>found !</seagreen> \n"
+        buffer_layout.text += "found ! \n"
+        buffer_layout._set_cursor_position(len(buffer_layout.text))
 
         first_frame_data_lenght = int.from_bytes(ser.read(1), "big")
         ser.read(
@@ -33,6 +35,8 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
         )  # Let's read the first frame entirely, then we are properly synced
 
     while True:
+        buffer_feed = ""  # Line to be printed to TMTC feed
+
         # FIXME read(1) call, and when it succeeds use read(inWaiting())
         *sync_word, data_lenght = ser.read(3)
         # for no reason ser.read returns int here..
@@ -49,7 +53,7 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
             frame_data = False
 
         if UI.verbose.checked:
-            buffer_layout.text += lib.format_frame(
+            buffer_feed += lib.format_frame(
                 "".join(sync_word),
                 format(data_lenght, "x"),
                 tag,
@@ -58,24 +62,29 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
                 "<b>" + frame_name + "</b>",
             )
         else:
-            buffer_layout.text += frame_name
+            buffer_feed += frame_name
 
         if frame_data:
             pointer = 0
-            buffer_layout.text += " ("
+            buffer_feed += " ("
             for key, value in enumerate(frame_data):
                 if key != 0:
-                    buffer_layout.text += "|"
+                    buffer_feed += "|"
                 field_lenght = int(value[0])
                 field_name = value[1]
 
-                buffer_layout.text += (
-                    field_name + "=<skyblue>0x" + "".join(data[pointer : pointer + field_lenght]) + "</skyblue>"
+                buffer_feed += (
+                    field_name
+                    + "=<skyblue>0x"
+                    + "".join(data[pointer : pointer + field_lenght])
+                    + "</skyblue>"
                 )
                 pointer = pointer + field_lenght
-            buffer_layout.text += ")"
+            buffer_feed += ")"
 
-        buffer_layout.text += "\n"
+        buffer_feed += "\n"
+
+        buffer_layout.insert_line(buffer_feed)
 
         if not get_app().layout.has_focus(TM_window):
             buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
@@ -95,6 +104,8 @@ def serial_com_TC(ser, lock, buffer_layout, watchdog_radio, loop_mode=False):
         ser.write(bytearray.fromhex(frame_to_be_sent))
 
     while True:
+        buffer_feed = ""  # Line to be printed to TMTC feed
+
         if watchdog_radio.current_value:
             frame_to_be_sent = (
                 BD["01"]["header"]
@@ -107,7 +118,7 @@ def serial_com_TC(ser, lock, buffer_layout, watchdog_radio, loop_mode=False):
             with lock:
                 ser.write(bytearray.fromhex(frame_to_be_sent))
                 if UI.verbose.checked:
-                    buffer_layout.text += lib.format_frame(
+                    buffer_feed += lib.format_frame(
                         BD["01"]["header"],
                         BD["01"]["length"],
                         BD["01"]["tag"],
@@ -116,9 +127,10 @@ def serial_com_TC(ser, lock, buffer_layout, watchdog_radio, loop_mode=False):
                         BD["01"]["name"],
                     )
                 else:
-                    buffer_layout.text += BD["01"]["name"]
+                    buffer_feed += BD["01"]["name"]
 
-                buffer_layout.text += "\n"
+                buffer_feed += "\n"
+                buffer_layout.insert_line(buffer_feed)
 
         sleep(1)
 
@@ -134,8 +146,12 @@ def send_TC(ser, lock, buffer_layout, TC_list, TM_window):
 
     with lock:
         ser.write(bytearray.fromhex(frame_to_be_sent))
+
+        buffer_feed = ""  # Line to be printed to TMTC feed
+
+
         if UI.verbose.checked:
-            buffer_layout.text += lib.format_frame(
+            buffer_feed += lib.format_frame(
                 BD[TC_list.current_value]["header"],
                 BD[TC_list.current_value]["length"],
                 BD[TC_list.current_value]["tag"],
@@ -144,9 +160,11 @@ def send_TC(ser, lock, buffer_layout, TC_list, TM_window):
                 BD[TC_list.current_value]["name"],
             )
         else:
-            buffer_layout.text += BD[TC_list.current_value]["name"]
+            buffer_feed += BD[TC_list.current_value]["name"]
 
-        buffer_layout.text += "\n"
+        buffer_feed += "\n"
+
+        buffer_layout.insert_line(buffer_feed)
 
         if not get_app().layout.has_focus(TM_window):
             buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)

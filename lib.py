@@ -19,7 +19,7 @@ except FileNotFoundError:
 
 def format_frame(*frame):
     formatted_frame = " ".join(frame[:-1])
-    formatted_frame = f"{formatted_frame:30} {frame[-1]}"
+    formatted_frame = f"{formatted_frame:25} {frame[-1]}"
     return formatted_frame
 
 

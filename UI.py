@@ -19,6 +19,7 @@ from prompt_toolkit.layout.processors import Processor, Transformation
 from prompt_toolkit.formatted_text.base import to_formatted_text
 from prompt_toolkit.formatted_text.utils import fragment_list_to_text
 from prompt_toolkit import HTML
+import datetime
 
 
 class FormatText(Processor):
@@ -33,14 +34,27 @@ class FormatText(Processor):
         return Transformation(fragments)
 
 
+class Buffer_(Buffer):
+    def insert_line(self, data):
+        time_tag = (
+            "<grey>"
+            + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-4]
+            + "</grey>"
+        )
+        self.text += time_tag + ": " + data
+
+
 # UI
 
-buffer_layout = Buffer()  # TM/TC live feed buffer
+buffer_layout = Buffer_()  # TM/TC live feed buffer
 
 verbose = Checkbox(text="Verbose", checked=False)
 
 TM_window = Window(
-    BufferControl(buffer=buffer_layout, focusable=True, input_processors=[FormatText()])
+    BufferControl(
+        buffer=buffer_layout, focusable=True, input_processors=[FormatText()]
+    ),
+    wrap_lines=True,
 )
 
 verticalline1 = VerticalLine()
