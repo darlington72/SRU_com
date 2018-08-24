@@ -9,16 +9,6 @@
         "data": "",
         "CRC": "7C"
     },
-    "TC-81": {
-        "type": "TC",
-        "name": "REBOOT (no TM)",
-        "with_TM": "True",
-        "header": "1234",
-        "length": "00",
-        "tag": "80",
-        "data": "",
-        "CRC": "93"
-    },
     "TM-80": {
         "type": "TM",
         "name": "TM REBOOT",
@@ -72,7 +62,13 @@
         "header": "1234",
         "length": "01",
         "tag": "01",
-        "data": "63",
+        "data": [
+            [
+                "1",
+                "Name",
+                "63"
+            ]
+        ],
         "CRC": "A7"
     }
 }

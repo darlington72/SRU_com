@@ -23,25 +23,14 @@ from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
 
 # Custom lib
+import version
 import lib
 from lib import BD, conf
 from serial_com import *
 import UI
-
-__version__ = "1.0.0"
+from args import args
 
 lock = threading.Lock()
-
-
-# Args parser
-parser = argparse.ArgumentParser(description="SRU Com " + __version__, prog="SRU_com")
-parser.add_argument("-l", "--loop", action="store_true", help="Serial loop mode")
-parser.add_argument("--version", action="version", version="%(prog)s " + __version__)
-# parser.add_argument("-f", "--file", help="Write output to file", default="output")
-args = parser.parse_args()
-
-
-# UI
 
 
 # TC list and sending
@@ -63,7 +52,7 @@ root_container = VSplit(
                 Frame(title="Clear Watchdog", body=UI.watchdog_radio),
                 Frame(title="TC List", body=TC_selectable_list),
                 Frame(title="Configuration", body=UI.verbose),
-                UI.watchdog_cleared
+                UI.watchdog_cleared,
             ],
             height=D(),
             width=30,

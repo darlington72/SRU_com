@@ -62,7 +62,10 @@ TM_window = Window(
 verticalline1 = VerticalLine()
 
 watchdog_radio = RadioList(values=[(False, "False"), (True, "True")])
-watchdog_cleared = Label(text="")
+watchdog_cleared_buffer = Buffer()
+watchdog_cleared = Window(
+    BufferControl(buffer=watchdog_cleared_buffer, focusable=False)
+)
 
 
 style = Style.from_dict(
