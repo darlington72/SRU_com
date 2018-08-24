@@ -12,13 +12,7 @@ from prompt_toolkit.layout.containers import *
 from prompt_toolkit.layout.dimension import D
 from prompt_toolkit.layout.layout import Layout, Window
 from prompt_toolkit.styles import Style
-from prompt_toolkit.widgets import (
-    Frame,
-    RadioList,
-    VerticalLine,
-    SelectableList,
-    Checkbox,
-)
+from prompt_toolkit.widgets import Frame, RadioList, VerticalLine, SelectableList, Checkbox
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
 
@@ -102,7 +96,7 @@ if __name__ == "__main__":
     except serial.serialutil.SerialException as msg:
         print("Serial error. Please check connection:")
         print(msg)
-        print("Both modules usbserial and ftdi_sio should be load (modprobe xx)")
+        print("Both modules usbserial and ftdi_sio should be loaded (modprobe xx)")
         sys.exit(0)
 
     thread1 = threading.Thread(
@@ -113,8 +107,7 @@ if __name__ == "__main__":
     thread1.start()
 
     thread2 = threading.Thread(
-        target=serial_com_TM,
-        args=(ser, lock, UI.buffer_layout, UI.TM_window, args.loop),
+        target=serial_com_TM, args=(ser, lock, UI.buffer_layout, UI.TM_window, args.loop)
     )
     thread2.daemon = True
     thread2.start()
