@@ -56,19 +56,18 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
 
     first_frame = True
     sync_word = [first_byte, second_byte]
-    data_lenght = int.from_bytes(ser.read(1), 'big')
-
+    data_lenght = int.from_bytes(ser.read(1), "big")
 
     while True:
         buffer_feed = "<tm>TM</tm> - "  # Line to be printed to TMTC feed
 
         # FIXME: read(1) call, and when it succeeds use read(inWaiting())
-        
+
         if first_frame:
             first_frame = False
         else:
             *sync_word, data_lenght = ser.read(3)
-            # when using unpacking, ser.read return are cast to int 
+            # when using unpacking, ser.read return are cast to int
 
             sync_word = [format(_, "x") for _ in sync_word]
             # "HEX"
@@ -109,7 +108,7 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
                 buffer_feed += (
                     field_name
                     + "=<data>0x"
-                    + "".join(data[pointer : pointer + field_lenght])
+                    + "".join(data[pointer : pointer + field_lenght]).zfill(2)
                     + "</data>"
                 )
                 pointer = pointer + field_lenght
@@ -189,7 +188,9 @@ def send_TC(ser, lock, buffer_layout, TC_list, TM_window):
                 "<syncword>" + BD[TC_list.current_value]["header"] + "</syncword>",
                 "<datalen>" + BD[TC_list.current_value]["length"] + "</datalen>",
                 "<tag>" + BD[TC_list.current_value]["tag"] + "</tag>",
-                "<data>" + "".join([_[2] for _ in BD[TC_list.current_value]["data"]]) + "</data>",
+                "<data>"
+                + "".join([_[2] for _ in BD[TC_list.current_value]["data"]])
+                + "</data>",
                 "<crc>" + BD[TC_list.current_value]["CRC"] + "</crc>",
                 BD[TC_list.current_value]["name"],
             )
