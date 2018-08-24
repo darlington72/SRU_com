@@ -24,4 +24,10 @@ parser.add_argument(
     help="Set the watchdog to be cleared on startup",
 )
 parser.add_argument("-v", dest="verbose", action="store_true", help="Verbose mode")
+parser.add_argument(
+    "-t",
+    "--test",
+    action="store_true",
+    help="Start in test mode (serial loop simulation)",
+)
 args = parser.parse_args()

@@ -12,7 +12,13 @@ from prompt_toolkit.layout.containers import *
 from prompt_toolkit.layout.dimension import D
 from prompt_toolkit.layout.layout import Layout, Window
 from prompt_toolkit.styles import Style
-from prompt_toolkit.widgets import Frame, RadioList, VerticalLine, SelectableList, Checkbox
+from prompt_toolkit.widgets import (
+    Frame,
+    RadioList,
+    VerticalLine,
+    SelectableList,
+    Checkbox,
+)
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
 
@@ -91,30 +97,42 @@ if __name__ == "__main__":
     bindings.add("s-tab")(focus_previous)
 
     # Serial
-    try:
-        ser = serial.Serial("/dev/" + conf["COM"]["port"], conf["COM"]["baudrate"])
-    except serial.serialutil.SerialException as msg:
-        print("Serial error. Please check connection:")
-        print(msg)
-        print("Both modules usbserial and ftdi_sio should be loaded (modprobe xx)")
-        sys.exit(0)
 
-    thread1 = threading.Thread(
-        target=serial_com_watchdog,
-        args=(ser, lock, UI.buffer_layout, UI.TM_window, UI.watchdog_radio, args.loop),
-    )
-    thread1.daemon = True
-    thread1.start()
+    if args.test:
+        thread1 = threading.Thread(
+            target=lib.fill_buffer_debug, args=(UI.buffer_layout,)
+        )
+        thread1.daemon = True
+        thread1.start()
+    else:
+        try:
+            ser = serial.Serial("/dev/" + conf["COM"]["port"], conf["COM"]["baudrate"])
+        except serial.serialutil.SerialException as msg:
+            print("Serial error. Please check connection:")
+            print(msg)
+            print("Both modules usbserial and ftdi_sio should be loaded (modprobe xx)")
+            sys.exit(0)
 
-    thread2 = threading.Thread(
-        target=serial_com_TM, args=(ser, lock, UI.buffer_layout, UI.TM_window, args.loop)
-    )
-    thread2.daemon = True
-    thread2.start()
+        thread1 = threading.Thread(
+            target=serial_com_watchdog,
+            args=(
+                ser,
+                lock,
+                UI.buffer_layout,
+                UI.TM_window,
+                UI.watchdog_radio,
+                args.loop,
+            ),
+        )
+        thread1.daemon = True
+        thread1.start()
 
-    # thread1 = threading.Thread(target=lib.fill_buffer_debug, args=(UI.buffer_layout,))
-    # thread1.daemon = True
-    # thread1.start()
+        thread2 = threading.Thread(
+            target=serial_com_TM,
+            args=(ser, lock, UI.buffer_layout, UI.TM_window, args.loop),
+        )
+        thread2.daemon = True
+        thread2.start()
 
     run_app()
 
