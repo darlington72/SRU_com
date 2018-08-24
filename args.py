@@ -17,4 +17,11 @@ parser.add_argument(
     nargs="?",
     const="output",
 )
+parser.add_argument(
+    "-w",
+    "--watchdog",
+    action="store_true",
+    help="Set the watchdog to be cleared on startup",
+)
+parser.add_argument("-v", dest="verbose", action="store_true", help="Verbose mode")
 args = parser.parse_args()

@@ -49,18 +49,29 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
     buffer_layout.text += "found ! \n"
     buffer_layout._set_cursor_position(len(buffer_layout.text))
 
-    first_frame_data_lenght = int.from_bytes(ser.read(1), "big")
-    ser.read(
-        first_frame_data_lenght + 2
-    )  # Let's read the first frame entirely, then we are properly synced
+    # first_frame_data_lenght = int.from_bytes(ser.read(1), "big")
+    # ser.read(
+    #     first_frame_data_lenght + 2
+    # )  # Let's read the first frame entirely, then we are properly synced
+
+    first_frame = True
+    sync_word = [first_byte, second_byte]
+    data_lenght = int.from_bytes(ser.read(1), 'big')
+
 
     while True:
         buffer_feed = "<tm>TM</tm> - "  # Line to be printed to TMTC feed
 
-        # FIXME read(1) call, and when it succeeds use read(inWaiting())
-        *sync_word, data_lenght = ser.read(3)
-        # for no reason ser.read returns int here..
-        sync_word = [format(_, "x") for _ in sync_word]
+        # FIXME: read(1) call, and when it succeeds use read(inWaiting())
+        
+        if first_frame:
+            first_frame = False
+        else:
+            *sync_word, data_lenght = ser.read(3)
+            # when using unpacking, ser.read return are cast to int 
+
+            sync_word = [format(_, "x") for _ in sync_word]
+            # "HEX"
 
         tag, *data, CRC = [format(_, "x") for _ in ser.read(data_lenght + 2)]
 
@@ -76,11 +87,11 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
 
         if UI.verbose.checked:
             buffer_feed += lib.format_frame(
-                "".join(sync_word),
-                format(data_lenght, "x").zfill(2),
-                tag.zfill(2),
-                "".join(data),
-                CRC.zfill(2),
+                "<syncword>" + "".join(sync_word) + "</syncword>",
+                "<datalen>" + format(data_lenght, "x").zfill(2) + "</datalen>",
+                "<tag>" + tag.zfill(2) + "</tag>",
+                "<data>" + "".join(data) + "</data>",
+                "<crc>" + CRC.zfill(2) + "</crc>",
                 "<b>" + frame_name + "</b>",
             )
         else:
@@ -108,7 +119,12 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
 
         buffer_layout.insert_line(buffer_feed)
         write_to_file(
-            "".join(sync_word) + format(data_lenght, "x") + tag + "".join(data) + CRC + "\n"
+            "".join(sync_word)
+            + format(data_lenght, "x")
+            + tag
+            + "".join(data)
+            + CRC
+            + "\n"
         )
 
         if not get_app().layout.has_focus(TM_window):
@@ -125,7 +141,7 @@ def serial_com_watchdog(
             BD["TC-01"]["header"]
             + BD["TC-01"]["length"]
             + BD["TC-01"]["tag"]
-            + "".join([_[2] for _ in BD['TC-01']['data']])
+            + "".join([_[2] for _ in BD["TC-01"]["data"]])
             + BD["TC-01"]["CRC"]
         )
         ser.write(bytearray.fromhex(frame_to_be_sent))
@@ -138,7 +154,7 @@ def serial_com_watchdog(
                 BD["TC-01"]["header"]
                 + BD["TC-01"]["length"]
                 + BD["TC-01"]["tag"]
-                + "".join([_[2] for _ in BD['TC-01']['data']])
+                + "".join([_[2] for _ in BD["TC-01"]["data"]])
                 + BD["TC-01"]["CRC"]
             )
 
@@ -159,7 +175,7 @@ def send_TC(ser, lock, buffer_layout, TC_list, TM_window):
         BD[TC_list.current_value]["header"]
         + BD[TC_list.current_value]["length"]
         + BD[TC_list.current_value]["tag"]
-        + "".join([_[2] for _ in BD[TC_list.current_value]['data']])
+        + "".join([_[2] for _ in BD[TC_list.current_value]["data"]])
         + BD[TC_list.current_value]["CRC"]
     )
 
@@ -170,11 +186,11 @@ def send_TC(ser, lock, buffer_layout, TC_list, TM_window):
 
         if UI.verbose.checked:
             buffer_feed += lib.format_frame(
-                BD[TC_list.current_value]["header"],
-                BD[TC_list.current_value]["length"],
-                BD[TC_list.current_value]["tag"],
-                "".join([_[2] for _ in BD[TC_list.current_value]['data']]),
-                BD[TC_list.current_value]["CRC"],
+                "<syncword>" + BD[TC_list.current_value]["header"] + "</syncword>",
+                "<datalen>" + BD[TC_list.current_value]["length"] + "</datalen>",
+                "<tag>" + BD[TC_list.current_value]["tag"] + "</tag>",
+                "<data>" + "".join([_[2] for _ in BD[TC_list.current_value]["data"]]) + "</data>",
+                "<crc>" + BD[TC_list.current_value]["CRC"] + "</crc>",
                 BD[TC_list.current_value]["name"],
             )
         else:
@@ -183,9 +199,7 @@ def send_TC(ser, lock, buffer_layout, TC_list, TM_window):
         buffer_feed += "\n"
 
         buffer_layout.insert_line(buffer_feed)
-        write_to_file(
-            frame_to_be_sent + "\n"
-        )
+        write_to_file(frame_to_be_sent + "\n")
         if not get_app().layout.has_focus(TM_window):
             buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
 

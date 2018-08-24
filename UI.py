@@ -21,6 +21,7 @@ from prompt_toolkit.formatted_text.base import to_formatted_text
 from prompt_toolkit.formatted_text.utils import fragment_list_to_text
 from prompt_toolkit import HTML
 import datetime
+from args import args
 
 
 class FormatText(Processor):
@@ -45,11 +46,17 @@ class Buffer_(Buffer):
         self.text += time_tag + ": " + data
 
 
+class RadioList_(RadioList):
+    def set_value(self, index):
+        self._selected_index = index
+        self.current_value = self.values[self._selected_index][0]
+
+
 # UI
 
 buffer_layout = Buffer_()  # TM/TC live feed buffer
 
-verbose = Checkbox(text="Verbose", checked=False)
+verbose = Checkbox(text="Verbose", checked=args.verbose)
 
 
 TM_window = Window(
@@ -61,7 +68,10 @@ TM_window = Window(
 
 verticalline1 = VerticalLine()
 
-watchdog_radio = RadioList(values=[(False, "False"), (True, "True")])
+watchdog_radio = RadioList_(values=[(False, "False"), (True, "True")])
+if args.watchdog:
+    watchdog_radio.set_value(1)
+
 watchdog_cleared_buffer = Buffer()
 watchdog_cleared = Window(
     BufferControl(buffer=watchdog_cleared_buffer, focusable=False)
@@ -78,7 +88,11 @@ style = Style.from_dict(
         "radiolist focused radio.selected": "reverse",
         "tc": "fg:#ffaf5f",
         "tm": "fg:#ffffb0",
-        "data": "skyblue",
+        "syncword": "fg:#247ba0",
+        "datalen": "fg:#8ba6a9",
+        "tag": "fg:#a7cecb",
+        "data": "fg:#f3ffbd",
+        "crc": "fg:#247ba0",
     }
 )
 
