@@ -99,12 +99,9 @@ if __name__ == "__main__":
     # Serial
 
     if args.test:
-        thread1 = threading.Thread(
-            target=lib.fill_buffer_debug, args=(UI.buffer_layout,)
-        )
-        thread1.daemon = True
-        thread1.start()
+        ser = lib.SerialTest()
     else:
+
         try:
             ser = serial.Serial("/dev/" + conf["COM"]["port"], conf["COM"]["baudrate"])
         except serial.serialutil.SerialException as msg:
@@ -113,26 +110,19 @@ if __name__ == "__main__":
             print("Both modules usbserial and ftdi_sio should be loaded (modprobe xx)")
             sys.exit(0)
 
-        thread1 = threading.Thread(
-            target=serial_com_watchdog,
-            args=(
-                ser,
-                lock,
-                UI.buffer_layout,
-                UI.TM_window,
-                UI.watchdog_radio,
-                args.loop,
-            ),
-        )
-        thread1.daemon = True
-        thread1.start()
+    thread1 = threading.Thread(
+        target=serial_com_watchdog,
+        args=(ser, lock, UI.buffer_layout, UI.TM_window, UI.watchdog_radio, args.loop),
+    )
+    thread1.daemon = True
+    thread1.start()
 
-        thread2 = threading.Thread(
-            target=serial_com_TM,
-            args=(ser, lock, UI.buffer_layout, UI.TM_window, args.loop),
-        )
-        thread2.daemon = True
-        thread2.start()
+    thread2 = threading.Thread(
+        target=serial_com_TM,
+        args=(ser, lock, UI.buffer_layout, UI.TM_window, args.loop),
+    )
+    thread2.daemon = True
+    thread2.start()
 
     run_app()
 

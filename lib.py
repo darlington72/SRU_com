@@ -1,6 +1,7 @@
 from time import sleep
 import json
 import sys
+from queue import Queue
 
 try:
     conf_file = open("conf.json", "r")
@@ -27,3 +28,20 @@ def fill_buffer_debug(buffer):
     while True:
         buffer.text += "TM \n"
         sleep(1)
+
+
+class SerialTest:
+    def __init__(self):
+        self.buffer = Queue()
+
+    def write(self, data):
+        for i in data:
+            self.buffer.put(i)
+
+    def read(self, size=1):
+        data = bytearray()
+        for _ in range(size):
+            data += bytearray([self.buffer.get()])
+
+        return data
+
