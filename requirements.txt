@@ -13,3 +13,4 @@ PyYAML==3.13
 six==1.11.0
 wcwidth==0.1.7
 wrapt==1.10.11
+prompt-toolkit==2.0.4

@@ -24,21 +24,25 @@ def format_frame(*frame):
     return formatted_frame
 
 
-def fill_buffer_debug(buffer):
-    while True:
-        buffer.text += "TM \n"
-        sleep(1)
+class SerialTest(object):
+    """Replace Serial() for simulation purpose
+    
+    This class is meant to replace the Serial() class when the flag "-t" (--test) 
+    is used on startup. Every byte passed to the write method will be avalaible 
+    to be read by the read method. Just as if we looped TX on RX on a real serial 
+    link. 
 
+    It allows the software to be tested without the need of any hardware.
+    """
 
-class SerialTest:
     def __init__(self):
         self.buffer = Queue()
 
-    def write(self, data):
+    def write(self, data: bytearray):
         for i in data:
             self.buffer.put(i)
 
-    def read(self, size=1):
+    def read(self, size=1) -> bytearray:
         data = bytearray()
         for _ in range(size):
             data += bytearray([self.buffer.get()])

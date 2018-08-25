@@ -4,7 +4,7 @@
 ```
 python3 -m venv .env
 source .env/bin/activate (on Unix) 
-.env/bin/activate.bat (on Windows) 
+.env/Scripts/activate.bat (on Windows) 
 ```
 
 #### Install the requirements 
