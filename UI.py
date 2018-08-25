@@ -38,6 +38,9 @@ class Buffer_(Buffer):
         # TODO: integrate cursor position
         # if not get_app().layout.has_focus(TM_window):
         #     buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
+        # app = get_app()
+
+        # focused_before = app.layout.current_window
 
 
 class RadioList_(RadioList):
