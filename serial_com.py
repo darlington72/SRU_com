@@ -3,9 +3,11 @@ import json
 import sys
 import lib
 from prompt_toolkit.application.current import get_app
+from prompt_toolkit.shortcuts import message_dialog
 from lib import BD
 import UI
 from args import args
+import bootloader_window
 
 # 43 21 Boot TC
 # 43 12 Boot TM
@@ -28,8 +30,8 @@ def write_to_file(line):
 
 def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
 
-    # with lock:
-    buffer_layout.text = "Waiting for sync word..."
+    # Looking for sync word
+    buffer_layout.text = "Waiting for sync word...\n"
 
     if loop_mode:
         sleep(0.5)
@@ -45,13 +47,7 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
                 break
         sleep(0.1)  # To be able to catch exit call
 
-    buffer_layout.text += "found ! \n"
     buffer_layout._set_cursor_position(len(buffer_layout.text))
-
-    # first_frame_data_lenght = int.from_bytes(ser.read(1), "big")
-    # ser.read(
-    #     first_frame_data_lenght + 2
-    # )  # Let's read the first frame entirely, then we are properly synced
 
     first_frame = True
     sync_word = [first_byte, second_byte]
@@ -95,6 +91,7 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
         else:
             buffer_feed += HEADER_FROM[sync_word[0]] + " - " + frame_name
 
+        # Let's print the frame's data if any
         if frame_data:
             pointer = 0
             buffer_feed += " ("
@@ -202,3 +199,7 @@ def send_TC(ser, lock, buffer_layout, TC_list, TM_window):
         write_to_file(frame_to_be_sent + "\n")
         if not get_app().layout.has_focus(TM_window):
             buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
+
+        if BD[TC_list.current_value]["name"] == "bootloader":
+            bootloader_window.do_about()
+
