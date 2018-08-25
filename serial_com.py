@@ -32,9 +32,8 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
     buffer_layout.text = "Waiting for sync word..."
 
     if loop_mode:
-        sleep(
-            0.5
-        )  # In loop mode, we give a chance to serial_com_TC to send out one frame before looking for sync word.
+        sleep(0.5)
+        # In loop mode, we give a chance to serial_com_TC to send out one frame before looking for sync word.
 
     while True:
         first_byte = ser.read(1).hex()
@@ -67,7 +66,7 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
             first_frame = False
         else:
             *sync_word, data_lenght = ser.read(3)
-            # when using unpacking, ser.read return are cast to int
+            # when unpacking, ser.read return are cast to int
 
             sync_word = [format(_, "x") for _ in sync_word]
             # "HEX"
@@ -203,4 +202,3 @@ def send_TC(ser, lock, buffer_layout, TC_list, TM_window):
         write_to_file(frame_to_be_sent + "\n")
         if not get_app().layout.has_focus(TM_window):
             buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
-

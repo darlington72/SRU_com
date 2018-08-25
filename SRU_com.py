@@ -20,7 +20,7 @@ from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
 import version
 import lib
 from lib import BD, conf
-from serial_com import *
+from serial_com import send_TC, serial_com_TM, serial_com_watchdog
 import UI
 from args import args
 
@@ -124,4 +124,3 @@ if __name__ == "__main__":
     thread2.start()
 
     run_app()
-
