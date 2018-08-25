@@ -35,6 +35,10 @@ class Buffer_(Buffer):
         )
         self.text += time_tag + ": " + data
 
+        # TODO: integrate cursor position
+        # if not get_app().layout.has_focus(TM_window):
+        #     buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
+
 
 class RadioList_(RadioList):
     def set_value(self, index):
@@ -132,28 +136,21 @@ class SelectableList(object):
 # UI
 
 buffer_layout = Buffer_()  # TM/TC live feed buffer
-
 verbose = Checkbox_(text="Verbose", checked=args.verbose)
-
-
 TM_window = Window(
     BufferControl(
         buffer=buffer_layout, focusable=True, input_processors=[FormatText()]
     ),
     wrap_lines=True,
 )
-
 verticalline1 = VerticalLine()
-
 watchdog_radio = RadioList_(values=[(False, "False"), (True, "True")])
 if args.watchdog:
     watchdog_radio.set_value(1)
-
 watchdog_cleared_buffer = Buffer()
 watchdog_cleared = Window(
     BufferControl(buffer=watchdog_cleared_buffer, focusable=False)
 )
-
 
 style = Style.from_dict(
     {
