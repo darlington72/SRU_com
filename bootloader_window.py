@@ -26,6 +26,7 @@ class TextInputDialog(object):
     def __init__(self, title="", label_text="", completer=None):
         self.future = Future()
 
+        # FIXME: check next version of prompt toolkit
         def accept_text(buf):
             get_app().layout.focus(ok_button)
             buf.complete_state = None
@@ -62,8 +63,8 @@ def do_open_file(root_container):
     def coroutine():
         global current_path
         open_dialog = TextInputDialog(
-            title="Open file",
-            label_text="Enter the path of a file:",
+            title="Application Upload to SRU",
+            label_text="Enter the path of the file:",
             completer=PathCompleter(),
         )
 
