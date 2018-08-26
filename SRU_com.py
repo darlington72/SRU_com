@@ -65,7 +65,13 @@ root_container = FloatContainer(
             UI.TM_window,
         ]
     ),
-    floats=[Float(xcursor=True, ycursor=True, content=test)],
+    floats=[
+        Float(
+            xcursor=True,
+            ycursor=True,
+            content=CompletionsMenu(max_height=16, scroll_offset=1),
+        )
+    ],
 )
 
 
