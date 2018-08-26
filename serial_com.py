@@ -165,7 +165,7 @@ def serial_com_watchdog(
             sleep(1)
 
 
-def send_TC(ser, lock, buffer_layout, TC_list, TM_window):
+def send_TC(ser, lock, buffer_layout, TC_list, TM_window, root_container):
     frame_to_be_sent = (
         BD[TC_list.current_value]["header"]
         + BD[TC_list.current_value]["length"]
@@ -201,5 +201,5 @@ def send_TC(ser, lock, buffer_layout, TC_list, TM_window):
             buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
 
         if BD[TC_list.current_value]["name"] == "bootloader":
-            bootloader_window.do_about()
+            bootloader_window.do_open_file(root_container)
 

@@ -26,9 +26,9 @@ class TextInputDialog(object):
     def __init__(self, title="", label_text="", completer=None):
         self.future = Future()
 
-        def accept_text(buf):
+        def accept_text():
             get_app().layout.focus(ok_button)
-            buf.complete_state = None
+            # buf.complete_state = None
 
         def accept():
             self.future.set_result(self.text_area.text)
@@ -58,7 +58,7 @@ class TextInputDialog(object):
         return self.dialog
 
 
-def do_open_file():
+def do_open_file(root_container):
     def coroutine():
         global current_path
         open_dialog = TextInputDialog(
@@ -67,23 +67,19 @@ def do_open_file():
             completer=PathCompleter(),
         )
 
-        path = yield From(show_dialog_as_float(open_dialog))
+        path = yield From(show_dialog_as_float(open_dialog, root_container))
         current_path = path
 
-        # if path is not None:
-        #     try:
-        #         with open(path, "rb") as f:
-        #             text_field.text = f.read().decode("utf-8", errors="ignore")
-        #     except IOError as e:
-        #         show_message("Error", "{}".format(e))
+        if path is not None:
+            pass
 
     ensure_future(coroutine())
 
 
-def show_dialog_as_float(dialog):
+def show_dialog_as_float(dialog, root_container):
     " Coroutine. "
     float_ = Float(content=dialog)
-    # root_container.floats.insert(0, float_)
+    root_container.floats.insert(0, float_)
 
     app = get_app()
 
@@ -91,21 +87,22 @@ def show_dialog_as_float(dialog):
     app.layout.focus(dialog)
     result = yield dialog.future
     app.layout.focus(focused_before)
-
-    # if float_ in root_container.floats:
-    #     root_container.floats.remove(float_)
+    if float_ in root_container.floats:
+        root_container.floats.remove(float_)
 
     raise Return(result)
 
 
-def do_about():
-    show_message("About", "Text editor demo.\nCreated by Jonathan Slenders.")
+def do_about(root_container):
+    show_message(
+        "About", "Text editor demo.\nCreated by Jonathan Slenders.", root_container
+    )
 
 
-def show_message(title, text):
+def show_message(title, text, root_container):
     def coroutine():
         dialog = MessageDialog(title, text)
-        yield From(show_dialog_as_float(dialog))
+        yield From(show_dialog_as_float(dialog, root_container))
 
     ensure_future(coroutine())
 

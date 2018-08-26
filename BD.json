@@ -70,5 +70,20 @@
             ]
         ],
         "CRC": "A7"
+    },
+    "TC-02": {
+        "type": "TC",
+        "name": "bootloader",
+        "header": "1234",
+        "length": "01",
+        "tag": "01",
+        "data": [
+            [
+                "1",
+                "Name",
+                "63"
+            ]
+        ],
+        "CRC": "A7"
     }
 }
