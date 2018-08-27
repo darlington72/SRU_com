@@ -207,25 +207,27 @@ def send_TC(ser, lock, buffer_layout, TC_list, TM_window, root_container):
 
 def upload_app(ser, lock, data, root_container):
     data = data.decode()
-    info_message = bootloader_window.InfoDialog("Upload in progress..", "test", root_container)
+    # info_message = bootloader_window.InfoDialog("Upload in progress..", "test", root_container)
 
-    sleep(5)
-    info_message.remove_dialog_as_float(root_container)
-    info_message2 = bootloader_window.InfoDialog("Upload in progress..", "test 2", root_container)
+    # sleep(5)
+    # info_message.remove_dialog_as_float(root_container)
+    # info_message2 = bootloader_window.InfoDialog("Upload in progress..", "test 2", root_container)
     # info_message = bootloader_window.InfoDialog("Upload in progress..", data, root_container)
     # bootloader_window.show_message('Test', 'test', root_container, button=True)
 
-    # with lock:
-    #     data = data.split('\n')
-    #     for line in data:
-    #         if line[0] == ':':
-    #             for char in line:
-    #                 ser.write(ord(char))
-    #                 sleep(conf['hex_upload']['delay_inter_char'])
+    with lock:
+        data = data.split('\n')
+        for line in data:
+            if line[0] == ':':
+                for char in line:
+                    ser.write(ord(char))
+                    sleep(conf['hex_upload']['delay_inter_char'])
                 
-    #             sleep(conf['hex_upload']['delay_inter_line'])
+                sleep(conf['hex_upload']['delay_inter_line'])
+
+
     # sleep(1)
     # info_message.remove_dialog_as_float(root_container)
 
-    # bootloader_window.show_message("Application Upload to SRU", "Upload done.", root_container)
+    bootloader_window.show_message("Application Upload to SRU", "Upload done.", root_container)
 
