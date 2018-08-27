@@ -287,7 +287,7 @@
     "TM-85": {
         "type": "TM",
         "name": "READ MRAM",
-        "header": "1234",
+        "header": "1243",
         "length": "03",
         "tag": "85",
         "data": [
@@ -534,15 +534,9 @@
         "name": "bootloader",
         "bootloader": "True",
         "header": "1234",
-        "length": "03",
+        "length": "00",
         "tag": "20",
-        "data": [
-            [
-                "",
-                "",
-                ""
-            ]
-        ],
+        "data": "",
         "CRC": "85"
     }
 }
