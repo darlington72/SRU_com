@@ -528,5 +528,21 @@
             ]
         ],
         "CRC": "6C"
+    },
+    "TC-20": {
+        "type": "TC",
+        "name": "bootloader",
+        "bootloader": "True",
+        "header": "1234",
+        "length": "03",
+        "tag": "20",
+        "data": [
+            [
+                "",
+                "",
+                ""
+            ]
+        ],
+        "CRC": "85"
     }
 }
