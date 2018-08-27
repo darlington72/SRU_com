@@ -4,7 +4,7 @@ import sys
 import lib
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit.shortcuts import message_dialog
-from lib import BD
+from lib import BD, conf
 import UI
 from args import args
 import bootloader_window
@@ -101,6 +101,7 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
                 field_lenght = int(value[0])
                 field_name = value[1]
 
+                # FIXME: zfill modulo 2 
                 buffer_feed += (
                     field_name
                     + "=<data>0x"
@@ -200,6 +201,31 @@ def send_TC(ser, lock, buffer_layout, TC_list, TM_window, root_container):
         if not get_app().layout.has_focus(TM_window):
             buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
 
-        if BD[TC_list.current_value]["name"] == "bootloader":
-            bootloader_window.do_open_file(root_container)
+    if BD[TC_list.current_value]["name"] == "bootloader":
+        bootloader_window.do_open_file(ser, lock, root_container)
+
+
+def upload_app(ser, lock, data, root_container):
+    data = data.decode()
+    info_message = bootloader_window.InfoDialog("Upload in progress..", "test", root_container)
+
+    sleep(5)
+    info_message.remove_dialog_as_float(root_container)
+    info_message2 = bootloader_window.InfoDialog("Upload in progress..", "test 2", root_container)
+    # info_message = bootloader_window.InfoDialog("Upload in progress..", data, root_container)
+    # bootloader_window.show_message('Test', 'test', root_container, button=True)
+
+    # with lock:
+    #     data = data.split('\n')
+    #     for line in data:
+    #         if line[0] == ':':
+    #             for char in line:
+    #                 ser.write(ord(char))
+    #                 sleep(conf['hex_upload']['delay_inter_char'])
+                
+    #             sleep(conf['hex_upload']['delay_inter_line'])
+    # sleep(1)
+    # info_message.remove_dialog_as_float(root_container)
+
+    # bootloader_window.show_message("Application Upload to SRU", "Upload done.", root_container)
 

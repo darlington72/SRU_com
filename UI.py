@@ -5,7 +5,7 @@ from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
 from prompt_toolkit.layout.dimension import D
 from prompt_toolkit.layout.layout import Layout, Window
 from prompt_toolkit.styles import Style
-from prompt_toolkit.widgets import Frame, RadioList, VerticalLine, Checkbox, Label
+from prompt_toolkit.widgets import Frame, RadioList, VerticalLine, Checkbox, Label, TextArea
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
 from prompt_toolkit.layout.processors import Processor, Transformation
@@ -13,6 +13,11 @@ from prompt_toolkit.formatted_text.base import to_formatted_text
 from prompt_toolkit.formatted_text.utils import fragment_list_to_text
 from prompt_toolkit.layout.margins import ScrollbarMargin, NumberedMargin
 from prompt_toolkit import HTML
+from prompt_toolkit.document import Document
+from prompt_toolkit.widgets.toolbars import SearchToolbar
+from prompt_toolkit.layout.processors import PasswordProcessor, ConditionalProcessor, BeforeInput
+from prompt_toolkit.filters import to_filter, Condition
+import six
 import datetime
 from args import args
 
@@ -46,6 +51,85 @@ class Checkbox_(Checkbox):
     def __init__(self, text="", checked=True):
         super().__init__(text)
         self.checked = checked
+
+
+class TextArea_(TextArea):
+    def __init__(self, text='', multiline=True, password=False,
+    lexer=None, completer=None, accept_handler=None,
+    focusable=True, wrap_lines=True, read_only=False,
+    width=None, height=None,
+    dont_extend_height=False, dont_extend_width=False,
+    line_numbers=False, scrollbar=False, style='',
+    search_field=None, preview_search=True,
+    prompt=''):
+
+        super().__init__(text='', multiline=True, password=False,
+        lexer=None, completer=None, accept_handler=None,
+        focusable=True, wrap_lines=True, read_only=False,
+        width=None, height=None,
+        dont_extend_height=False, dont_extend_width=False,
+        line_numbers=False, scrollbar=False, style='',
+        search_field=None, preview_search=True,
+        prompt='')
+
+        assert isinstance(text, six.text_type)
+        assert search_field is None or isinstance(search_field, SearchToolbar)
+
+        if search_field is None:
+            search_control = None
+        elif isinstance(search_field, SearchToolbar):
+            search_control = search_field.control
+
+        self.buffer = Buffer(
+            document=Document(text, 0),
+            multiline=multiline,
+            read_only=read_only,
+            completer=completer,
+            complete_while_typing=True,
+            accept_handler=(lambda buff: accept_handler(buff)) if accept_handler else None)
+
+        self.control = BufferControl(
+            buffer=self.buffer,
+            lexer=lexer,
+            input_processors=[
+                ConditionalProcessor(
+                    processor=PasswordProcessor(),
+                    filter=to_filter(password)
+                ),
+                BeforeInput(prompt, style='class:text-area.prompt'),
+            ],
+            search_buffer_control=search_control,
+            preview_search=preview_search,
+            focusable=focusable)
+
+        if multiline:
+            if scrollbar:
+                right_margins = [ScrollbarMargin(display_arrows=True)]
+            else:
+                right_margins = []
+            if line_numbers:
+                left_margins = [NumberedMargin()]
+            else:
+                left_margins = []
+        else:
+            wrap_lines = False  # Never wrap for single line input.
+            height = D.exact(1)
+            left_margins = []
+            right_margins = []
+
+        style = 'class:text-area ' + style
+
+        self.window = Window(
+            height=height,
+            width=width,
+            dont_extend_height=dont_extend_height,
+            dont_extend_width=dont_extend_width,
+            content=self.control,
+            style=style,
+            wrap_lines=wrap_lines,
+            left_margins=left_margins,
+            right_margins=right_margins)
+
 
 
 class SelectableList(object):
