@@ -101,11 +101,10 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
                 field_lenght = int(value[0])
                 field_name = value[1]
 
-                # FIXME: zfill modulo 2 
                 buffer_feed += (
                     field_name
                     + "=<data>0x"
-                    + "".join(data[pointer : pointer + field_lenght]).zfill(2)
+                    + "".join(data[pointer : pointer + field_lenght]).zfill(field_lenght * 2)
                     + "</data>"
                 )
                 pointer = pointer + field_lenght
