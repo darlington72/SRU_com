@@ -5,7 +5,7 @@
     },
     "debug": "True",
     "hex_upload": {
-        "delay_inter_char": 0.001,
-        "delay_inter_line": 0.010
+        "delay_inter_char": 0.000,
+        "delay_inter_line": 0.000
     }
 }

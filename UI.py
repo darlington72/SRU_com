@@ -23,9 +23,6 @@ from args import args
 
 
 class FormatText(Processor):
-    def __init__(self, char="*"):
-        self.char = char
-
     def apply_transformation(self, ti):
         fragments = to_formatted_text(HTML(fragment_list_to_text(ti.fragments)))
         return Transformation(fragments)

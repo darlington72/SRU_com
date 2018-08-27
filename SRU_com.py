@@ -28,6 +28,7 @@ from args import args
 """TODO:
 
 - Fix TC in sync
+- up to down in TC list
 """
 
 lock = threading.Lock()

@@ -69,7 +69,9 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
 
         tag, *data, CRC = [format(_, "x") for _ in ser.read(data_lenght + 2)]
 
-        tag = str(tag) if len(str(tag)) > 1 else "0" + str(tag)
+        tag = tag.zfill(2)
+
+
         try:
             frame_name = BD[HEADER_TYPE[sync_word[1]] + "-" + tag]["name"]
             frame_data = BD[HEADER_TYPE[sync_word[1]] + "-" + tag]["data"]
@@ -104,7 +106,9 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
                 buffer_feed += (
                     field_name
                     + "=<data>0x"
-                    + "".join(data[pointer : pointer + field_lenght]).zfill(field_lenght * 2)
+                    + "".join(data[pointer : pointer + field_lenght]).zfill(
+                        field_lenght * 2
+                    )
                     + "</data>"
                 )
                 pointer = pointer + field_lenght
@@ -212,21 +216,25 @@ def upload_app(ser, lock, data, root_container):
     # info_message.remove_dialog_as_float(root_container)
     # info_message2 = bootloader_window.InfoDialog("Upload in progress..", "test 2", root_container)
     # info_message = bootloader_window.InfoDialog("Upload in progress..", data, root_container)
-    # bootloader_window.show_message('Test', 'test', root_container, button=True)
+    # bootloader_window.show_message('Upload', data, root_container, button=True)
+
 
     with lock:
+        # ser.write(bytearray.fromhex("123403A4"))
+
         data = data.split('\n')
+
         for line in data:
             if line[0] == ':':
                 for char in line:
-                    ser.write(ord(char))
+                    ser.write(char.encode())
                     sleep(conf['hex_upload']['delay_inter_char'])
-                
+
                 sleep(conf['hex_upload']['delay_inter_line'])
 
+    # ser.write(bytearray.fromhex("FF"))
 
-    # sleep(1)
-    # info_message.remove_dialog_as_float(root_container)
-
-    bootloader_window.show_message("Application Upload to SRU", "Upload done.", root_container)
+    bootloader_window.show_message(
+        "Application Upload to SRU", "Upload done.", root_container
+    )
 
