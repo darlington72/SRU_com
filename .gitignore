@@ -12,6 +12,9 @@ dev/
 # C extensions
 *.so
 
+text-editor.py
+test_fullscreen.py
+
 # Distribution / packaging
 .Python
 build/
