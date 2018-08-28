@@ -71,7 +71,6 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
 
         tag = tag.zfill(2).upper()
 
-
         try:
             frame_name = BD[HEADER_TYPE[sync_word[1]] + "-" + tag]["name"]
             frame_data = BD[HEADER_TYPE[sync_word[1]] + "-" + tag]["data"]
@@ -218,19 +217,19 @@ def upload_app(ser, lock, data, root_container):
     # info_message = bootloader_window.InfoDialog("Upload in progress..", data, root_container)
     # bootloader_window.show_message('Upload', data, root_container, button=True)
 
-
     with lock:
         # ser.write(bytearray.fromhex("123403A4"))
 
-        data = data.split('\n')
+        data = data.split("\n")
 
         for line in data:
-            if line[0] == ':':
-                for char in line:
-                    ser.write(char.encode())
-                    sleep(conf['hex_upload']['delay_inter_char'])
+            if line:
+                if line[0] == ":":
+                    for char in line:
+                        ser.write(char.encode())
+                        sleep(conf["hex_upload"]["delay_inter_char"])
 
-                sleep(conf['hex_upload']['delay_inter_line'])
+                    sleep(conf["hex_upload"]["delay_inter_line"])
 
     # ser.write(bytearray.fromhex("FF"))
 
