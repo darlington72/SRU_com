@@ -8,13 +8,14 @@ import datetime
 from prompt_toolkit.application import Application
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
-from prompt_toolkit.layout.containers import HSplit, VSplit
+from prompt_toolkit.layout.containers import HSplit, VSplit, FloatContainer, Float
 from prompt_toolkit.layout.dimension import D
 from prompt_toolkit.layout.layout import Layout, Window
 from prompt_toolkit.styles import Style
 from prompt_toolkit.widgets import Frame, RadioList, VerticalLine, Checkbox
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
+from prompt_toolkit.layout.menus import CompletionsMenu
 
 # Custom lib
 import version
@@ -27,6 +28,7 @@ from args import args
 """TODO:
 
 - Fix TC in sync
+- up to down in TC list
 """
 
 lock = threading.Lock()
@@ -38,27 +40,39 @@ TC_selectable_list = []
 
 
 def TC_send_handler():
-    send_TC(ser, lock, UI.buffer_layout, TC_selectable_list, UI.TM_window)
+    send_TC(
+        ser, lock, UI.buffer_layout, TC_selectable_list, UI.TM_window, root_container
+    )
 
 
 TC_selectable_list = UI.SelectableList(values=TC_list, handler=TC_send_handler)
 
+test = Window()
 
-root_container = VSplit(
-    [
-        HSplit(
-            [
-                Frame(title="Clear Watchdog", body=UI.watchdog_radio),
-                Frame(title="TC List", body=TC_selectable_list),
-                Frame(title="Configuration", body=UI.verbose),
-                UI.watchdog_cleared,
-            ],
-            height=D(),
-            width=30,
-        ),
-        UI.verticalline1,
-        UI.TM_window,
-    ]
+root_container = FloatContainer(
+    content=VSplit(
+        [
+            HSplit(
+                [
+                    Frame(title="Clear Watchdog", body=UI.watchdog_radio),
+                    Frame(title="TC List", body=TC_selectable_list),
+                    Frame(title="Configuration", body=UI.verbose),
+                    UI.watchdog_cleared,
+                ],
+                height=D(),
+                width=30,
+            ),
+            UI.verticalline1,
+            UI.TM_window,
+        ]
+    ),
+    floats=[
+        Float(
+            xcursor=True,
+            ycursor=True,
+            content=CompletionsMenu(max_height=16, scroll_offset=1),
+        )
+    ],
 )
 
 
@@ -68,7 +82,7 @@ bindings = KeyBindings()
 
 @bindings.add("c-c", eager=True)
 @bindings.add("c-q", eager=True)
-@bindings.add("q", eager=True)
+# @bindings.add("q", eager=True)
 def _(event):
     event.app.exit()
 
@@ -111,7 +125,7 @@ if __name__ == "__main__":
 
     thread1 = threading.Thread(
         target=serial_com_watchdog,
-        args=(ser, lock, UI.buffer_layout, UI.TM_window, UI.watchdog_radio, args.loop),
+        args=(ser, lock, UI.buffer_layout, UI.TM_window, UI.watchdog_radio),
     )
     thread1.daemon = True
     thread1.start()

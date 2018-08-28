@@ -3,9 +3,11 @@ import json
 import sys
 import lib
 from prompt_toolkit.application.current import get_app
-from lib import BD
+from prompt_toolkit.shortcuts import message_dialog
+from lib import BD, conf
 import UI
 from args import args
+import bootloader_window
 
 # 43 21 Boot TC
 # 43 12 Boot TM
@@ -28,8 +30,8 @@ def write_to_file(line):
 
 def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
 
-    # with lock:
-    buffer_layout.text = "Waiting for sync word..."
+    # Looking for sync word
+    buffer_layout.text = "Waiting for sync word...\n"
 
     if loop_mode:
         sleep(0.5)
@@ -45,13 +47,7 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
                 break
         sleep(0.1)  # To be able to catch exit call
 
-    buffer_layout.text += "found ! \n"
     buffer_layout._set_cursor_position(len(buffer_layout.text))
-
-    # first_frame_data_lenght = int.from_bytes(ser.read(1), "big")
-    # ser.read(
-    #     first_frame_data_lenght + 2
-    # )  # Let's read the first frame entirely, then we are properly synced
 
     first_frame = True
     sync_word = [first_byte, second_byte]
@@ -73,7 +69,8 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
 
         tag, *data, CRC = [format(_, "x") for _ in ser.read(data_lenght + 2)]
 
-        tag = str(tag) if len(str(tag)) > 1 else "0" + str(tag)
+        tag = tag.zfill(2).upper()
+
         try:
             frame_name = BD[HEADER_TYPE[sync_word[1]] + "-" + tag]["name"]
             frame_data = BD[HEADER_TYPE[sync_word[1]] + "-" + tag]["data"]
@@ -95,6 +92,7 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
         else:
             buffer_feed += HEADER_FROM[sync_word[0]] + " - " + frame_name
 
+        # Let's print the frame's data if any
         if frame_data:
             pointer = 0
             buffer_feed += " ("
@@ -107,7 +105,9 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
                 buffer_feed += (
                     field_name
                     + "=<data>0x"
-                    + "".join(data[pointer : pointer + field_lenght]).zfill(2)
+                    + "".join(data[pointer : pointer + field_lenght]).zfill(
+                        field_lenght * 2
+                    )
                     + "</data>"
                 )
                 pointer = pointer + field_lenght
@@ -131,10 +131,8 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
         sleep(0.01)
 
 
-def serial_com_watchdog(
-    ser, lock, buffer_layout, TM_window, watchdog_radio, loop_mode=False
-):
-    if loop_mode:
+def serial_com_watchdog(ser, lock, buffer_layout, TM_window, watchdog_radio):
+    if args.loop:
         frame_to_be_sent = (
             BD["TC-01"]["header"]
             + BD["TC-01"]["length"]
@@ -168,7 +166,7 @@ def serial_com_watchdog(
             sleep(1)
 
 
-def send_TC(ser, lock, buffer_layout, TC_list, TM_window):
+def send_TC(ser, lock, buffer_layout, TC_list, TM_window, root_container):
     frame_to_be_sent = (
         BD[TC_list.current_value]["header"]
         + BD[TC_list.current_value]["length"]
@@ -202,3 +200,40 @@ def send_TC(ser, lock, buffer_layout, TC_list, TM_window):
         write_to_file(frame_to_be_sent + "\n")
         if not get_app().layout.has_focus(TM_window):
             buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
+
+    if BD[TC_list.current_value]["name"] == "bootloader":
+        bootloader_window.do_open_file(ser, lock, root_container)
+
+
+def upload_app(ser, lock, data, root_container):
+    data = data.decode()
+    # info_message = bootloader_window.InfoDialog("Upload in progress..", "test", root_container)
+
+    # sleep(5)
+    # info_message.remove_dialog_as_float(root_container)
+    # info_message2 = bootloader_window.InfoDialog("Upload in progress..", "test 2", root_container)
+    # info_message = bootloader_window.InfoDialog("Upload in progress..", data, root_container)
+    # bootloader_window.show_message('Upload', data, root_container, button=True)
+
+    # with lock:
+    if args.loop:
+        ser.write(bytearray.fromhex("123456A4"))
+
+    data = data.split("\n")
+
+    for line in data:
+        if line:
+            if line[0] == ":":
+                for char in line:
+                    ser.write(char.encode())
+                    sleep(conf["hex_upload"]["delay_inter_char"])
+
+                sleep(conf["hex_upload"]["delay_inter_line"])
+
+    if args.loop:
+        ser.write(bytearray.fromhex("FF"))
+
+    bootloader_window.show_message(
+        "Application Upload to SRU", "Upload done.", root_container
+    )
+

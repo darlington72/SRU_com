@@ -3,5 +3,9 @@
         "port": "ttyUSB0",
         "baudrate": "115200"
     },
-    "debug": "True"
+    "debug": "True",
+    "hex_upload": {
+        "delay_inter_char": 0.001,
+        "delay_inter_line": 0.005
+    }
 }
