@@ -1,7 +1,8 @@
 {
     "COM": {
         "port": "ttyUSB0",
-        "baudrate": "115200"
+        "baudrate": "115200",
+        "timeout": 0.020
     },
     "debug": "True",
     "hex_upload": {

@@ -5,7 +5,14 @@ from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
 from prompt_toolkit.layout.dimension import D
 from prompt_toolkit.layout.layout import Layout, Window
 from prompt_toolkit.styles import Style
-from prompt_toolkit.widgets import Frame, RadioList, VerticalLine, Checkbox, Label, TextArea
+from prompt_toolkit.widgets import (
+    Frame,
+    RadioList,
+    VerticalLine,
+    Checkbox,
+    Label,
+    TextArea,
+)
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
 from prompt_toolkit.layout.processors import Processor, Transformation
@@ -15,7 +22,11 @@ from prompt_toolkit.layout.margins import ScrollbarMargin, NumberedMargin
 from prompt_toolkit import HTML
 from prompt_toolkit.document import Document
 from prompt_toolkit.widgets.toolbars import SearchToolbar
-from prompt_toolkit.layout.processors import PasswordProcessor, ConditionalProcessor, BeforeInput
+from prompt_toolkit.layout.processors import (
+    PasswordProcessor,
+    ConditionalProcessor,
+    BeforeInput,
+)
 from prompt_toolkit.filters import to_filter, Condition
 import six
 import datetime
@@ -29,13 +40,17 @@ class FormatText(Processor):
 
 
 class Buffer_(Buffer):
-    def insert_line(self, data):
-        time_tag = (
-            "<grey>"
-            + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-4]
-            + "</grey>"
-        )
-        self.text += time_tag + ": " + data
+    def insert_line(self, data, with_time_tag=True):
+        if with_time_tag:
+            time_tag = (
+                "<grey>"
+                + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-4]
+                + "</grey>: "
+            )
+        else:
+            time_tag = ""
+
+        self.text += time_tag + data
 
         # TODO: integrate cursor position
         # if not get_app().layout.has_focus(TM_window):
@@ -58,23 +73,50 @@ class Checkbox_(Checkbox):
 
 
 class TextArea_(TextArea):
-    def __init__(self, text='', multiline=True, password=False,
-    lexer=None, completer=None, accept_handler=None,
-    focusable=True, wrap_lines=True, read_only=False,
-    width=None, height=None,
-    dont_extend_height=False, dont_extend_width=False,
-    line_numbers=False, scrollbar=False, style='',
-    search_field=None, preview_search=True,
-    prompt=''):
+    def __init__(
+        self,
+        text="",
+        multiline=True,
+        password=False,
+        lexer=None,
+        completer=None,
+        accept_handler=None,
+        focusable=True,
+        wrap_lines=True,
+        read_only=False,
+        width=None,
+        height=None,
+        dont_extend_height=False,
+        dont_extend_width=False,
+        line_numbers=False,
+        scrollbar=False,
+        style="",
+        search_field=None,
+        preview_search=True,
+        prompt="",
+    ):
 
-        super().__init__(text='', multiline=True, password=False,
-        lexer=None, completer=None, accept_handler=None,
-        focusable=True, wrap_lines=True, read_only=False,
-        width=None, height=None,
-        dont_extend_height=False, dont_extend_width=False,
-        line_numbers=False, scrollbar=False, style='',
-        search_field=None, preview_search=True,
-        prompt='')
+        super().__init__(
+            text="",
+            multiline=True,
+            password=False,
+            lexer=None,
+            completer=None,
+            accept_handler=None,
+            focusable=True,
+            wrap_lines=True,
+            read_only=False,
+            width=None,
+            height=None,
+            dont_extend_height=False,
+            dont_extend_width=False,
+            line_numbers=False,
+            scrollbar=False,
+            style="",
+            search_field=None,
+            preview_search=True,
+            prompt="",
+        )
 
         assert isinstance(text, six.text_type)
         assert search_field is None or isinstance(search_field, SearchToolbar)
@@ -90,21 +132,24 @@ class TextArea_(TextArea):
             read_only=read_only,
             completer=completer,
             complete_while_typing=True,
-            accept_handler=(lambda buff: accept_handler(buff)) if accept_handler else None)
+            accept_handler=(lambda buff: accept_handler(buff))
+            if accept_handler
+            else None,
+        )
 
         self.control = BufferControl(
             buffer=self.buffer,
             lexer=lexer,
             input_processors=[
                 ConditionalProcessor(
-                    processor=PasswordProcessor(),
-                    filter=to_filter(password)
+                    processor=PasswordProcessor(), filter=to_filter(password)
                 ),
-                BeforeInput(prompt, style='class:text-area.prompt'),
+                BeforeInput(prompt, style="class:text-area.prompt"),
             ],
             search_buffer_control=search_control,
             preview_search=preview_search,
-            focusable=focusable)
+            focusable=focusable,
+        )
 
         if multiline:
             if scrollbar:
@@ -121,7 +166,7 @@ class TextArea_(TextArea):
             left_margins = []
             right_margins = []
 
-        style = 'class:text-area ' + style
+        style = "class:text-area " + style
 
         self.window = Window(
             height=height,
@@ -132,8 +177,8 @@ class TextArea_(TextArea):
             style=style,
             wrap_lines=wrap_lines,
             left_margins=left_margins,
-            right_margins=right_margins)
-
+            right_margins=right_margins,
+        )
 
 
 class SelectableList(object):
@@ -251,5 +296,6 @@ style = Style.from_dict(
         "tag": "fg:#a7cecb",
         "data": "fg:#f3ffbd",
         "crc": "fg:#247ba0",
+        "error": "fg:#af4f54"
     }
 )

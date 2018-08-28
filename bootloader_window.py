@@ -64,7 +64,7 @@ class TextInputDialog(object):
         return self.dialog
 
 
-def do_open_file(ser, lock, root_container):
+def do_open_file(ser, root_container):
     def coroutine():
         open_dialog = TextInputDialog(
             title="Application Upload to SRU",
@@ -81,7 +81,7 @@ def do_open_file(ser, lock, root_container):
                     data = f.readall()
                     thread_upload = threading.Thread(
                         target=serial_com.upload_app,
-                        args=(ser, lock, data, root_container),
+                        args=(ser, data, root_container),
                     )
                     thread_upload.start()
             except IOError as e:

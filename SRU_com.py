@@ -123,10 +123,7 @@ if __name__ == "__main__":
             print("Both modules usbserial and ftdi_sio should be loaded (modprobe xx)")
             sys.exit(0)
 
-    thread1 = threading.Thread(
-        target=serial_com_watchdog,
-        args=(ser, lock, UI.buffer_layout, UI.TM_window, UI.watchdog_radio),
-    )
+    thread1 = threading.Thread(target=serial_com_watchdog, args=(ser, lock))
     thread1.daemon = True
     thread1.start()
 

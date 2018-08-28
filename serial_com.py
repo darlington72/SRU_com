@@ -1,5 +1,4 @@
-from time import sleep
-import json
+from time import sleep, time
 import sys
 import lib
 from prompt_toolkit.application.current import get_app
@@ -22,21 +21,20 @@ HEADER_FROM = HEADER_DEF[0]
 HEADER_TYPE = {**HEADER_DEF[1][0], **HEADER_DEF[1][1]}
 
 
-def write_to_file(line):
-    if args.file is not None:
-        with open(args.file + ".txt", mode="a") as file:
-            file.write(line)
+def look_for_sync_words(ser, first_frame, buffer_layout):
+    """
+    Blocking function that synchronise to the beginning
+    of a new frame
+    
+    Arguments:
+        ser -- serial handler
 
+    
+    Returns:
+        [first_byte, second_byte] -- sync words
+    """
 
-def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
-
-    # Looking for sync word
-    buffer_layout.text = "Waiting for sync word...\n"
-
-    if loop_mode:
-        sleep(0.5)
-        # In loop mode, we give a chance to serial_com_TC to send out one frame before looking for sync word.
-
+    # TODO: add error message is not first frame 
     while True:
         first_byte = ser.read(1).hex()
         if first_byte in HEADER_DEF[0].keys():
@@ -45,107 +43,136 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
                 HEADER_DEF[1][list(HEADER_DEF[0]).index(first_byte)]
             ):
                 break
-        sleep(0.1)  # To be able to catch exit call
+        else:
+            if not first_frame:
+                buffer_layout.insert_line('<error>Too many bytes received</error> \n')
 
-    buffer_layout._set_cursor_position(len(buffer_layout.text))
+    return first_byte, second_byte
+
+
+# FIXME: Move to lib.py
+def write_to_file(line):
+    if args.file is not None:
+        with open(args.file + ".txt", mode="a") as file:
+            file.write(line)
+
+
+def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
 
     first_frame = True
-    sync_word = [first_byte, second_byte]
-    data_lenght = int.from_bytes(ser.read(1), "big")
-
     while True:
+
+        # Looking for sync word
+
+        if first_frame:
+            buffer_layout.insert_line(
+                "<waiting_sync>Waiting for sync word...</waiting_sync>\n",
+                with_time_tag=False,
+            )
+            buffer_layout._set_cursor_position(len(buffer_layout.text))
+            
+    
+        sync_word = look_for_sync_words(ser, first_frame, buffer_layout)
+        first_frame = False
+
+        data_length = int.from_bytes(ser.read(1), "big")
+
         buffer_feed = "<tm>TM</tm> - "  # Line to be printed to TMTC feed
 
         # FIXME: read(1) call, and when it succeeds use read(inWaiting())
 
-        if first_frame:
-            first_frame = False
+        # We set the timeout for the frame 
+        ser.timeout = conf['COM']['timeout'] 
+
+        frame = ser.read(data_length + 2)
+
+        if len(frame) < data_length + 2:
+            # Timeout occurred
+
+            frame = "".join([format(_, "x") for _ in frame]) + "<error>"
+            frame = frame.ljust(((data_length + 2) * 2) + 7, "X")
+
+            buffer_feed += "<syncword>" + "".join(sync_word) + "</syncword>" +  "<datalen>" + format(data_length, "x").zfill(2) + "</datalen>"
+            buffer_feed += frame
+            buffer_feed += ' Timeout error.</error> '
+
+            buffer_layout.insert_line(buffer_feed)
+            first_frame = True 
+            
         else:
-            *sync_word, data_lenght = ser.read(3)
-            # when unpacking, ser.read return are cast to int
+            tag, *data, CRC = [format(_, "x") for _ in frame]
 
-            sync_word = [format(_, "x") for _ in sync_word]
-            # "HEX"
+            # We set back the timeout to none as next time we'll be looking for syncword
+            ser.timeout = None
 
-        tag, *data, CRC = [format(_, "x") for _ in ser.read(data_lenght + 2)]
+            tag = tag.zfill(2).upper()
 
-        tag = tag.zfill(2).upper()
-
-        try:
-            frame_name = BD[HEADER_TYPE[sync_word[1]] + "-" + tag]["name"]
-            frame_data = BD[HEADER_TYPE[sync_word[1]] + "-" + tag]["data"]
-        except KeyError:
-            frame_name = (
-                "<tan>Frame unrecognized: " + "".join(sync_word) + "-" + tag + "</tan>"
-            )
-            frame_data = False
-
-        if UI.verbose.checked:
-            buffer_feed += lib.format_frame(
-                "<syncword>" + "".join(sync_word) + "</syncword>",
-                "<datalen>" + format(data_lenght, "x").zfill(2) + "</datalen>",
-                "<tag>" + tag.zfill(2) + "</tag>",
-                "<data>" + "".join(data) + "</data>",
-                "<crc>" + CRC.zfill(2) + "</crc>",
-                "<b>" + frame_name + "</b>",
-            )
-        else:
-            buffer_feed += HEADER_FROM[sync_word[0]] + " - " + frame_name
-
-        # Let's print the frame's data if any
-        if frame_data:
-            pointer = 0
-            buffer_feed += " ("
-            for key, value in enumerate(frame_data):
-                if key != 0:
-                    buffer_feed += "|"
-                field_lenght = int(value[0])
-                field_name = value[1]
-
-                buffer_feed += (
-                    field_name
-                    + "=<data>0x"
-                    + "".join(data[pointer : pointer + field_lenght]).zfill(
-                        field_lenght * 2
-                    )
-                    + "</data>"
+            try:
+                frame_name = BD[HEADER_TYPE[sync_word[1]] + "-" + tag]["name"]
+                frame_data = BD[HEADER_TYPE[sync_word[1]] + "-" + tag]["data"]
+            except KeyError:
+                frame_name = (
+                    "<tan>Frame unrecognized: " + "".join(sync_word) + "-" + tag + "</tan>"
                 )
-                pointer = pointer + field_lenght
-            buffer_feed += ")"
+                frame_data = False
 
-        buffer_feed += "\n"
+            if UI.verbose.checked:
+                buffer_feed += lib.format_frame(
+                    "<syncword>" + "".join(sync_word) + "</syncword>",
+                    "<datalen>" + format(data_length, "x").zfill(2) + "</datalen>",
+                    "<tag>" + tag.zfill(2) + "</tag>",
+                    "<data>" + "".join(data) + "</data>",
+                    "<crc>" + CRC.zfill(2) + "</crc>",
+                    "<b>" + frame_name + "</b>",
+                )
+            else:
+                buffer_feed += HEADER_FROM[sync_word[0]] + " - " + frame_name
 
-        buffer_layout.insert_line(buffer_feed)
-        write_to_file(
-            "".join(sync_word)
-            + format(data_lenght, "x")
-            + tag
-            + "".join(data)
-            + CRC
-            + "\n"
-        )
+            # Let's print the frame's data if any
+            if frame_data:
+                pointer = 0
+                buffer_feed += " ("
+                for key, value in enumerate(frame_data):
+                    if key != 0:
+                        buffer_feed += "|"
+                    field_lenght = int(value[0])
+                    field_name = value[1]
 
-        if not get_app().layout.has_focus(TM_window):
-            buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
+                    buffer_feed += (
+                        field_name
+                        + "=<data>0x"
+                        + "".join(data[pointer : pointer + field_lenght]).zfill(
+                            field_lenght * 2
+                        )
+                        + "</data>"
+                    )
+                    pointer = pointer + field_lenght
+                buffer_feed += ")"
 
-        sleep(0.01)
+            buffer_feed += "\n"
+
+            buffer_layout.insert_line(buffer_feed)
+            write_to_file(
+                "".join(sync_word)
+                + format(data_length, "x")
+                + tag
+                + "".join(data)
+                + CRC
+                + "\n"
+            )
+
+            if not get_app().layout.has_focus(TM_window):
+                buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
+
+            sleep(0.01)
 
 
-def serial_com_watchdog(ser, lock, buffer_layout, TM_window, watchdog_radio):
-    if args.loop:
-        frame_to_be_sent = (
-            BD["TC-01"]["header"]
-            + BD["TC-01"]["length"]
-            + BD["TC-01"]["tag"]
-            + "".join([_[2] for _ in BD["TC-01"]["data"]])
-            + BD["TC-01"]["CRC"]
-        )
-        ser.write(bytearray.fromhex(frame_to_be_sent))
+def serial_com_watchdog(ser, lock):
 
     while True:
         # buffer_feed = "TC - "  # Line to be printed to TMTC feed
 
-        if watchdog_radio.current_value:
+        if UI.watchdog_radio.current_value:
             frame_to_be_sent = (
                 BD["TC-01"]["header"]
                 + BD["TC-01"]["length"]
@@ -158,9 +185,9 @@ def serial_com_watchdog(ser, lock, buffer_layout, TM_window, watchdog_radio):
                 ser.write(bytearray.fromhex(frame_to_be_sent))
 
             UI.watchdog_cleared_buffer.text = "      Watchdog Cleared"
-            sleep(1)
+            sleep(0.500)
             UI.watchdog_cleared_buffer.text = ""
-            sleep(1)
+            sleep(0.500)
 
         else:
             sleep(1)
@@ -202,10 +229,10 @@ def send_TC(ser, lock, buffer_layout, TC_list, TM_window, root_container):
             buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
 
     if BD[TC_list.current_value]["name"] == "bootloader":
-        bootloader_window.do_open_file(ser, lock, root_container)
+        bootloader_window.do_open_file(ser, root_container)
 
 
-def upload_app(ser, lock, data, root_container):
+def upload_app(ser, data, root_container):
     data = data.decode()
     # info_message = bootloader_window.InfoDialog("Upload in progress..", "test", root_container)
 
@@ -216,6 +243,12 @@ def upload_app(ser, lock, data, root_container):
     # bootloader_window.show_message('Upload', data, root_container, button=True)
 
     # with lock:
+
+    # Let's desactivate the watchdog if it's on
+    watchdog_value = UI.watchdog_radio.current_value
+    if watchdog_value:
+        UI.watchdog_radio.set_value(0)
+
     if args.loop:
         ser.write(bytearray.fromhex("123456A4"))
 
@@ -237,3 +270,6 @@ def upload_app(ser, lock, data, root_container):
         "Application Upload to SRU", "Upload done.", root_container
     )
 
+    # Let's turn the watchdog back on
+    if watchdog_value:
+        UI.watchdog_radio.set_value(1)

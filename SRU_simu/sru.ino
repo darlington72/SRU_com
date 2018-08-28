@@ -9,10 +9,10 @@ void setup()
 void loop()
 {
 
-  // byte message[] = {0x43, 0x12, 0x01, 0x85, 0xFF, 0xFF};
-  // Serial.write(message, sizeof(message));
-  // Serial.flush();
-  // delay(1000);
+  byte message[] = {0x43, 0x12, 0x10, 0x85, 0xFF};
+  Serial.write(message, sizeof(message));
+  Serial.flush();
+  delay(1000);
 
   byte message2[] = {0x12, 0x43, 0x03, 0x85, 0x00, 0xCA, 0xFE, 0x7B};
   Serial.write(message2, sizeof(message2));
