@@ -69,7 +69,7 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
 
         tag, *data, CRC = [format(_, "x") for _ in ser.read(data_lenght + 2)]
 
-        tag = tag.zfill(2)
+        tag = tag.zfill(2).upper()
 
 
         try:
