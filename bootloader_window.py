@@ -1,3 +1,6 @@
+import sys
+import threading
+
 from prompt_toolkit.application import Application
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
@@ -22,7 +25,6 @@ from prompt_toolkit.application.current import get_app
 from prompt_toolkit.eventloop import Future, ensure_future, Return, From
 from UI import TextArea_
 import serial_com
-import sys
 
 
 class TextInputDialog(object):
@@ -77,7 +79,11 @@ def do_open_file(ser, lock, root_container):
                 with open(path, "rb", buffering=0) as f:
                     # show_message("Ok", "It's ok", root_container)
                     data = f.readall()
-                    serial_com.upload_app(ser, lock, data, root_container)
+                    thread_upload = threading.Thread(
+                        target=serial_com.upload_app,
+                        args=(ser, lock, data, root_container),
+                    )
+                    thread_upload.start()
             except IOError as e:
                 show_message("Error", "{}".format(e), root_container)
 
@@ -120,7 +126,9 @@ class MessageDialog(object):
         def set_done():
             self.future.set_result(None)
 
-        ok_button = [Button(text="OK", handler=(lambda: set_done()))] if button else None
+        ok_button = (
+            [Button(text="OK", handler=(lambda: set_done()))] if button else None
+        )
 
         self.dialog = Dialog(
             title=title,
@@ -141,7 +149,7 @@ class InfoDialog(object):
         self.show_dialog_as_float(dialog, root_container)
 
         # ensure_future(coroutine())
-    
+
     def show_dialog_as_float(self, dialog, root_container):
         " Coroutine. "
         self.float_ = Float(content=dialog)
@@ -161,4 +169,3 @@ class InfoDialog(object):
     def remove_dialog_as_float(self, root_container):
         if self.float_ in root_container.floats:
             root_container.floats.remove(self.float_)
-    

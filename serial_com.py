@@ -134,6 +134,7 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
 def serial_com_watchdog(
     ser, lock, buffer_layout, TM_window, watchdog_radio, loop_mode=False
 ):
+    # FIXME: can now access args.loop directly
     if loop_mode:
         frame_to_be_sent = (
             BD["TC-01"]["header"]
@@ -217,21 +218,23 @@ def upload_app(ser, lock, data, root_container):
     # info_message = bootloader_window.InfoDialog("Upload in progress..", data, root_container)
     # bootloader_window.show_message('Upload', data, root_container, button=True)
 
-    with lock:
-        # ser.write(bytearray.fromhex("123403A4"))
+    # with lock:
+    if args.loop:
+        ser.write(bytearray.fromhex("123456A4"))
 
-        data = data.split("\n")
+    data = data.split("\n")
 
-        for line in data:
-            if line:
-                if line[0] == ":":
-                    for char in line:
-                        ser.write(char.encode())
-                        sleep(conf["hex_upload"]["delay_inter_char"])
+    for line in data:
+        if line:
+            if line[0] == ":":
+                for char in line:
+                    ser.write(char.encode())
+                    sleep(conf["hex_upload"]["delay_inter_char"])
 
-                    sleep(conf["hex_upload"]["delay_inter_line"])
+                sleep(conf["hex_upload"]["delay_inter_line"])
 
-    # ser.write(bytearray.fromhex("FF"))
+    if args.loop:
+        ser.write(bytearray.fromhex("FF"))
 
     bootloader_window.show_message(
         "Application Upload to SRU", "Upload done.", root_container
