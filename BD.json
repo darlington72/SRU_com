@@ -529,14 +529,14 @@
         ],
         "CRC": "6C"
     },
-    "TC-20": {
+    "TC-A4": {
         "type": "TC",
         "name": "bootloader",
         "bootloader": "True",
         "header": "1234",
         "length": "00",
-        "tag": "20",
+        "tag": "A4",
         "data": "",
-        "CRC": "85"
+        "CRC": "C9"
     }
 }
