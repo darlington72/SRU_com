@@ -9,6 +9,7 @@ from prompt_toolkit.widgets import (
     Frame,
     RadioList,
     VerticalLine,
+    HorizontalLine,
     Checkbox,
     Label,
     TextArea,
@@ -281,6 +282,10 @@ watchdog_cleared = Window(
     BufferControl(buffer=watchdog_cleared_buffer, focusable=False)
 )
 
+horizontal_line = HorizontalLine()
+raw_serial_buffer = Buffer_()
+raw_serial_window = Window(BufferControl(buffer=raw_serial_buffer, focusable=False, input_processors=[FormatText()]), height=10, wrap_lines=True)
+
 style = Style.from_dict(
     {
         "window.border": "#888888",
@@ -293,9 +298,9 @@ style = Style.from_dict(
         "tm": "fg:#ffffb0",
         "syncword": "fg:#247ba0",
         "datalen": "fg:#8ba6a9",
-        "tag": "fg:#a7cecb",
+        "tag": "fg:#a7cecb",    
         "data": "fg:#f3ffbd",
         "crc": "fg:#247ba0",
-        "error": "fg:#af4f54"
+        "error": "fg:#af4f54",
     }
 )

@@ -3,6 +3,7 @@ import sys
 import argparse
 import serial
 import datetime
+import binascii
 
 # Prompt_toolkit
 from prompt_toolkit.application import Application
@@ -47,8 +48,6 @@ def TC_send_handler():
 
 TC_selectable_list = UI.SelectableList(values=TC_list, handler=TC_send_handler)
 
-test = Window()
-
 root_container = FloatContainer(
     content=VSplit(
         [
@@ -63,7 +62,7 @@ root_container = FloatContainer(
                 width=30,
             ),
             UI.verticalline1,
-            UI.TM_window,
+            HSplit([UI.TM_window, UI.horizontal_line, UI.raw_serial_window]),
         ]
     ),
     floats=[
@@ -117,6 +116,33 @@ if __name__ == "__main__":
 
         try:
             ser = serial.Serial("/dev/" + conf["COM"]["port"], conf["COM"]["baudrate"])
+
+            def add_raw_to_window(func):
+                def wrapper(data):
+                    UI.raw_serial_buffer.text += (
+                        "<TC>" + binascii.hexlify(data).decode().upper() + "</TC>"
+                    )
+                    UI.raw_serial_buffer._set_cursor_position(len(UI.raw_serial_buffer.text) - 1)
+                    func(data)
+
+                return wrapper
+
+            def add_raw_TM_to_window(func):
+                def wrapper(data):
+
+                    read = func(data)
+
+                    UI.raw_serial_buffer.text += (
+                        "<TM>" + "".join([format(_, "x") for _ in read]).upper() + "</TM>"
+                    )
+                    UI.raw_serial_buffer._set_cursor_position(len(UI.raw_serial_buffer.text) - 1)
+                    
+                    return read
+
+                return wrapper
+
+            ser.write = add_raw_to_window(ser.write)
+            ser.read = add_raw_TM_to_window(ser.read)
         except serial.serialutil.SerialException as msg:
             print("Serial error. Please check connection:")
             print(msg)
