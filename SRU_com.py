@@ -125,7 +125,7 @@ if __name__ == "__main__":
 
     thread1 = threading.Thread(
         target=serial_com_watchdog,
-        args=(ser, lock, UI.buffer_layout, UI.TM_window, UI.watchdog_radio, args.loop),
+        args=(ser, lock, UI.buffer_layout, UI.TM_window, UI.watchdog_radio),
     )
     thread1.daemon = True
     thread1.start()

@@ -131,11 +131,8 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
         sleep(0.01)
 
 
-def serial_com_watchdog(
-    ser, lock, buffer_layout, TM_window, watchdog_radio, loop_mode=False
-):
-    # FIXME: can now access args.loop directly
-    if loop_mode:
+def serial_com_watchdog(ser, lock, buffer_layout, TM_window, watchdog_radio):
+    if args.loop:
         frame_to_be_sent = (
             BD["TC-01"]["header"]
             + BD["TC-01"]["length"]
