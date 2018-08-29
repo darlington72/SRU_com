@@ -233,7 +233,7 @@ def send_TC(ser, lock, TC_list, root_container):
                 "<data>"
                 + "".join([_[2] for _ in BD[TC_list.current_value]["data"]])
                 + "</data>",
-                "<crc>" + BD[TC_list.current_value]["CRC"] + "</crc>",
+                "<crc>" + frame_to_be_sent_str[:-2] + "</crc>",
                 BD[TC_list.current_value]["name"],
             )
         else:
@@ -250,15 +250,8 @@ def send_TC(ser, lock, TC_list, root_container):
 
 def upload_app(ser, data, root_container):
     data = data.decode()
-    # info_message = bootloader_window.InfoDialog("Upload in progress..", "test", root_container)
-
-    # sleep(5)
-    # info_message.remove_dialog_as_float(root_container)
-    # info_message2 = bootloader_window.InfoDialog("Upload in progress..", "test 2", root_container)
-    # info_message = bootloader_window.InfoDialog("Upload in progress..", data, root_container)
-    # bootloader_window.show_message('Upload', data, root_container, button=True)
-
-    # with lock:
+    info_message = bootloader_window.InfoDialog("Application Upload to SRU", "Upload in progress..", root_container)
+    get_app().invalidate()
 
     # Let's desactivate the watchdog if it's on
     watchdog_value = UI.watchdog_radio.current_value
@@ -282,6 +275,8 @@ def upload_app(ser, data, root_container):
     if args.loop:
         ser.write(bytearray.fromhex("FF"))
 
+    get_app().invalidate()
+    info_message.remove_dialog_as_float(root_container)
     get_app().invalidate()
     bootloader_window.show_message(
         "Application Upload to SRU", "Upload done.", root_container
