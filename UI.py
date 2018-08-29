@@ -203,11 +203,18 @@ class SelectableList(object):
 
         @kb.add("up")
         def _(event):
-            self._selected_index = max(0, self._selected_index - 1)
+            if self._selected_index == 0:
+                self._selected_index = len(self.values) - 1
+            else:
+                self._selected_index = self._selected_index - 1
+
 
         @kb.add("down")
         def _(event):
-            self._selected_index = min(len(self.values) - 1, self._selected_index + 1)
+            if self._selected_index == len(self.values) - 1:
+                self._selected_index = 0
+            else:
+                self._selected_index = self._selected_index + 1
 
         @kb.add("enter")
         @kb.add(" ")

@@ -27,10 +27,6 @@ from serial_com import send_TC, serial_com_TM, serial_com_watchdog
 import UI
 from args import args
 
-"""TODO:
-- up to down in TC list
-"""
-
 lock = threading.Lock()
 
 
