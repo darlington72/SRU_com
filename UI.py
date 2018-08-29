@@ -32,6 +32,7 @@ from prompt_toolkit.filters import to_filter, Condition
 import six
 import datetime
 from args import args
+from version import __version__
 
 
 class FormatText(Processor):
@@ -283,8 +284,13 @@ watchdog_cleared = Window(
 )
 
 horizontal_line = HorizontalLine()
-raw_serial_buffer = Buffer_()
-raw_serial_window = Window(BufferControl(buffer=raw_serial_buffer, focusable=False, input_processors=[FormatText()]), height=10, wrap_lines=True)
+credit = Label(text=f'   SRU_com - Version {__version__} \n      Author: L.Riviere \n  <laurent.riviere@cnes.fr> ')
+
+# raw_serial_buffer = Buffer_()
+# raw_serial_window = Window(BufferControl(buffer=raw_serial_buffer, focusable=False, input_processors=[FormatText()]), height=10, wrap_lines=True)
+
+raw_serial_buffer = FormattedTextControl(HTML(''), show_cursor=False)
+raw_serial_window = Window(content=raw_serial_buffer, height=10, wrap_lines=True)
 
 style = Style.from_dict(
     {

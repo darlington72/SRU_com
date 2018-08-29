@@ -2,9 +2,7 @@ from __future__ import unicode_literals
 import six
 import xml.dom.minidom as minidom
 
-__all__ = [
-    'HTML'
-]
+__all__ = ["HTML"]
 
 
 class HTML(object):
@@ -26,10 +24,11 @@ class HTML(object):
     E.g. ``<username>...</username>`` can be styled, by setting a style for
     ``username``.
     """
+
     def __init__(self, value):
         assert isinstance(value, six.text_type)
         self.value = value
-        document = minidom.parseString('<html-root>%s</html-root>' % (value, ))
+        document = minidom.parseString("<html-root>%s</html-root>" % (value,))
 
         result = []
         name_stack = []
@@ -40,13 +39,13 @@ class HTML(object):
             " Build style string for current node. "
             parts = []
             if name_stack:
-                parts.append('class:' + ','.join(name_stack))
+                parts.append("class:" + ",".join(name_stack))
 
             if fg_stack:
-                parts.append('fg:' + fg_stack[-1])
+                parts.append("fg:" + fg_stack[-1])
             if bg_stack:
-                parts.append('bg:' + bg_stack[-1])
-            return ' '.join(parts)
+                parts.append("bg:" + bg_stack[-1])
+            return " ".join(parts)
 
         def process_node(node):
             " Process node recursively. "
@@ -54,35 +53,50 @@ class HTML(object):
                 if child.nodeType == child.TEXT_NODE:
                     result.append((get_current_style(), child.data))
                 else:
-                    add_to_name_stack = child.nodeName not in ('#document', 'html-root', 'style')
-                    fg = bg = ''
+                    add_to_name_stack = child.nodeName not in (
+                        "#document",
+                        "html-root",
+                        "style",
+                    )
+                    fg = bg = ""
 
                     for k, v in child.attributes.items():
-                        if k == 'fg': fg = v
-                        if k == 'bg': bg = v
-                        if k == 'color': fg = v  # Alias for 'fg'.
+                        if k == "fg":
+                            fg = v
+                        if k == "bg":
+                            bg = v
+                        if k == "color":
+                            fg = v  # Alias for 'fg'.
 
                     # Check for spaces in attributes. This would result in
                     # invalid style strings otherwise.
-                    if ' ' in fg: raise ValueError('"fg" attribute contains a space.')
-                    if ' ' in bg: raise ValueError('"bg" attribute contains a space.')
+                    if " " in fg:
+                        raise ValueError('"fg" attribute contains a space.')
+                    if " " in bg:
+                        raise ValueError('"bg" attribute contains a space.')
 
-                    if add_to_name_stack: name_stack.append(child.nodeName)
-                    if fg: fg_stack.append(fg)
-                    if bg: bg_stack.append(bg)
+                    if add_to_name_stack:
+                        name_stack.append(child.nodeName)
+                    if fg:
+                        fg_stack.append(fg)
+                    if bg:
+                        bg_stack.append(bg)
 
                     process_node(child)
 
-                    if add_to_name_stack: name_stack.pop()
-                    if fg: fg_stack.pop()
-                    if bg: bg_stack.pop()
+                    if add_to_name_stack:
+                        name_stack.pop()
+                    if fg:
+                        fg_stack.pop()
+                    if bg:
+                        bg_stack.pop()
 
         process_node(document)
 
         self.formatted_text = result
 
     def __repr__(self):
-        return 'HTML(%r)' % (self.value, )
+        return "HTML(%r)" % (self.value,)
 
     def __pt_formatted_text__(self):
         return self.formatted_text
@@ -103,16 +117,35 @@ class HTML(object):
         HTML('<b>%s</b>') % value
         """
         if not isinstance(value, tuple):
-            value = (value, )
+            value = (value,)
 
         value = tuple(html_escape(i) for i in value)
         return HTML(self.value % value)
+
+    def __iadd__(self, html):
+        """
+        Allow to do HTML() + HTML()
+        """
+
+        return HTML(self.value + html.value)
+
+    def __add__(self, html):
+        """
+        Allow to do HTML() + HTML()
+        """
+
+        return HTML(self.value + html.value)
 
 
 def html_escape(text):
     # The string interpolation functions also take integers and other types.
     # Convert to string first.
     if not isinstance(text, six.text_type):
-        text = '{}'.format(text)
+        text = "{}".format(text)
 
-    return text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+    return (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )

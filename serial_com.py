@@ -71,7 +71,7 @@ def serial_com_TM(ser, lock):
                 with_time_tag=False,
             )
             if not get_app().layout.has_focus(UI.TM_window):
-                UI.buffer_layout._set_cursor_position(len(UI.buffer_layout.text) - 1)
+                UI.buffer_layout.cursor_position = len(UI.buffer_layout.text) - 1
             
     
         sync_word = look_for_sync_words(ser, first_frame)
@@ -164,7 +164,7 @@ def serial_com_TM(ser, lock):
             )
 
             if not get_app().layout.has_focus(UI.TM_window):
-                UI.buffer_layout._set_cursor_position(len(UI.buffer_layout.text) - 1)
+                UI.buffer_layout.cursor_position = len(UI.buffer_layout.text) - 1
 
         # sleep(0.5)
 
@@ -228,7 +228,7 @@ def send_TC(ser, lock, TC_list, root_container):
         UI.buffer_layout.insert_line(buffer_feed)
         write_to_file(frame_to_be_sent + "\n")
         if not get_app().layout.has_focus(UI.TM_window):
-            UI.buffer_layout._set_cursor_position(len(UI.buffer_layout.text) - 1)
+            UI.buffer_layout.cursor_position = len(UI.buffer_layout.text) - 1
 
     if BD[TC_list.current_value]["name"] == "bootloader":
         bootloader_window.do_open_file(ser, root_container)
