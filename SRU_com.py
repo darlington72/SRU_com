@@ -28,8 +28,6 @@ import UI
 from args import args
 
 """TODO:
-
-- Fix TC in sync
 - up to down in TC list
 """
 
@@ -171,11 +169,6 @@ if __name__ == "__main__":
                 )
                 UI.raw_serial_window.text_len += len(read_formatted)
             
-
-            # UI.raw_serial_buffer._set_cursor_position(
-            #     len(UI.raw_serial_buffer.text) - 1
-            # )
-
             return read
 
         return wrapper

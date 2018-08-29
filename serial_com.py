@@ -44,18 +44,14 @@ def look_for_sync_words(ser, first_frame):
                 break
         else:
             if not first_frame:
-                UI.buffer_layout.insert_line('<error>Too many bytes received</error> \n')
-        
+                UI.buffer_layout.insert_line(
+                    "<error>Too many bytes received</error> \n"
+                )
+
         # sleep(0.10)
 
     return first_byte, second_byte
 
-
-# FIXME: Move to lib.py
-def write_to_file(line):
-    if args.file is not None:
-        with open(args.file + ".txt", mode="a") as file:
-            file.write(line)
 
 
 def serial_com_TM(ser, lock):
@@ -72,8 +68,7 @@ def serial_com_TM(ser, lock):
             )
             if not get_app().layout.has_focus(UI.TM_window):
                 UI.buffer_layout.cursor_position = len(UI.buffer_layout.text) - 1
-            
-    
+
         sync_word = look_for_sync_words(ser, first_frame)
         first_frame = False
 
@@ -81,10 +76,8 @@ def serial_com_TM(ser, lock):
 
         buffer_feed = "<tm>TM</tm> - "  # Line to be printed to TMTC feed
 
-        # FIXME: read(1) call, and when it succeeds use read(inWaiting())
-
-        # We set the timeout for the frame 
-        ser.timeout = conf['COM']['timeout'] 
+        # We set the timeout for the frame
+        ser.timeout = conf["COM"]["timeout"]
 
         frame = ser.read(data_length + 2)
 
@@ -94,13 +87,20 @@ def serial_com_TM(ser, lock):
             frame = "".join([format(_, "x") for _ in frame]) + "<error>"
             frame = frame.ljust(((data_length + 2) * 2) + 7, "X")
 
-            buffer_feed += "<syncword>" + "".join(sync_word) + "</syncword>" +  "<datalen>" + format(data_length, "x").zfill(2) + "</datalen>"
+            buffer_feed += (
+                "<syncword>"
+                + "".join(sync_word)
+                + "</syncword>"
+                + "<datalen>"
+                + format(data_length, "x").zfill(2)
+                + "</datalen>"
+            )
             buffer_feed += frame
-            buffer_feed += ' Timeout error.</error> '
+            buffer_feed += " Timeout error.</error> "
 
             UI.buffer_layout.insert_line(buffer_feed)
-            first_frame = True 
-            
+            first_frame = True
+
         else:
             tag, *data, CRC = [format(_, "x") for _ in frame]
 
@@ -114,7 +114,11 @@ def serial_com_TM(ser, lock):
                 frame_data = BD[HEADER_TYPE[sync_word[1]] + "-" + tag]["data"]
             except KeyError:
                 frame_name = (
-                    "<tan>Frame unrecognized: " + "".join(sync_word) + "-" + tag + "</tan>"
+                    "<tan>Frame unrecognized: "
+                    + "".join(sync_word)
+                    + "-"
+                    + tag
+                    + "</tan>"
                 )
                 frame_data = False
 
@@ -154,7 +158,7 @@ def serial_com_TM(ser, lock):
             buffer_feed += "\n"
 
             UI.buffer_layout.insert_line(buffer_feed)
-            write_to_file(
+            lib.write_to_file(
                 "".join(sync_word)
                 + format(data_length, "x")
                 + tag
@@ -163,10 +167,6 @@ def serial_com_TM(ser, lock):
                 + "\n"
             )
 
-            if not get_app().layout.has_focus(UI.TM_window):
-                UI.buffer_layout.cursor_position = len(UI.buffer_layout.text) - 1
-
-        # sleep(0.5)
 
 
 def serial_com_watchdog(ser, lock):
@@ -226,9 +226,8 @@ def send_TC(ser, lock, TC_list, root_container):
         buffer_feed += "\n"
 
         UI.buffer_layout.insert_line(buffer_feed)
-        write_to_file(frame_to_be_sent + "\n")
-        if not get_app().layout.has_focus(UI.TM_window):
-            UI.buffer_layout.cursor_position = len(UI.buffer_layout.text) - 1
+        lib.write_to_file(frame_to_be_sent + "\n")
+
 
     if BD[TC_list.current_value]["name"] == "bootloader":
         bootloader_window.do_open_file(ser, root_container)
@@ -268,6 +267,7 @@ def upload_app(ser, data, root_container):
     if args.loop:
         ser.write(bytearray.fromhex("FF"))
 
+    get_app().invalidate()
     bootloader_window.show_message(
         "Application Upload to SRU", "Upload done.", root_container
     )

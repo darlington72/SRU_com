@@ -2,6 +2,7 @@ from time import sleep
 import json
 import sys
 from queue import Queue
+from args import args
 
 try:
     conf_file = open("conf.json", "r")
@@ -22,6 +23,12 @@ def format_frame(*frame):
     frame_hexa = "".join(frame[:-1])
     formatted_frame = f"{frame_hexa:95} {frame[-1]}"
     return formatted_frame
+
+
+def write_to_file(line):
+    if args.file is not None:
+        with open(args.file + ".txt", mode="a") as file:
+            file.write(line)
 
 
 class SerialTest(object):

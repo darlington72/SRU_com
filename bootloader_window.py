@@ -31,7 +31,6 @@ class TextInputDialog(object):
     def __init__(self, title="", label_text="", completer=None):
         self.future = Future()
 
-        # FIXME: check next version of prompt toolkit
         def accept_text(buf):
             get_app().layout.focus(ok_button)
             buf.complete_state = None

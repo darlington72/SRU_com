@@ -14,6 +14,7 @@ from prompt_toolkit.widgets import (
     Label,
     TextArea,
 )
+from prompt_toolkit.application import get_app
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
 from prompt_toolkit.layout.processors import Processor, Transformation
@@ -54,12 +55,9 @@ class Buffer_(Buffer):
 
         self.text += time_tag + data
 
-        # TODO: integrate cursor position
-        # if not get_app().layout.has_focus(TM_window):
-        #     buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
-        # app = get_app()
+        if not get_app().layout.has_focus(self):
+            buffer_layout.cursor_position = len(buffer_layout.text) - 1
 
-        # focused_before = app.layout.current_window
 
 
 class RadioList_(RadioList):
