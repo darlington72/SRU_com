@@ -21,7 +21,7 @@ HEADER_FROM = HEADER_DEF[0]
 HEADER_TYPE = {**HEADER_DEF[1][0], **HEADER_DEF[1][1]}
 
 
-def look_for_sync_words(ser, first_frame, buffer_layout):
+def look_for_sync_words(ser, first_frame):
     """
     Blocking function that synchronise to the beginning
     of a new frame
@@ -34,7 +34,6 @@ def look_for_sync_words(ser, first_frame, buffer_layout):
         [first_byte, second_byte] -- sync words
     """
 
-    # TODO: add error message is not first frame 
     while True:
         first_byte = ser.read(1).hex()
         if first_byte in HEADER_DEF[0].keys():
@@ -45,7 +44,9 @@ def look_for_sync_words(ser, first_frame, buffer_layout):
                 break
         else:
             if not first_frame:
-                buffer_layout.insert_line('<error>Too many bytes received</error> \n')
+                UI.buffer_layout.insert_line('<error>Too many bytes received</error> \n')
+        
+        # sleep(0.10)
 
     return first_byte, second_byte
 
@@ -57,7 +58,7 @@ def write_to_file(line):
             file.write(line)
 
 
-def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
+def serial_com_TM(ser, lock):
 
     first_frame = True
     while True:
@@ -65,15 +66,15 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
         # Looking for sync word
 
         if first_frame:
-            buffer_layout.insert_line(
+            UI.buffer_layout.insert_line(
                 "<waiting_sync>Waiting for sync word...</waiting_sync>\n",
                 with_time_tag=False,
             )
-            if not get_app().layout.has_focus(TM_window):
-                buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
+            if not get_app().layout.has_focus(UI.TM_window):
+                UI.buffer_layout._set_cursor_position(len(UI.buffer_layout.text) - 1)
             
     
-        sync_word = look_for_sync_words(ser, first_frame, buffer_layout)
+        sync_word = look_for_sync_words(ser, first_frame)
         first_frame = False
 
         data_length = int.from_bytes(ser.read(1), "big")
@@ -97,7 +98,7 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
             buffer_feed += frame
             buffer_feed += ' Timeout error.</error> '
 
-            buffer_layout.insert_line(buffer_feed)
+            UI.buffer_layout.insert_line(buffer_feed)
             first_frame = True 
             
         else:
@@ -152,7 +153,7 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
 
             buffer_feed += "\n"
 
-            buffer_layout.insert_line(buffer_feed)
+            UI.buffer_layout.insert_line(buffer_feed)
             write_to_file(
                 "".join(sync_word)
                 + format(data_length, "x")
@@ -162,10 +163,10 @@ def serial_com_TM(ser, lock, buffer_layout, TM_window, loop_mode=False):
                 + "\n"
             )
 
-            if not get_app().layout.has_focus(TM_window):
-                buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
+            if not get_app().layout.has_focus(UI.TM_window):
+                UI.buffer_layout._set_cursor_position(len(UI.buffer_layout.text) - 1)
 
-            sleep(0.01)
+        # sleep(0.5)
 
 
 def serial_com_watchdog(ser, lock):
@@ -194,7 +195,7 @@ def serial_com_watchdog(ser, lock):
             sleep(1)
 
 
-def send_TC(ser, lock, buffer_layout, TC_list, TM_window, root_container):
+def send_TC(ser, lock, TC_list, root_container):
     frame_to_be_sent = (
         BD[TC_list.current_value]["header"]
         + BD[TC_list.current_value]["length"]
@@ -224,10 +225,10 @@ def send_TC(ser, lock, buffer_layout, TC_list, TM_window, root_container):
 
         buffer_feed += "\n"
 
-        buffer_layout.insert_line(buffer_feed)
+        UI.buffer_layout.insert_line(buffer_feed)
         write_to_file(frame_to_be_sent + "\n")
-        if not get_app().layout.has_focus(TM_window):
-            buffer_layout._set_cursor_position(len(buffer_layout.text) - 1)
+        if not get_app().layout.has_focus(UI.TM_window):
+            UI.buffer_layout._set_cursor_position(len(UI.buffer_layout.text) - 1)
 
     if BD[TC_list.current_value]["name"] == "bootloader":
         bootloader_window.do_open_file(ser, root_container)

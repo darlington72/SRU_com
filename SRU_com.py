@@ -41,9 +41,7 @@ TC_selectable_list = []
 
 
 def TC_send_handler():
-    send_TC(
-        ser, lock, UI.buffer_layout, TC_selectable_list, UI.TM_window, root_container
-    )
+    send_TC(ser, lock, TC_selectable_list, root_container)
 
 
 TC_selectable_list = UI.SelectableList(values=TC_list, handler=TC_send_handler)
@@ -117,46 +115,48 @@ if __name__ == "__main__":
         try:
             ser = serial.Serial("/dev/" + conf["COM"]["port"], conf["COM"]["baudrate"])
 
-            def add_raw_to_window(func):
-                def wrapper(data):
-                    UI.raw_serial_buffer.text += (
-                        "<TC>" + binascii.hexlify(data).decode().upper() + "</TC>"
-                    )
-                    UI.raw_serial_buffer._set_cursor_position(len(UI.raw_serial_buffer.text) - 1)
-                    func(data)
-
-                return wrapper
-
-            def add_raw_TM_to_window(func):
-                def wrapper(data):
-
-                    read = func(data)
-
-                    UI.raw_serial_buffer.text += (
-                        "<TM>" + "".join([format(_, "x") for _ in read]).upper() + "</TM>"
-                    )
-                    UI.raw_serial_buffer._set_cursor_position(len(UI.raw_serial_buffer.text) - 1)
-                    
-                    return read
-
-                return wrapper
-
-            ser.write = add_raw_to_window(ser.write)
-            ser.read = add_raw_TM_to_window(ser.read)
         except serial.serialutil.SerialException as msg:
             print("Serial error. Please check connection:")
             print(msg)
             print("Both modules usbserial and ftdi_sio should be loaded (modprobe xx)")
             sys.exit(0)
 
+    def add_raw_to_window(func):
+        def wrapper(data):
+            UI.raw_serial_buffer.text += (
+                "<TC>" + binascii.hexlify(data).decode().upper() + "</TC>"
+            )
+            UI.raw_serial_buffer._set_cursor_position(
+                len(UI.raw_serial_buffer.text) - 1
+            )
+            func(data)
+
+        return wrapper
+
+    def add_raw_TM_to_window(func):
+        def wrapper(data):
+
+            read = func(data)
+
+            UI.raw_serial_buffer.text += (
+                "<TM>" + "".join([format(_, "x") for _ in read]).upper() + "</TM>"
+            )
+            UI.raw_serial_buffer._set_cursor_position(
+                len(UI.raw_serial_buffer.text) - 1
+            )
+
+            return read
+
+        return wrapper
+
+    ser.write = add_raw_to_window(ser.write)
+    ser.read = add_raw_TM_to_window(ser.read)
+
     thread1 = threading.Thread(target=serial_com_watchdog, args=(ser, lock))
     thread1.daemon = True
     thread1.start()
 
-    thread2 = threading.Thread(
-        target=serial_com_TM,
-        args=(ser, lock, UI.buffer_layout, UI.TM_window, args.loop),
-    )
+    thread2 = threading.Thread(target=serial_com_TM, args=(ser, lock))
     thread2.daemon = True
     thread2.start()
 
