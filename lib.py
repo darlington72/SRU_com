@@ -19,6 +19,21 @@ except FileNotFoundError:
     sys.exit()
 
 
+def compute_CRC(frame):
+    crc_poly = 0xD5
+    crc = 0
+
+    for byte in frame:
+        for _ in range(8):
+            if (byte & 0x80) ^ (crc & 0x80):
+                crc = (crc << 1) ^ crc_poly
+            else:
+                crc = crc << 1
+            byte = byte << 1
+
+    return crc % (2 ** 8)
+
+
 def format_frame(*frame):
     frame_hexa = "".join(frame[:-1])
     formatted_frame = f"{frame_hexa:95} {frame[-1]}"
@@ -31,13 +46,13 @@ def write_to_file(line):
             file.write(line)
 
 
-class SerialTest(object):
+class SerialTest:
     """Replace Serial() for simulation purpose
-    
-    This class is meant to replace the Serial() class when the flag "-t" (--test) 
-    is used on startup. Every byte passed to the write method will be avalaible 
-    to be read by the read method. Just as if we looped TX on RX on a real serial 
-    link. 
+
+    This class is meant to replace the Serial() class when the flag "-t" (--test)
+    is used on startup. Every byte passed to the write method will be available
+    to be read by the read method. Just as if we looped TX on RX on a real serial
+    link.
 
     It allows the software to be tested without the need of any hardware.
     """

@@ -7,6 +7,7 @@ from lib import BD, conf
 import UI
 from args import args
 import bootloader_window
+import binascii
 
 # 43 21 Boot TC
 # 43 12 Boot TM
@@ -51,7 +52,6 @@ def look_for_sync_words(ser, first_frame):
         # sleep(0.10)
 
     return first_byte, second_byte
-
 
 
 def serial_com_TM(ser, lock):
@@ -102,12 +102,15 @@ def serial_com_TM(ser, lock):
             first_frame = True
 
         else:
-            tag, *data, CRC = [format(_, "x") for _ in frame]
+            sync_word_byte = bytearray.fromhex("".join(sync_word))
+            frame_byte = sync_word_byte + bytearray([data_length]) + frame
+            CRC_calculated = lib.compute_CRC(frame_byte[:-1])
+            CRC_received = frame_byte[-1]
+
+            tag, *data, CRC = [format(_, "x").zfill(2).upper() for _ in frame]
 
             # We set back the timeout to none as next time we'll be looking for syncword
             ser.timeout = None
-
-            tag = tag.zfill(2).upper()
 
             try:
                 frame_name = BD[HEADER_TYPE[sync_word[1]] + "-" + tag]["name"]
@@ -126,13 +129,17 @@ def serial_com_TM(ser, lock):
                 buffer_feed += lib.format_frame(
                     "<syncword>" + "".join(sync_word) + "</syncword>",
                     "<datalen>" + format(data_length, "x").zfill(2) + "</datalen>",
-                    "<tag>" + tag.zfill(2) + "</tag>",
+                    "<tag>" + tag + "</tag>",
                     "<data>" + "".join(data) + "</data>",
-                    "<crc>" + CRC.zfill(2) + "</crc>",
+                    "<crc>" + CRC + "</crc>",
                     "<b>" + frame_name + "</b>",
                 )
             else:
                 buffer_feed += HEADER_FROM[sync_word[0]] + " - " + frame_name
+
+            if CRC_calculated != CRC_received:
+                buffer_feed += f" <error> Bad CRC: received {CRC}, should be {format(CRC_calculated, 'x').zfill(2)}</error>"
+
 
             # Let's print the frame's data if any
             if frame_data:
@@ -160,13 +167,12 @@ def serial_com_TM(ser, lock):
             UI.buffer_layout.insert_line(buffer_feed)
             lib.write_to_file(
                 "".join(sync_word)
-                + format(data_length, "x")
+                + format(data_length, "x").zfill(2)
                 + tag
                 + "".join(data)
                 + CRC
                 + "\n"
             )
-
 
 
 def serial_com_watchdog(ser, lock):
@@ -175,16 +181,22 @@ def serial_com_watchdog(ser, lock):
         # buffer_feed = "TC - "  # Line to be printed to TMTC feed
 
         if UI.watchdog_radio.current_value:
-            frame_to_be_sent = (
+            frame_to_be_sent_str = (
                 BD["TC-01"]["header"]
                 + BD["TC-01"]["length"]
                 + BD["TC-01"]["tag"]
                 + "".join([_[2] for _ in BD["TC-01"]["data"]])
-                + BD["TC-01"]["CRC"]
             )
 
+            frame_to_be_sent_bytes = bytearray.fromhex(frame_to_be_sent_str)
+            CRC = lib.compute_CRC(frame_to_be_sent_bytes)
+            frame_to_be_sent_bytes.append(CRC)
+            frame_to_be_sent_str += format(CRC, "x").zfill(2)
+
             with lock:
-                ser.write(bytearray.fromhex(frame_to_be_sent))
+                ser.write(frame_to_be_sent_bytes)
+
+            lib.write_to_file(frame_to_be_sent_str + "\n")
 
             UI.watchdog_cleared_buffer.text = "      Watchdog Cleared"
             sleep(0.500)
@@ -196,16 +208,20 @@ def serial_com_watchdog(ser, lock):
 
 
 def send_TC(ser, lock, TC_list, root_container):
-    frame_to_be_sent = (
+    frame_to_be_sent_str = (
         BD[TC_list.current_value]["header"]
         + BD[TC_list.current_value]["length"]
         + BD[TC_list.current_value]["tag"]
         + "".join([_[2] for _ in BD[TC_list.current_value]["data"]])
-        + BD[TC_list.current_value]["CRC"]
     )
 
+    frame_to_be_sent_bytes = bytearray.fromhex(frame_to_be_sent_str)
+    CRC = lib.compute_CRC(frame_to_be_sent_bytes)
+    frame_to_be_sent_bytes.append(CRC)
+    frame_to_be_sent_str += format(CRC, "x").zfill(2)
+
     with lock:
-        ser.write(bytearray.fromhex(frame_to_be_sent))
+        ser.write(frame_to_be_sent_bytes)
 
         buffer_feed = "<tc>TC</tc> - "  # Line to be printed to TMTC feed
 
@@ -226,8 +242,7 @@ def send_TC(ser, lock, TC_list, root_container):
         buffer_feed += "\n"
 
         UI.buffer_layout.insert_line(buffer_feed)
-        lib.write_to_file(frame_to_be_sent + "\n")
-
+        lib.write_to_file(frame_to_be_sent_str + "\n")
 
     if BD[TC_list.current_value]["name"] == "bootloader":
         bootloader_window.do_open_file(ser, root_container)
