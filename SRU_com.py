@@ -18,7 +18,7 @@ from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
 from prompt_toolkit.layout.menus import CompletionsMenu
 from prompt_toolkit import HTML
-
+import prompt_toolkit_redefinition
 # Custom lib
 import version
 import lib
@@ -39,7 +39,7 @@ def TC_send_handler():
     send_TC(ser, lock, TC_selectable_list, root_container)
 
 
-TC_selectable_list = UI.SelectableList(values=TC_list, handler=TC_send_handler)
+TC_selectable_list = prompt_toolkit_redefinition.SelectableList(values=TC_list, handler=TC_send_handler)
 
 root_container = FloatContainer(
     content=VSplit(

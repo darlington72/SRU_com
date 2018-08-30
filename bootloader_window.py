@@ -1,29 +1,11 @@
-import sys
 import threading
 
-from prompt_toolkit.application import Application
-from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
-from prompt_toolkit.layout.containers import HSplit, VSplit, Float
+from prompt_toolkit.layout.containers import Float, HSplit
 from prompt_toolkit.layout.dimension import D
-from prompt_toolkit.layout.layout import Layout, Window
-from prompt_toolkit.styles import Style
 from prompt_toolkit.completion import PathCompleter
-from prompt_toolkit.widgets import (
-    Frame,
-    RadioList,
-    VerticalLine,
-    Checkbox,
-    TextArea,
-    Dialog,
-    Label,
-    Button,
-)
-from prompt_toolkit.buffer import Buffer
-from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
+from prompt_toolkit.widgets import Dialog, Label, Button, TextArea
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit.eventloop import Future, ensure_future, Return, From
-from UI import TextArea_
 import serial_com
 
 
@@ -41,7 +23,7 @@ class TextInputDialog(object):
         def cancel():
             self.future.set_result(None)
 
-        self.text_area = TextArea_(
+        self.text_area = TextArea(
             completer=completer,
             multiline=False,
             width=D(preferred=40),
@@ -79,8 +61,7 @@ def do_open_file(ser, root_container):
                     # show_message("Ok", "It's ok", root_container)
                     data = f.readall()
                     thread_upload = threading.Thread(
-                        target=serial_com.upload_app,
-                        args=(ser, data, root_container),
+                        target=serial_com.upload_app, args=(ser, data, root_container)
                     )
                     thread_upload.start()
             except IOError as e:
