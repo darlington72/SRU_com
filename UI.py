@@ -10,15 +10,7 @@ from args import args
 from version import __version__
 
 
-buffer_layout = Buffer_()  # TM/TC live feed buffer
-verbose = Checkbox_(text="Verbose", checked=args.verbose)
-TM_window = Window(
-    BufferControl(
-        buffer=buffer_layout, focusable=True, input_processors=[FormatText()]
-    ),
-    wrap_lines=True,
-)
-verticalline1 = VerticalLine()
+######  CLEAR WATCHDOG ######
 watchdog_radio = RadioList_(values=[(False, "False"), (True, "True")])
 if args.watchdog:
     watchdog_radio.set_value(1)
@@ -27,16 +19,35 @@ watchdog_cleared = Window(
     BufferControl(buffer=watchdog_cleared_buffer, focusable=False)
 )
 
-horizontal_line = HorizontalLine()
+######  CONFIGURATION   #####
+verbose = Checkbox_(text="Verbose", checked=args.verbose)
+raw_data_onoff = Checkbox_(text="Raw Data Window", checked=True)
+
+
+######  CREDITS   #####
 credit = Label(
     text=f"   SRU_com - Version {__version__} \n      Author: L.Riviere \n  <laurent.riviere@cnes.fr> "
 )
 
-# raw_serial_buffer = Buffer_()
-# raw_serial_window = Window(BufferControl(buffer=raw_serial_buffer, focusable=False, input_processors=[FormatText()]), height=10, wrap_lines=True)
 
+######  TMTC FEED   #####
+verticalline1 = VerticalLine()
+
+buffer_layout = Buffer_()  # TM/TC live feed buffer
+
+TM_window = Window(
+    BufferControl(
+        buffer=buffer_layout, focusable=True, input_processors=[FormatText()]
+    ),
+    wrap_lines=True,
+)
+
+horizontal_line = HorizontalLine()
+
+######  RAW DATA   #####
 raw_serial_buffer = FormattedTextControl(HTML(""), show_cursor=False)
 raw_serial_window = Window(content=raw_serial_buffer, height=10, wrap_lines=True)
+
 
 style = Style.from_dict(
     {

@@ -19,6 +19,7 @@ from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
 from prompt_toolkit.layout.menus import CompletionsMenu
 from prompt_toolkit import HTML
 import prompt_toolkit_redefinition
+
 # Custom lib
 import version
 import lib
@@ -39,7 +40,10 @@ def TC_send_handler():
     send_TC(ser, lock, TC_selectable_list, root_container)
 
 
-TC_selectable_list = prompt_toolkit_redefinition.SelectableList(values=TC_list, handler=TC_send_handler)
+TC_selectable_list = prompt_toolkit_redefinition.SelectableList(
+    values=TC_list, handler=TC_send_handler
+)
+
 
 root_container = FloatContainer(
     content=VSplit(
@@ -117,7 +121,7 @@ if __name__ == "__main__":
             print("Both modules usbserial and ftdi_sio should be loaded (modprobe xx)")
             sys.exit(0)
 
-    def add_raw_to_window(func):
+    def add_raw_TC_to_window(func):
         def wrapper(data):
             data_formatted = binascii.hexlify(data).decode().upper()
 
@@ -141,7 +145,7 @@ if __name__ == "__main__":
 
             read = func(size)
 
-            read_formatted = "".join([format(_, "x") for _ in read]).upper()
+            read_formatted = "".join([format(_, "x") for _ in read]).upper().zfill(2)
 
             window_size = (
                 UI.raw_serial_window.current_width * UI.raw_serial_window.height
@@ -151,16 +155,14 @@ if __name__ == "__main__":
                 UI.raw_serial_buffer.text = HTML("<TM>" + read_formatted + "</TM>")
                 UI.raw_serial_window.text_len = len(read_formatted)
             else:
-                UI.raw_serial_buffer.text += HTML(
-                    "<TM>" + "".join([format(_, "x") for _ in read]).upper() + "</TM>"
-                )
+                UI.raw_serial_buffer.text += HTML("<TM>" + read_formatted + "</TM>")
                 UI.raw_serial_window.text_len += len(read_formatted)
 
             return read
 
         return wrapper
 
-    ser.write = add_raw_to_window(ser.write)
+    ser.write = add_raw_TC_to_window(ser.write)
     ser.read = add_raw_TM_to_window(ser.read)
 
     thread1 = threading.Thread(target=serial_com_watchdog, args=(ser, lock))

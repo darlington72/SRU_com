@@ -232,7 +232,7 @@ def send_TC(ser, lock, TC_list, root_container):
                 "<data>"
                 + "".join([_[2] for _ in BD[TC_list.current_value]["data"]])
                 + "</data>",
-                "<crc>" + frame_to_be_sent_str[:-2] + "</crc>",
+                "<crc>" + frame_to_be_sent_str[-2:] + "</crc>",
                 BD[TC_list.current_value]["name"],
             )
         else:
