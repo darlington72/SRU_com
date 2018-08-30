@@ -66,8 +66,6 @@ def serial_com_TM(ser, lock):
                 "<waiting_sync>Waiting for sync word...</waiting_sync>\n",
                 with_time_tag=False,
             )
-            if not get_app().layout.has_focus(UI.TM_window):
-                UI.buffer_layout.cursor_position = len(UI.buffer_layout.text) - 1
 
         sync_word = look_for_sync_words(ser, first_frame)
         first_frame = False

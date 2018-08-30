@@ -56,8 +56,7 @@ class Buffer_(Buffer):
         self.text += time_tag + data
 
         if not get_app().layout.has_focus(self):
-            buffer_layout.cursor_position = len(buffer_layout.text) - 1
-
+            self.cursor_position = len(buffer_layout.text) - len(time_tag + data)
 
 
 class RadioList_(RadioList):
@@ -208,7 +207,6 @@ class SelectableList(object):
             else:
                 self._selected_index = self._selected_index - 1
 
-
         @kb.add("down")
         def _(event):
             if self._selected_index == len(self.values) - 1:
@@ -289,12 +287,14 @@ watchdog_cleared = Window(
 )
 
 horizontal_line = HorizontalLine()
-credit = Label(text=f'   SRU_com - Version {__version__} \n      Author: L.Riviere \n  <laurent.riviere@cnes.fr> ')
+credit = Label(
+    text=f"   SRU_com - Version {__version__} \n      Author: L.Riviere \n  <laurent.riviere@cnes.fr> "
+)
 
 # raw_serial_buffer = Buffer_()
 # raw_serial_window = Window(BufferControl(buffer=raw_serial_buffer, focusable=False, input_processors=[FormatText()]), height=10, wrap_lines=True)
 
-raw_serial_buffer = FormattedTextControl(HTML(''), show_cursor=False)
+raw_serial_buffer = FormattedTextControl(HTML(""), show_cursor=False)
 raw_serial_window = Window(content=raw_serial_buffer, height=10, wrap_lines=True)
 
 style = Style.from_dict(
@@ -309,7 +309,7 @@ style = Style.from_dict(
         "tm": "fg:#ffffb0",
         "syncword": "fg:#247ba0",
         "datalen": "fg:#8ba6a9",
-        "tag": "fg:#a7cecb",    
+        "tag": "fg:#a7cecb",
         "data": "fg:#f3ffbd",
         "crc": "fg:#247ba0",
         "error": "fg:#af4f54",

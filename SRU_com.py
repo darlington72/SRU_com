@@ -50,7 +50,7 @@ root_container = FloatContainer(
                     Frame(title="TC List", body=TC_selectable_list),
                     Frame(title="Configuration", body=UI.verbose),
                     UI.watchdog_cleared,
-                    UI.credit
+                    UI.credit,
                 ],
                 height=D(),
                 width=30,
@@ -119,23 +119,18 @@ if __name__ == "__main__":
 
     def add_raw_to_window(func):
         def wrapper(data):
-            data_formatted =  binascii.hexlify(data).decode().upper()
+            data_formatted = binascii.hexlify(data).decode().upper()
 
             window_size = (
                 UI.raw_serial_window.current_width * UI.raw_serial_window.height
             )
 
             if UI.raw_serial_window.text_len > window_size:
-                UI.raw_serial_buffer.text = HTML(
-                    "<TC>" + data_formatted + "</TC>"
-                )
+                UI.raw_serial_buffer.text = HTML("<TC>" + data_formatted + "</TC>")
                 UI.raw_serial_window.text_len = len(data_formatted)
             else:
-                UI.raw_serial_buffer.text += HTML(
-                    "<TC>" + data_formatted + "</TC>"
-                )
+                UI.raw_serial_buffer.text += HTML("<TC>" + data_formatted + "</TC>")
                 UI.raw_serial_window.text_len += len(data_formatted)
-
 
             func(data)
 
@@ -146,25 +141,21 @@ if __name__ == "__main__":
 
             read = func(size)
 
-            read_formatted = "".join([format(_, "x") for _ in read]).upper() 
-
-
+            read_formatted = "".join([format(_, "x") for _ in read]).upper()
 
             window_size = (
                 UI.raw_serial_window.current_width * UI.raw_serial_window.height
             )
 
             if UI.raw_serial_window.text_len > window_size:
-                UI.raw_serial_buffer.text = HTML(
-                    "<TM>" + read_formatted + "</TM>"
-                )
+                UI.raw_serial_buffer.text = HTML("<TM>" + read_formatted + "</TM>")
                 UI.raw_serial_window.text_len = len(read_formatted)
             else:
                 UI.raw_serial_buffer.text += HTML(
                     "<TM>" + "".join([format(_, "x") for _ in read]).upper() + "</TM>"
                 )
                 UI.raw_serial_window.text_len += len(read_formatted)
-            
+
             return read
 
         return wrapper
