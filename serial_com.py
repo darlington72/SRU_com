@@ -141,24 +141,25 @@ def serial_com_TM(ser, lock):
 
             # Let's print the frame's data if any
             if frame_data:
-                pointer = 0
-                buffer_feed += " ("
-                for key, value in enumerate(frame_data):
-                    if key != 0:
-                        buffer_feed += "|"
-                    field_lenght = int(value[0])
-                    field_name = value[1]
+                if frame_data[0][0] != "":
+                    pointer = 0
+                    buffer_feed += " ("
+                    for key, value in enumerate(frame_data):
+                        if key != 0:
+                            buffer_feed += "|"
+                        field_length = int(value[0])
+                        field_name = value[1]
 
-                    buffer_feed += (
-                        field_name
-                        + "=<data>0x"
-                        + "".join(data[pointer : pointer + field_lenght]).zfill(
-                            field_lenght * 2
+                        buffer_feed += (
+                            field_name
+                            + "=<data>0x"
+                            + "".join(data[pointer : pointer + field_length]).zfill(
+                                field_length * 2
+                            )
+                            + "</data>"
                         )
-                        + "</data>"
-                    )
-                    pointer = pointer + field_lenght
-                buffer_feed += ")"
+                        pointer = pointer + field_length
+                    buffer_feed += ")"
 
             buffer_feed += "\n"
 
