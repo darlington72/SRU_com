@@ -15,39 +15,6 @@
         "tag": "80",
         "data": ""
     },
-    "TM-80": {
-        "type": "TM",
-        "name": "REBOOT",
-        "header": "1243",
-        "length": "06",
-        "tag": "80",
-        "data": [
-            [
-                "1",
-                "SRU reboot counter"
-            ],
-            [
-                "1",
-                "CPU reboot counter"
-            ],
-            [
-                "1",
-                "Watchdog disarming key"
-            ],
-            [
-                "1",
-                "App load status"
-            ],
-            [
-                "1",
-                "MRAM app CRC"
-            ],
-            [
-                "1",
-                "App CRC computed"
-            ]
-        ]
-    },
     "TC-01": {
         "type": "TC",
         "name": "CLEAR_WDG (no TM)",
@@ -76,12 +43,12 @@
             ]
         ]
     },
-    "TM-81": {
+    "TM-01": {
         "type": "TM",
         "name": "CLEAR_WDG",
         "header": "1243",
         "length": "01",
-        "tag": "81",
+        "tag": "01",
         "data": [
             [
                 "1",
@@ -117,12 +84,12 @@
             ]
         ]
     },
-    "TM-82": {
+    "TM-02": {
         "type": "TM",
         "name": "STATUS KEY WDG",
         "header": "1234",
         "length": "02",
-        "tag": "82",
+        "tag": "02",
         "data": [
             [
                 "1",
@@ -164,12 +131,12 @@
             ]
         ]
     },
-    "TM-83": {
+    "TM-03": {
         "type": "TM",
         "name": "WDG ENABLE",
         "header": "1234",
         "length": "03",
-        "tag": "83",
+        "tag": "03",
         "data": [
             [
                 "1",
@@ -216,12 +183,12 @@
             ]
         ]
     },
-    "TM-84": {
+    "TM-04": {
         "type": "TM",
         "name": "WDG DISABLE",
         "header": "1234",
         "length": "03",
-        "tag": "83",
+        "tag": "04",
         "data": [
             [
                 "1",
@@ -268,12 +235,12 @@
             ]
         ]
     },
-    "TM-85": {
+    "TM-05": {
         "type": "TM",
         "name": "READ MRAM",
         "header": "1243",
         "length": "03",
-        "tag": "85",
+        "tag": "05",
         "data": [
             [
                 "2",
@@ -315,12 +282,12 @@
             ]
         ]
     },
-    "TM-86": {
+    "TM-06": {
         "type": "TM",
         "name": "HK Requested",
         "header": "1234",
-        "length": "06",
-        "tag": "85",
+        "length": "09",
+        "tag": "06",
         "data": [
             [
                 "1",
@@ -336,7 +303,7 @@
             ],
             [
                 "1",
-                "App load status"
+                "Boot status"
             ],
             [
                 "1",
@@ -345,6 +312,90 @@
             [
                 "1",
                 "App CRC computed"
+            ],
+            [
+                "1",
+                "Watchdog level"
+            ],
+            [
+                "1",
+                "App nbr reload"
+            ],
+            [
+                "1",
+                "App Version"
+            ]
+        ]
+    },
+    "TC-07": {
+        "type": "TC",
+        "name": "Read RAM (no TM)",
+        "header": "1234",
+        "length": "04",
+        "tag": "07",
+        "data": [
+            [
+                "2",
+                "Start address",
+                "0010"
+            ],
+            [
+                "2",
+                "Stop address",
+                "0013"
+            ]
+        ]
+    },
+    "TC-87": {
+        "type": "TC",
+        "name": "Read RAM (with TM)",
+        "header": "1234",
+        "length": "04",
+        "tag": "87",
+        "data": [
+            [
+                "2",
+                "Start address",
+                "0010"
+            ],
+            [
+                "2",
+                "Stop address",
+                "0013"
+            ]
+        ]
+    },
+    "TM-07": {
+        "type": "TM",
+        "name": "Read RAM",
+        "header": "1234",
+        "length": "08",
+        "tag": "07",
+        "data": [
+            [
+                "2",
+                "Start address"
+            ],
+            [
+                "2",
+                "Stop address"
+            ],
+            [
+                "4",
+                "Data read"
+            ]
+        ]
+    },
+    "TM-87": {
+        "type": "TM",
+        "name": "Read RAM",
+        "header": "1234",
+        "length": "1",
+        "tag": "87",
+        "data": [
+            [
+                "1",
+                "Error flag"
             ]
         ]
     },
@@ -376,12 +427,12 @@
             ]
         ]
     },
-    "TM-89": {
+    "TM-09": {
         "type": "TM",
         "name": "MRAM COUNTER RESETED",
         "header": "1234",
-        "length": "04",
-        "tag": "89",
+        "length": "06",
+        "tag": "09",
         "data": [
             [
                 "1",
@@ -393,11 +444,19 @@
             ],
             [
                 "1",
+                "SRU app reloaded counter before"
+            ],
+            [
+                "1",
                 "SRU reboot counter after"
             ],
             [
                 "1",
                 "CPU reboot counter after"
+            ],
+            [
+                "1",
+                "SRU app reloaded counter after"
             ]
         ]
     },
@@ -429,12 +488,12 @@
             ]
         ]
     },
-    "TM-2e": {
+    "TM-2E": {
         "type": "TM",
         "name": "BAD CRC",
         "header": "1243",
         "length": "03",
-        "tag": "2e",
+        "tag": "2E",
         "data": [
             [
                 "1",
@@ -453,7 +512,7 @@
             ]
         ]
     },
-    "TM-2f": {
+    "TM-2F": {
         "type": "TM",
         "name": "TM UNKNOWN",
         "header": "1234",
@@ -477,7 +536,7 @@
             ]
         ]
     },
-    "TM-af": {
+    "TM-AF": {
         "type": "TM",
         "name": "TM UNKNOWN",
         "header": "1234",
@@ -503,11 +562,73 @@
     },
     "TC-A4": {
         "type": "TC",
-        "name": "bootloader",
-        "bootloader": "True",
+        "name": "Bootloader",
+        "bootloader": true,
         "header": "1234",
         "length": "00",
         "tag": "A4",
         "data": ""
+    },
+    "TM-C0": {
+        "type": "TM",
+        "name": "Bootloader status",
+        "header": "4312",
+        "length": "03",
+        "tag": "AF",
+        "data": [
+            [
+                "1",
+                "App Flag MRAM",
+                "00"
+            ],
+            [
+                "1",
+                "App CRC computed",
+                "00"
+            ],
+            [
+                "1",
+                "App CRC in MRAM",
+                "00"
+            ]
+        ]
+    },
+    "TM-C2": {
+        "type": "TM",
+        "name": "Flash page written",
+        "header": "4312",
+        "length": "04",
+        "tag": "AF",
+        "data": [
+            [
+                "4",
+                "Page address written",
+                "00000000"
+            ]
+        ]
+    },
+    "TM-C3": {
+        "type": "TM",
+        "name": "Last flash page written",
+        "header": "4312",
+        "length": "06",
+        "tag": "AF",
+        "data": [
+            [
+                "4",
+                "Last page address written",
+                "00000000"
+            ],
+            [
+                "1",
+                "App CRC",
+                "00"
+            ],
+            [
+                "1",
+                "MRAM TM request App boot",
+                "00"
+            ]
+        ]
     }
 }

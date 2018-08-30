@@ -242,9 +242,11 @@ def send_TC(ser, lock, TC_list, root_container):
         UI.buffer_layout.insert_line(buffer_feed)
         lib.write_to_file(frame_to_be_sent_str + "\n")
 
-    if BD[TC_list.current_value]["name"] == "bootloader":
-        bootloader_window.do_open_file(ser, root_container)
-
+    try:
+        if BD[TC_list.current_value]["bootloader"] is True:
+            bootloader_window.do_open_file(ser, root_container)
+    except KeyError:
+        pass
 
 def upload_app(ser, data, root_container):
     data = data.decode()

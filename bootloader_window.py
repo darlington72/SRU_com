@@ -85,6 +85,7 @@ def do_open_file(ser, root_container):
                     thread_upload.start()
             except IOError as e:
                 show_message("Error", "{}".format(e), root_container)
+                get_app().invalidate()
 
     ensure_future(coroutine())
 
