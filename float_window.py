@@ -71,6 +71,32 @@ def do_open_file(ser, root_container):
     ensure_future(coroutine())
 
 
+def do_conf_TC(ser, root_container):
+    def coroutine():
+        open_dialog = TextInputDialog(
+            title="Application Upload to SRU",
+            label_text="Enter the path of the file:",
+            completer=PathCompleter(),
+        )
+
+        path = yield From(show_dialog_as_float(open_dialog, root_container))
+
+        if path is not None:
+            try:
+                with open(path, "rb", buffering=0) as f:
+                    # show_message("Ok", "It's ok", root_container)
+                    data = f.readall()
+                    thread_upload = threading.Thread(
+                        target=serial_com.upload_app, args=(ser, data, root_container)
+                    )
+                    thread_upload.start()
+            except IOError as e:
+                show_message("Error", "{}".format(e), root_container)
+                get_app().invalidate()
+
+    ensure_future(coroutine())
+
+
 def show_dialog_as_float(dialog, root_container):
     " Coroutine. "
     float_ = Float(content=dialog)
@@ -125,11 +151,8 @@ class MessageDialog(object):
 
 class InfoDialog(object):
     def __init__(self, title, text, root_container):
-        # def coroutine():
         dialog = MessageDialog(title, text, button=False)
         self.show_dialog_as_float(dialog, root_container)
-
-        # ensure_future(coroutine())
 
     def show_dialog_as_float(self, dialog, root_container):
         " Coroutine. "
@@ -138,14 +161,7 @@ class InfoDialog(object):
 
         app = get_app()
 
-        # focused_before = app.layout.current_window
         app.layout.focus(dialog)
-        # result = yield dialog.future
-        # app.layout.focus(focused_before)
-        # if self.float_ in root_container.floats:
-        #     root_container.floats.remove(self.float_)
-
-        # raise Return(result)
 
     def remove_dialog_as_float(self, root_container):
         if self.float_ in root_container.floats:
