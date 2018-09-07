@@ -1,3 +1,5 @@
+import binascii
+
 # Prompt_toolkit
 from prompt_toolkit.layout.layout import Window
 from prompt_toolkit.styles import Style
@@ -34,7 +36,7 @@ class UI:
         self.TC_selectable_list = []
 
         def TC_send_handler():
-            serial_com.send_TC(ser, lock, self.TC_selectable_list)
+            serial_com.send_TC(self, ser, lock)
 
         self.TC_selectable_list = SelectableList(
             values=TC_list, handler=TC_send_handler
@@ -51,7 +53,7 @@ class UI:
 
         ######  CONFIGURATION   #####
         self.verbose = Checkbox_(text="Verbose", checked=args.verbose)
-        raw_data_onoff = Checkbox_(text="Raw Data Window", checked=True)
+        self.raw_data_onoff = Checkbox_(text="Raw Data Window", checked=True)
 
         ######  CREDITS   #####
         credit = Label(
@@ -75,9 +77,9 @@ class UI:
         horizontal_line = HorizontalLine()
 
         ######  RAW DATA   #####
-        raw_serial_buffer = FormattedTextControl(HTML(""), show_cursor=False)
-        raw_serial_window = Window(
-            content=raw_serial_buffer, height=10, wrap_lines=True
+        self.raw_serial_buffer = FormattedTextControl(HTML(""), show_cursor=False)
+        self.raw_serial_window = Window(
+            content=self.raw_serial_buffer, height=10, wrap_lines=True
         )
 
         style = Style.from_dict(
@@ -114,7 +116,7 @@ class UI:
                         width=30,
                     ),
                     verticalline1,
-                    HSplit([TM_window, horizontal_line, raw_serial_window]),
+                    HSplit([TM_window, horizontal_line, self.raw_serial_window]),
                 ]
             ),
             floats=[
@@ -152,3 +154,43 @@ class UI:
         lib.conf_file.close()
         lib.BD_file.close()
 
+    def add_raw_TC_to_window(self, func):
+        def wrapper(data):
+            data_formatted = binascii.hexlify(data).decode().upper()
+
+            window_size = (
+                self.raw_serial_window.current_width * self.raw_serial_window.height
+            )
+
+            if self.raw_serial_window.text_len > window_size:
+                self.raw_serial_buffer.text = HTML("<TC>" + data_formatted + "</TC>")
+                self.raw_serial_window.text_len = len(data_formatted)
+            else:
+                self.raw_serial_buffer.text += HTML("<TC>" + data_formatted + "</TC>")
+                self.raw_serial_window.text_len += len(data_formatted)
+
+            func(data)
+
+        return wrapper
+
+    def add_raw_TM_to_window(self, func):
+        def wrapper(size):
+
+            read = func(size)
+
+            read_formatted = "".join([format(_, "x") for _ in read]).upper().zfill(2)
+
+            window_size = (
+                self.raw_serial_window.current_width * self.raw_serial_window.height
+            )
+
+            if self.raw_serial_window.text_len > window_size:
+                self.raw_serial_buffer.text = HTML("<TM>" + read_formatted + "</TM>")
+                self.raw_serial_window.text_len = len(read_formatted)
+            else:
+                self.raw_serial_buffer.text += HTML("<TM>" + read_formatted + "</TM>")
+                self.raw_serial_window.text_len += len(read_formatted)
+
+            return read
+
+        return wrapper

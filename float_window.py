@@ -45,7 +45,7 @@ class TextInputDialog(object):
         return self.dialog
 
 
-def do_open_file(ser, root_container):
+def do_open_file(ui, ser):
     def coroutine():
         open_dialog = TextInputDialog(
             title="Application Upload to SRU",
@@ -53,7 +53,7 @@ def do_open_file(ser, root_container):
             completer=PathCompleter(),
         )
 
-        path = yield From(show_dialog_as_float(open_dialog, root_container))
+        path = yield From(show_dialog_as_float(open_dialog, ui.root_container))
 
         if path is not None:
             try:
@@ -61,11 +61,11 @@ def do_open_file(ser, root_container):
                     # show_message("Ok", "It's ok", root_container)
                     data = f.readall()
                     thread_upload = threading.Thread(
-                        target=serial_com.upload_app, args=(ser, data, root_container)
+                        target=serial_com.upload_app, args=(ui, ser, data)
                     )
                     thread_upload.start()
             except IOError as e:
-                show_message("Error", "{}".format(e), root_container)
+                show_message("Error", "{}".format(e), ui.root_container)
                 get_app().invalidate()
 
     ensure_future(coroutine())

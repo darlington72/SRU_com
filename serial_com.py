@@ -10,7 +10,6 @@ import float_window
 import binascii
 
 import SRU_com
-from SRU_com import UI_instance
 
 # 43 21 Boot TC
 # 43 12 Boot TM
@@ -25,7 +24,7 @@ HEADER_FROM = HEADER_DEF[0]
 HEADER_TYPE = {**HEADER_DEF[1][0], **HEADER_DEF[1][1]}
 
 
-def look_for_sync_words(ser, first_frame):
+def look_for_sync_words(ui, ser, first_frame):
     """
     Blocking function that synchronize to the beginning
     of a new frame
@@ -48,7 +47,7 @@ def look_for_sync_words(ser, first_frame):
                 break
         else:
             if not first_frame:
-                SRU_com.UI_instance.buffer_layout.insert_line(
+                ui.buffer_layout.insert_line(
                     "<error>Too many bytes received</error> \n"
                 )
 
@@ -57,7 +56,7 @@ def look_for_sync_words(ser, first_frame):
     return first_byte, second_byte
 
 
-def serial_com_TM(ser, lock):
+def serial_com_TM(ui, ser, lock):
 
     first_frame = True
     while True:
@@ -65,12 +64,12 @@ def serial_com_TM(ser, lock):
         # Looking for sync word
 
         if first_frame:
-            UI_instance.buffer_layout.insert_line(
+            ui.buffer_layout.insert_line(
                 "<waiting_sync>Waiting for sync word...</waiting_sync>\n",
                 with_time_tag=False,
             )
 
-        sync_word = look_for_sync_words(ser, first_frame)
+        sync_word = look_for_sync_words(ui, ser, first_frame)
         first_frame = False
 
         data_length = int.from_bytes(ser.read(1), "big")
@@ -99,7 +98,7 @@ def serial_com_TM(ser, lock):
             buffer_feed += frame
             buffer_feed += " Timeout error.</error> "
 
-            SRU_com.UI_instance.buffer_layout.insert_line(buffer_feed)
+            ui.buffer_layout.insert_line(buffer_feed)
             first_frame = True
 
         else:
@@ -126,7 +125,7 @@ def serial_com_TM(ser, lock):
                 )
                 frame_data = False
 
-            if SRU_com.UI_instance.verbose.checked:
+            if ui.verbose.checked:
                 buffer_feed += lib.format_frame(
                     "<syncword>" + "".join(sync_word) + "</syncword>",
                     "<datalen>" + format(data_length, "x").zfill(2) + "</datalen>",
@@ -165,7 +164,7 @@ def serial_com_TM(ser, lock):
 
             buffer_feed += "\n"
 
-            SRU_com.UI_instance.buffer_layout.insert_line(buffer_feed)
+            ui.buffer_layout.insert_line(buffer_feed)
             lib.write_to_file(
                 "".join(sync_word)
                 + format(data_length, "x").zfill(2)
@@ -176,12 +175,12 @@ def serial_com_TM(ser, lock):
             )
 
 
-def serial_com_watchdog(ser, lock):
+def serial_com_watchdog(ui, ser, lock):
 
     while True:
         # buffer_feed = "TC - "  # Line to be printed to TMTC feed
 
-        if SRU_com.UI_instance.watchdog_radio.current_value:
+        if ui.watchdog_radio.current_value:
             frame_to_be_sent_str = (
                 BD["TC-01"]["header"]
                 + BD["TC-01"]["length"]
@@ -199,22 +198,22 @@ def serial_com_watchdog(ser, lock):
 
             lib.write_to_file(frame_to_be_sent_str + "\n")
 
-            SRU_com.UI_instance.watchdog_cleared_buffer.text = "      Watchdog Cleared"
+            ui.watchdog_cleared_buffer.text = "      Watchdog Cleared"
             sleep(0.500)
-            SRU_com.UI_instance.watchdog_cleared_buffer.text = ""
+            ui.watchdog_cleared_buffer.text = ""
             sleep(0.500)
 
         else:
             sleep(1)
 
 
-def send_TC(ser, lock, TC_list):
+def send_TC(ui, ser, lock):
 
     frame_to_be_sent_str = (
-        BD[TC_list.current_value]["header"]
-        + BD[TC_list.current_value]["length"]
-        + BD[TC_list.current_value]["tag"]
-        + "".join([_[2] for _ in BD[TC_list.current_value]["data"]])
+        BD[ui.TC_selectable_list.current_value]["header"]
+        + BD[ui.TC_selectable_list.current_value]["length"]
+        + BD[ui.TC_selectable_list.current_value]["tag"]
+        + "".join([_[2] for _ in BD[ui.TC_selectable_list.current_value]["data"]])
     )
 
     frame_to_be_sent_bytes = bytearray.fromhex(frame_to_be_sent_str)
@@ -227,43 +226,49 @@ def send_TC(ser, lock, TC_list):
 
         buffer_feed = "<tc>TC</tc> - "  # Line to be printed to TMTC feed
 
-        if UI_layout.verbose.checked:
+        if ui.verbose.checked:
             buffer_feed += lib.format_frame(
-                "<syncword>" + BD[TC_list.current_value]["header"] + "</syncword>",
-                "<datalen>" + BD[TC_list.current_value]["length"] + "</datalen>",
-                "<tag>" + BD[TC_list.current_value]["tag"] + "</tag>",
+                "<syncword>"
+                + BD[ui.TC_selectable_list.current_value]["header"]
+                + "</syncword>",
+                "<datalen>"
+                + BD[ui.TC_selectable_list.current_value]["length"]
+                + "</datalen>",
+                "<tag>" + BD[ui.TC_selectable_list.current_value]["tag"] + "</tag>",
                 "<data>"
-                + "".join([_[2] for _ in BD[TC_list.current_value]["data"]])
+                + "".join(
+                    [_[2] for _ in BD[ui.TC_selectable_list.current_value]["data"]]
+                )
                 + "</data>",
                 "<crc>" + frame_to_be_sent_str[-2:] + "</crc>",
-                BD[TC_list.current_value]["name"],
+                BD[ui.TC_selectable_list.current_value]["name"],
             )
         else:
-            buffer_feed += BD[TC_list.current_value]["name"]
+            buffer_feed += BD[ui.TC_selectable_list.current_value]["name"]
 
         buffer_feed += "\n"
 
-        UI_layout.buffer_layout.insert_line(buffer_feed)
+        ui.buffer_layout.insert_line(buffer_feed)
         lib.write_to_file(frame_to_be_sent_str + "\n")
 
     try:
-        if BD[TC_list.current_value]["bootloader"] is True:
-            float_window.do_open_file(ser, SRU_com.UI_instance.root_container)
+        if BD[ui.TC_selectable_list.current_value]["bootloader"] is True:
+            float_window.do_open_file(ui, ser)
     except KeyError:
         pass
 
 
-def upload_app(ser, data, root_container):
+def upload_app(ui, ser, data):
     data = data.decode()
     info_message = float_window.InfoDialog(
-        "Application Upload to SRU", "Upload in progress..", root_container
+        "Application Upload to SRU", "Upload in progress..", ui.root_container
     )
     get_app().invalidate()
 
     # Let's desactivate the watchdog if it's on
-    watchdog_value = UI_layout.watchdog_radio.current_value
+    watchdog_value = ui.watchdog_radio.current_value
     if watchdog_value:
-        UI_layout.watchdog_radio.set_value(0)
+        ui.watchdog_radio.set_value(0)
 
     if args.loop:
         ser.write(bytearray.fromhex("123456A4"))
@@ -283,12 +288,12 @@ def upload_app(ser, data, root_container):
         ser.write(bytearray.fromhex("FF"))
 
     get_app().invalidate()
-    info_message.remove_dialog_as_float(root_container)
+    info_message.remove_dialog_as_float(ui.root_container)
     get_app().invalidate()
     float_window.show_message(
-        "Application Upload to SRU", "Upload done.", root_container
+        "Application Upload to SRU", "Upload done.", ui.root_container
     )
 
     # Let's turn the watchdog back on
     if watchdog_value:
-        UI_layout.watchdog_radio.set_value(1)
+        ui.watchdog_radio.set_value(1)
