@@ -22,6 +22,8 @@ from prompt_toolkit.layout.dimension import D
 from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.widgets import Frame
 from prompt_toolkit.layout.menus import CompletionsMenu
+
+# Project
 from args import args
 from version import __version__
 import serial_com

@@ -1,11 +1,14 @@
 import threading
 
+# Prompt_toolkit
 from prompt_toolkit.layout.containers import Float, HSplit
 from prompt_toolkit.layout.dimension import D
 from prompt_toolkit.completion import PathCompleter
 from prompt_toolkit.widgets import Dialog, Label, Button, TextArea
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit.eventloop import Future, ensure_future, Return, From
+
+# Project
 import serial_com
 
 

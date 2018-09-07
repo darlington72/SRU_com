@@ -1,15 +1,17 @@
 from time import sleep, time
 import sys
 import lib
+import binascii
+
+# Prompt_toolkit
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit.shortcuts import message_dialog
+
+# Project
 from lib import BD, conf
 import UI_layout
 from args import args
 import float_window
-import binascii
-
-import SRU_com
 
 # 43 21 Boot TC
 # 43 12 Boot TM
