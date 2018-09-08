@@ -77,7 +77,7 @@ def do_open_file(ui, ser):
 
 def do_conf_TC(current_key, TC_data, ui, ser, lock):
     def coroutine():
-
+        error = False
         param_count = len(BD[ui.TC_selectable_list.current_value]["data"])
 
         if current_key == param_count:
@@ -112,6 +112,7 @@ def do_conf_TC(current_key, TC_data, ui, ser, lock):
                 result = result.zfill(2 * param_size)
 
                 if len(result) > 2 * param_size:
+                    error = true
                     show_message(
                         "Error",
                         f"Value too long, {param_size} byte(s) needed.",
@@ -122,6 +123,7 @@ def do_conf_TC(current_key, TC_data, ui, ser, lock):
                     try:
                         int(result, 16)
                     except ValueError:
+                        error = True
                         show_message(
                             "Error", "Non hexadecimal value.", ui.root_container
                         )
@@ -131,7 +133,8 @@ def do_conf_TC(current_key, TC_data, ui, ser, lock):
 
                         TC_data.append(result)
 
-            do_conf_TC(current_key + 1, TC_data, ui, ser, lock)
+            if not error:
+                do_conf_TC(current_key + 1, TC_data, ui, ser, lock)
 
     ensure_future(coroutine())
 
