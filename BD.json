@@ -1,4 +1,28 @@
 {
+    "TC-99": {
+        "type": "TC",
+        "name": "TEST",
+        "header": "4312",
+        "length": "12",
+        "tag": "AF",
+        "data": [
+            [
+                "4",
+                "Page address written",
+                "00000000"
+            ],
+            [
+                "4",
+                "LOL",
+                "?"
+            ],
+            [
+                "4",
+                "Page address written",
+                "00000000"
+            ]
+        ]
+    },
     "TC-00": {
         "type": "TC",
         "name": "REBOOT (no TM)",
@@ -356,12 +380,12 @@
             [
                 "2",
                 "Start address",
-                "0010"
+                "?"
             ],
             [
                 "2",
                 "Stop address",
-                "0013"
+                "?"
             ]
         ]
     },

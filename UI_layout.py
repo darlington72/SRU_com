@@ -22,12 +22,14 @@ from prompt_toolkit.layout.dimension import D
 from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.widgets import Frame
 from prompt_toolkit.layout.menus import CompletionsMenu
+from prompt_toolkit.application.current import get_app
 
 # Project
 from args import args
 from version import __version__
 import serial_com
 import lib
+import float_window
 
 
 class UI:
@@ -38,7 +40,10 @@ class UI:
         self.TC_selectable_list = []
 
         def TC_send_handler():
-            serial_com.send_TC(self, ser, lock)
+            if int(lib.BD[self.TC_selectable_list.current_value]["length"], 16) > 0:
+                float_window.do_conf_TC(0, [], self, ser, lock)
+            else:
+                serial_com.send_TC([], self, ser, lock)
 
         self.TC_selectable_list = SelectableList(
             values=TC_list, handler=TC_send_handler

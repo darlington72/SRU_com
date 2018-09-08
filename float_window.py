@@ -10,6 +10,8 @@ from prompt_toolkit.eventloop import Future, ensure_future, Return, From
 
 # Project
 import serial_com
+from lib import BD
+import serial_com
 
 
 class TextInputDialog(object):
@@ -61,7 +63,6 @@ def do_open_file(ui, ser):
         if path is not None:
             try:
                 with open(path, "rb", buffering=0) as f:
-                    # show_message("Ok", "It's ok", root_container)
                     data = f.readall()
                     thread_upload = threading.Thread(
                         target=serial_com.upload_app, args=(ui, ser, data)
@@ -74,28 +75,63 @@ def do_open_file(ui, ser):
     ensure_future(coroutine())
 
 
-def do_conf_TC(ser, root_container):
+def do_conf_TC(current_key, TC_data, ui, ser, lock):
     def coroutine():
-        open_dialog = TextInputDialog(
-            title="Application Upload to SRU",
-            label_text="Enter the path of the file:",
-            completer=PathCompleter(),
-        )
 
-        path = yield From(show_dialog_as_float(open_dialog, root_container))
+        param_count = len(BD[ui.TC_selectable_list.current_value]["data"])
 
-        if path is not None:
+        if current_key == param_count:
+            serial_com.send_TC(TC_data, ui, ser, lock)
+        else:
             try:
-                with open(path, "rb", buffering=0) as f:
-                    # show_message("Ok", "It's ok", root_container)
-                    data = f.readall()
-                    thread_upload = threading.Thread(
-                        target=serial_com.upload_app, args=(ser, data, root_container)
+                param_size = int(
+                    BD[ui.TC_selectable_list.current_value]["data"][current_key][0]
+                )
+            except:
+                show_message(
+                    "Error",
+                    f"param count: {param_count}, current key:{current_key}",
+                    ui.root_container,
+                )
+
+            param_name = BD[ui.TC_selectable_list.current_value]["data"][current_key][1]
+            param_data = BD[ui.TC_selectable_list.current_value]["data"][current_key][2]
+
+            if param_data is not "?":
+                TC_data.append(param_data)
+            else:
+                open_dialog = TextInputDialog(
+                    title="TC Parameters",
+                    label_text=f"Please enter the hexadecimal value for the parameter: \n{param_name} (length: {param_size} byte(s))",
+                )
+
+                result = yield From(
+                    show_dialog_as_float(open_dialog, ui.root_container)
+                )
+
+                result = result.zfill(2 * param_size)
+
+                if len(result) > 2 * param_size:
+                    show_message(
+                        "Error",
+                        f"Value too long, {param_size} byte(s) needed.",
+                        ui.root_container,
                     )
-                    thread_upload.start()
-            except IOError as e:
-                show_message("Error", "{}".format(e), root_container)
-                get_app().invalidate()
+                    get_app().invalidate()
+                else:
+                    try:
+                        int(result, 16)
+                    except ValueError:
+                        show_message(
+                            "Error", "Non hexadecimal value.", ui.root_container
+                        )
+                        get_app().invalidate()
+                    else:
+                        get_app().invalidate()
+
+                        TC_data.append(result)
+
+            do_conf_TC(current_key + 1, TC_data, ui, ser, lock)
 
     ensure_future(coroutine())
 

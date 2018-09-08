@@ -209,13 +209,13 @@ def serial_com_watchdog(ui, ser, lock):
             sleep(1)
 
 
-def send_TC(ui, ser, lock):
+def send_TC(TC_data, ui, ser, lock):
 
     frame_to_be_sent_str = (
         BD[ui.TC_selectable_list.current_value]["header"]
         + BD[ui.TC_selectable_list.current_value]["length"]
         + BD[ui.TC_selectable_list.current_value]["tag"]
-        + "".join([_[2] for _ in BD[ui.TC_selectable_list.current_value]["data"]])
+        + "".join(TC_data)
     )
 
     frame_to_be_sent_bytes = bytearray.fromhex(frame_to_be_sent_str)
@@ -237,11 +237,7 @@ def send_TC(ui, ser, lock):
                 + BD[ui.TC_selectable_list.current_value]["length"]
                 + "</datalen>",
                 "<tag>" + BD[ui.TC_selectable_list.current_value]["tag"] + "</tag>",
-                "<data>"
-                + "".join(
-                    [_[2] for _ in BD[ui.TC_selectable_list.current_value]["data"]]
-                )
-                + "</data>",
+                "<data>" + "".join(TC_data) + "</data>",
                 "<crc>" + frame_to_be_sent_str[-2:] + "</crc>",
                 BD[ui.TC_selectable_list.current_value]["name"],
             )
