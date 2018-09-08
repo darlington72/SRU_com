@@ -112,7 +112,7 @@ def do_conf_TC(current_key, TC_data, ui, ser, lock):
                 result = result.zfill(2 * param_size)
 
                 if len(result) > 2 * param_size:
-                    error = true
+                    error = True
                     show_message(
                         "Error",
                         f"Value too long, {param_size} byte(s) needed.",
