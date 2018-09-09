@@ -101,7 +101,7 @@ def do_conf_TC(current_key, TC_data, ui, ser, lock):
                 TC_data.append(param_data)
             else:
                 open_dialog = TextInputDialog(
-                    title="TC Parameters",
+                    title="TC Parameter",
                     label_text=f"Please enter the hexadecimal value for the parameter: \n{param_name} (length: {param_size} byte(s))",
                 )
 

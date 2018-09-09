@@ -268,7 +268,7 @@ def send_TC(TC_data, ui, ser, lock):
 
         buffer_feed += "\n"
 
-        ui.buffer_layout.insert_line(buffer_feed)
+        ui.buffer_layout.insert_line(buffer_feed.upper())
         lib.write_to_file(frame_to_be_sent_str + "\n")
 
     try:
