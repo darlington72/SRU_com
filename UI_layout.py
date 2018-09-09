@@ -49,7 +49,7 @@ class UI:
             values=TC_list, handler=TC_send_handler
         )
 
-        ######  CLEAR WATCHDOG ######
+        ######  WATCHDOG CLEAR ######
         self.watchdog_radio = RadioList_(values=[(False, "False"), (True, "True")])
         if args.watchdog:
             self.watchdog_radio.set_value(1)
@@ -113,7 +113,7 @@ class UI:
                 [
                     HSplit(
                         [
-                            Frame(title="Clear Watchdog", body=self.watchdog_radio),
+                            Frame(title="Watchdog Clear", body=self.watchdog_radio),
                             Frame(title="TC List", body=self.TC_selectable_list),
                             Frame(title="Configuration", body=self.verbose),
                             watchdog_cleared,
