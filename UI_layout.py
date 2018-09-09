@@ -185,7 +185,7 @@ class UI:
 
             read = func(size)
 
-            read_formatted = "".join([format(_, "x") for _ in read]).upper().zfill(2)
+            read_formatted = "".join([format(_, "x").zfill(2) for _ in read]).upper()
 
             window_size = (
                 self.raw_serial_window.current_width * self.raw_serial_window.height
