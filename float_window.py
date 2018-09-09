@@ -109,29 +109,31 @@ def do_conf_TC(current_key, TC_data, ui, ser, lock):
                     show_dialog_as_float(open_dialog, ui.root_container)
                 )
 
-                result = result.zfill(2 * param_size)
-
-                if len(result) > 2 * param_size:
+                if result is None:
                     error = True
-                    show_message(
-                        "Error",
-                        f"Value too long, {param_size} byte(s) needed.",
-                        ui.root_container,
-                    )
-                    get_app().invalidate()
                 else:
-                    try:
-                        int(result, 16)
-                    except ValueError:
+                    result = result.zfill(2 * param_size).upper()
+                    if len(result) > 2 * param_size:
                         error = True
                         show_message(
-                            "Error", "Non hexadecimal value.", ui.root_container
+                            "Error",
+                            f"Value too long, {param_size} byte(s) needed.",
+                            ui.root_container,
                         )
                         get_app().invalidate()
                     else:
-                        get_app().invalidate()
+                        try:
+                            int(result, 16)
+                        except ValueError:
+                            error = True
+                            show_message(
+                                "Error", "Non hexadecimal value.", ui.root_container
+                            )
+                            get_app().invalidate()
+                        else:
+                            get_app().invalidate()
 
-                        TC_data.append(result)
+                            TC_data.append(result)
 
             if not error:
                 do_conf_TC(current_key + 1, TC_data, ui, ser, lock)
