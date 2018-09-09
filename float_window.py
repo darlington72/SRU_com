@@ -50,7 +50,7 @@ class TextInputDialog(object):
         return self.dialog
 
 
-def do_open_file(ui, ser):
+def do_upload_hex(ui, ser):
     def coroutine():
         open_dialog = TextInputDialog(
             title="Application Upload to SRU",
@@ -65,7 +65,7 @@ def do_open_file(ui, ser):
                 with open(path, "rb", buffering=0) as f:
                     data = f.readall()
                     thread_upload = threading.Thread(
-                        target=serial_com.upload_app, args=(ui, ser, data)
+                        target=serial_com.upload_hex, args=(ui, ser, data)
                     )
                     thread_upload.start()
             except IOError as e:
@@ -156,10 +156,6 @@ def show_dialog_as_float(dialog, root_container):
         root_container.floats.remove(float_)
 
     raise Return(result)
-
-
-def do_about(root_container):
-    show_message("About", "about demo", root_container)
 
 
 def show_message(title, text, root_container, button=True):

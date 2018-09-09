@@ -53,18 +53,23 @@ def look_for_sync_words(ui, ser, first_frame):
                     "<error>Too many bytes received</error> \n"
                 )
 
-        # sleep(0.10)
-
     return first_byte, second_byte
 
 
 def serial_com_TM(ui, ser, lock):
+    """Infinite loop that handles bytes received 
+    on the serial link
+    
+    Arguments:
+        ui   -- UI instance
+        ser  -- Serial instance
+        lock -- Thread lock
+    """
 
     first_frame = True
     while True:
 
         # Looking for sync word
-
         if first_frame:
             ui.buffer_layout.insert_line(
                 "<waiting_sync>Waiting for sync word...</waiting_sync>\n",
@@ -111,7 +116,7 @@ def serial_com_TM(ui, ser, lock):
 
             tag, *data, CRC = [format(_, "x").zfill(2).upper() for _ in frame]
 
-            # We set back the timeout to none as next time we'll be looking for syncword
+            # We set back the timeout to none as next time we'll be looking for syncwords
             ser.timeout = None
 
             try:
@@ -178,9 +183,16 @@ def serial_com_TM(ui, ser, lock):
 
 
 def serial_com_watchdog(ui, ser, lock):
+    """Infinite loop that sends the watchdog TC every second
+    if watchdog_radio is ON
+    
+    Arguments:
+        ui   -- UI instance
+        ser  -- Serial instance
+        lock -- Thread lock
+    """
 
     while True:
-        # buffer_feed = "TC - "  # Line to be printed to TMTC feed
 
         if ui.watchdog_radio.current_value:
             frame_to_be_sent_str = (
@@ -200,6 +212,7 @@ def serial_com_watchdog(ui, ser, lock):
 
             lib.write_to_file(frame_to_be_sent_str + "\n")
 
+            # UI
             ui.watchdog_cleared_buffer.text = "      Watchdog Cleared"
             sleep(0.500)
             ui.watchdog_cleared_buffer.text = ""
@@ -210,6 +223,15 @@ def serial_com_watchdog(ui, ser, lock):
 
 
 def send_TC(TC_data, ui, ser, lock):
+    """Sends a TC over the serial link
+    Called by UI instance 
+    
+    Arguments:
+        TC_data {list} -- List of string, each element is a TC parameter 
+        ui   -- UI instance
+        ser  -- Serial instance
+        lock -- Thread lock
+    """
 
     frame_to_be_sent_str = (
         BD[ui.TC_selectable_list.current_value]["header"]
@@ -251,12 +273,21 @@ def send_TC(TC_data, ui, ser, lock):
 
     try:
         if BD[ui.TC_selectable_list.current_value]["bootloader"] is True:
-            float_window.do_open_file(ui, ser)
+            float_window.do_upload_hex(ui, ser)
     except KeyError:
         pass
 
 
-def upload_app(ui, ser, data):
+def upload_hex(ui, ser, data):
+    """Upload a hex file to SRU
+    Called by do_upload_hex()
+    
+    Arguments:
+        ui {[type]} -- [description]
+        ser {[type]} -- [description]
+        data {[type]} -- [description]
+    """
+
     data = data.decode()
     info_message = float_window.InfoDialog(
         "Application Upload to SRU", "Upload in progress..", ui.root_container

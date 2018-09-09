@@ -15,7 +15,6 @@ lock = threading.Lock()
 if __name__ == "__main__":
 
     # Serial
-
     if args.test:
         ser = lib.SerialTest()
     else:
@@ -33,6 +32,8 @@ if __name__ == "__main__":
 
     ui = UI_layout.UI(ser, lock)
 
+    # Let's wrap serial's read & write to display raw TM/TC exchange
+    # in the raw TM/TC window
     ser.write = ui.add_raw_TC_to_window(ser.write)
     ser.read = ui.add_raw_TM_to_window(ser.read)
 
