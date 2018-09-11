@@ -159,7 +159,7 @@ def serial_com_TM(ui, ser, lock):
                         for key, value in enumerate(frame_data):
                             if key != 0:
                                 buffer_feed += "|"
-                            field_length = int(value[0]) if (value[0] == '?') else (data_length - sum(data_len[0] for data_len in frame_data if data_len[0] != '?'))
+                            field_length = int(value[0]) if (value[0] != '?') else (data_length - sum(int(data_len[0]) for data_len in frame_data if data_len[0] != '?'))
                             field_name = value[1]
 
                             buffer_feed += (
