@@ -393,7 +393,6 @@
         "type": "TM",
         "name": "Read RAM",
         "header": "1234",
-        "length": "08",
         "tag": "07",
         "data": [
             [
@@ -405,7 +404,7 @@
                 "Stop address"
             ],
             [
-                "4",
+                "?",
                 "Data read"
             ]
         ]
