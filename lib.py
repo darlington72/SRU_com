@@ -60,9 +60,12 @@ class SerialTest:
     def __init__(self):
         self.buffer = Queue()
 
-    def write(self, data: bytearray):
-        for i in data:
-            self.buffer.put(i)
+    def write(self, data):
+        if isinstance(data, int):
+            self.buffer.put(data)
+        else:
+            for i in data:
+                self.buffer.put(i)
 
     def read(self, size=1) -> bytearray:
         data = bytearray()

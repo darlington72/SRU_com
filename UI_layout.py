@@ -163,7 +163,10 @@ class UI:
 
     def add_raw_TC_to_window(self, func):
         def wrapper(data):
-            data_formatted = binascii.hexlify(data).decode().upper()
+            if isinstance(data, int):
+                data_formatted = format(data, 'x').zfill(2).upper()
+            else:
+                data_formatted = binascii.hexlify(data).decode().upper()
 
             window_size = (
                 self.raw_serial_window.current_width * self.raw_serial_window.height
