@@ -248,7 +248,8 @@ def send_TC(TC_data, ui, ser, lock):
     with lock:
         for byte in frame_to_be_sent_bytes:
             ser.write(byte)
-            sleep(conf['COM']['delay_inter_byte'])
+            print(byte)
+            # sleep(conf['COM']['delay_inter_byte'])
 
         buffer_feed = "<tc>TC</tc> - "  # Line to be printed to TMTC feed
 
