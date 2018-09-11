@@ -165,6 +165,8 @@ class UI:
         def wrapper(data):
             if isinstance(data, int):
                 data_formatted = format(data, 'x').zfill(2).upper()
+            elif isinstance(data, list):
+                data_formatted = format(data[0], 'x').zfill(2).upper()
             else:
                 data_formatted = binascii.hexlify(data).decode().upper()
 

@@ -41,6 +41,8 @@ def look_for_sync_words(ui, ser, first_frame):
 
     while True:
         first_byte = ser.read(1).hex()
+        # ui.buffer_layout.insert_line(f"{first_byte} \n")
+
         if first_byte in HEADER_DEF[0].keys():
             second_byte = ser.read(1).hex()
             if second_byte in list(
@@ -68,7 +70,7 @@ def serial_com_TM(ui, ser, lock):
 
     first_frame = True
     while True:
-
+        
         # Looking for sync word
         if first_frame:
             ui.buffer_layout.insert_line(
@@ -86,100 +88,102 @@ def serial_com_TM(ui, ser, lock):
         # We set the timeout for the frame
         ser.timeout = conf["COM"]["timeout"]
 
-        frame = ser.read(data_length + 2)
+        with lock:
+            
+            frame = ser.read(data_length + 2) # TAG + data + CRC
 
-        if len(frame) < data_length + 2:
-            # Timeout occurred
+            if len(frame) < data_length + 2:
+                # Timeout occurred
 
-            frame = "".join([format(_, "x") for _ in frame]) + "<error>"
-            frame = frame.ljust(((data_length + 2) * 2) + 7, "X")
+                frame = "".join([format(_, "x").zfill(2) for _ in frame]) + "<error>"
+                frame = frame.ljust(((data_length + 2) * 2) + 7, "X")
 
-            buffer_feed += (
-                "<syncword>"
-                + "".join(sync_word)
-                + "</syncword>"
-                + "<datalen>"
-                + format(data_length, "x").zfill(2)
-                + "</datalen>"
-            )
-            buffer_feed += frame
-            buffer_feed += " Timeout error.</error> "
-
-            ui.buffer_layout.insert_line(buffer_feed)
-            first_frame = True
-
-        else:
-            sync_word_byte = bytearray.fromhex("".join(sync_word))
-            frame_byte = sync_word_byte + bytearray([data_length]) + frame
-            CRC_calculated = lib.compute_CRC(frame_byte[:-1])
-            CRC_received = frame_byte[-1]
-
-            tag, *data, CRC = [format(_, "x").zfill(2).upper() for _ in frame]
-
-            # We set back the timeout to none as next time we'll be looking for syncwords
-            ser.timeout = None
-
-            try:
-                frame_name = BD[HEADER_TYPE[sync_word[1]] + "-" + tag]["name"]
-                frame_data = BD[HEADER_TYPE[sync_word[1]] + "-" + tag]["data"]
-            except KeyError:
-                frame_name = (
-                    "<tan>Frame unrecognized: "
+                buffer_feed += (
+                    "<syncword>"
                     + "".join(sync_word)
-                    + "-"
-                    + tag
-                    + "</tan>"
+                    + "</syncword>"
+                    + "<datalen>"
+                    + format(data_length, "x").zfill(2)
+                    + "</datalen>"
                 )
-                frame_data = False
+                buffer_feed += frame
+                buffer_feed += " Timeout error.</error> "
 
-            if ui.verbose.checked:
-                buffer_feed += lib.format_frame(
-                    "<syncword>" + "".join(sync_word) + "</syncword>",
-                    "<datalen>" + format(data_length, "x").zfill(2) + "</datalen>",
-                    "<tag>" + tag + "</tag>",
-                    "<data>" + "".join(data) + "</data>",
-                    "<crc>" + CRC + "</crc>",
-                    "<b>" + frame_name + "</b>",
-                )
+                ui.buffer_layout.insert_line(buffer_feed)
+                first_frame = True
+
             else:
-                buffer_feed += HEADER_FROM[sync_word[0]] + " - " + frame_name
+                sync_word_byte = bytearray.fromhex("".join(sync_word))
+                frame_byte = sync_word_byte + bytearray([data_length]) + frame
+                CRC_calculated = lib.compute_CRC(frame_byte[:-1])
+                CRC_received = frame_byte[-1]
 
-            if CRC_calculated != CRC_received:
-                buffer_feed += f" <error> Bad CRC: received {CRC}, should be {format(CRC_calculated, 'x').zfill(2)}</error>"
+                tag, *data, CRC = [format(_, "x").zfill(2).upper() for _ in frame]
 
-            # Let's print the frame's data if any
-            if frame_data:
-                if frame_data[0][0] != "":
-                    pointer = 0
-                    buffer_feed += " ("
-                    for key, value in enumerate(frame_data):
-                        if key != 0:
-                            buffer_feed += "|"
-                        field_length = int(value[0])
-                        field_name = value[1]
+                # We set back the timeout to none as next time we'll be looking for syncwords
+                ser.timeout = None
 
-                        buffer_feed += (
-                            field_name
-                            + "=<data>0x"
-                            + "".join(data[pointer : pointer + field_length]).zfill(
-                                field_length * 2
+                try:
+                    frame_name = BD[HEADER_TYPE[sync_word[1]] + "-" + tag]["name"]
+                    frame_data = BD[HEADER_TYPE[sync_word[1]] + "-" + tag]["data"]
+                except KeyError:
+                    frame_name = (
+                        "<tan>Frame unrecognized: "
+                        + "".join(sync_word)
+                        + "-"
+                        + tag
+                        + "</tan>"
+                    )
+                    frame_data = False
+
+                if ui.verbose.checked:
+                    buffer_feed += lib.format_frame(
+                        "<syncword>" + "".join(sync_word) + "</syncword>",
+                        "<datalen>" + format(data_length, "x").zfill(2) + "</datalen>",
+                        "<tag>" + tag + "</tag>",
+                        "<data>" + "".join(data) + "</data>",
+                        "<crc>" + CRC + "</crc>",
+                        "<b>" + frame_name + "</b>",
+                    )
+                else:
+                    buffer_feed += HEADER_FROM[sync_word[0]] + " - " + frame_name
+
+                if CRC_calculated != CRC_received:
+                    buffer_feed += f" <error> Bad CRC: received {CRC}, should be {format(CRC_calculated, 'x').zfill(2)}</error>"
+
+                # Let's print the frame's data if any
+                if frame_data:
+                    if frame_data[0][0] != "":
+                        pointer = 0
+                        buffer_feed += " ("
+                        for key, value in enumerate(frame_data):
+                            if key != 0:
+                                buffer_feed += "|"
+                            field_length = int(value[0])
+                            field_name = value[1]
+
+                            buffer_feed += (
+                                field_name
+                                + "=<data>0x"
+                                + "".join(data[pointer : pointer + field_length]).zfill(
+                                    field_length * 2
+                                )
+                                + "</data>"
                             )
-                            + "</data>"
-                        )
-                        pointer = pointer + field_length
-                    buffer_feed += ")"
+                            pointer = pointer + field_length
+                        buffer_feed += ")"
 
-            buffer_feed += "\n"
+                buffer_feed += "\n"
 
-            ui.buffer_layout.insert_line(buffer_feed)
-            lib.write_to_file(
-                "".join(sync_word)
-                + format(data_length, "x").zfill(2)
-                + tag
-                + "".join(data)
-                + CRC
-                + "\n"
-            )
+                ui.buffer_layout.insert_line(buffer_feed)
+                lib.write_to_file(
+                    "".join(sync_word)
+                    + format(data_length, "x").zfill(2)
+                    + tag
+                    + "".join(data)
+                    + CRC
+                    + "\n"
+                )
 
 
 def serial_com_watchdog(ui, ser, lock):
@@ -246,10 +250,10 @@ def send_TC(TC_data, ui, ser, lock):
     frame_to_be_sent_str += format(CRC, "x").zfill(2)
 
     with lock:
-        for byte in frame_to_be_sent_bytes:
-            ser.write(byte)
-            print(byte)
-            # sleep(conf['COM']['delay_inter_byte'])
+        for key, int_ in enumerate(frame_to_be_sent_bytes):
+            ser.write([int_])
+            if key != len(frame_to_be_sent_bytes) - 1:
+                sleep(conf['COM']['delay_inter_byte'])
 
         buffer_feed = "<tc>TC</tc> - "  # Line to be printed to TMTC feed
 

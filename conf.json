@@ -3,7 +3,7 @@
         "port": "ttyUSB0",
         "baudrate": "115200",
         "timeout": 0.020,
-        "delay_inter_byte": 0.001
+        "delay_inter_byte": 0.005
     },
     "debug": "True",
     "hex_upload": {
