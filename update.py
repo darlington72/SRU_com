@@ -1,5 +1,7 @@
 from version import __version__
 
+# https://api.github.com/repos/superlevure/SRU_com/releases/latest
+
 
 COMMANDS = {
     # Lables

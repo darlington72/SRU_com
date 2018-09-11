@@ -8,12 +8,17 @@ import lib
 import serial_com
 import UI_layout
 from args import args
+from update import update
 
 lock = threading.Lock()
 
 
 if __name__ == "__main__":
 
+    if args.update:
+        update()
+        sys.exit()
+        
     # Serial
     if args.test:
         ser = lib.SerialTest()
