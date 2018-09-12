@@ -14,7 +14,7 @@ dev/
 backups/
 text-editor.py
 test_fullscreen.py
-
+.vscode/
 # Distribution / packaging
 .Python
 build/
