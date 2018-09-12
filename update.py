@@ -1,14 +1,11 @@
-import requests
 import json
-from pprint import pprint
 import sys
 import tarfile
 from datetime import datetime
-from time import sleep
 import os
 import shutil
-import stat
 from tqdm import tqdm
+import requests
 
 from version import __version__
 
@@ -42,12 +39,6 @@ def copytree(src, dst, symlinks=False, ignore=None):
             if os.path.lexists(d):
                 os.remove(d)
             os.symlink(os.readlink(s), d)
-            try:
-                st = os.lstat(s)
-                mode = stat.S_IMODE(st.st_mode)
-                os.lchmod(d, mode)
-            except:
-                pass  # lchmod not available
         elif os.path.isdir(s):
             copytree(s, d, symlinks, ignore)
         else:
@@ -107,7 +98,6 @@ def update():
             if r.status_code == 200:
                 last_version_name += ".tar.gz"
                 with open(last_version_name, "wb") as f:
-                    size_downloaded = 0
                     try:
                         total_size = r.headers["Content-Length"]
                     except KeyError:
@@ -146,9 +136,21 @@ def update():
 
                 print_c(f"New version {last_version_name} has been installed !", "good")
 
+            else:
+                print_c(
+                    "Error in HTTP request, please check the connection and try again.",
+                    "bad",
+                )
+                sys.exit(0)
         else:
             print_c("SRU_com is already up to date", "good")
             sys.exit(0)
+
+    else:
+        print_c(
+            "Error in HTTP request, please check the connection and try again.", "bad"
+        )
+        sys.exit(0)
 
 
 # update()
