@@ -1,28 +1,4 @@
 {
-    "TC-99": {
-        "type": "TC",
-        "name": "TEST",
-        "header": "4312",
-        "length": "0C",
-        "tag": "AF",
-        "data": [
-            [
-                "4",
-                "Page address written",
-                "00000000"
-            ],
-            [
-                "4",
-                "LOL",
-                "?"
-            ],
-            [
-                "4",
-                "Page address written",
-                "00000000"
-            ]
-        ]
-    },
     "TC-00": {
         "type": "TC",
         "name": "REBOOT (no TM)",
@@ -39,46 +15,74 @@
         "tag": "80",
         "data": ""
     },
+    "TM-00": {
+        "type": "TM",
+        "name": "REBOOT",
+        "header": "1234",
+        "length": "09",
+        "tag": "06",
+        "data": [
+            [
+                "1",
+                "SRU reboot counter"
+            ],
+            [
+                "1",
+                "CPU reboot counter"
+            ],
+            [
+                "1",
+                "Watchdog disarming key"
+            ],
+            [
+                "1",
+                "Boot status"
+            ],
+            [
+                "1",
+                "MRAM app CRC"
+            ],
+            [
+                "1",
+                "App CRC computed"
+            ],
+            [
+                "1",
+                "Watchdog level"
+            ],
+            [
+                "1",
+                "App nbr reload"
+            ],
+            [
+                "1",
+                "App Version"
+            ]
+        ]
+    },
     "TC-01": {
         "type": "TC",
         "name": "CLEAR_WDG (no TM)",
         "header": "1234",
-        "length": "01",
+        "length": "00",
         "tag": "01",
-        "data": [
-            [
-                "1",
-                "Clear",
-                "63"
-            ]
-        ]
+        "data": ""
     },
     "TC-81": {
         "type": "TC",
         "name": "CLEAR_WDG (with TM)",
         "header": "1234",
-        "length": "01",
+        "length": "00",
         "tag": "81",
-        "data": [
-            [
-                "1",
-                "Clear",
-                "63"
-            ]
-        ]
+        "data": ""
     },
     "TM-01": {
         "type": "TM",
         "name": "CLEAR_WDG",
         "header": "1243",
-        "length": "01",
+        "length": "00",
         "tag": "01",
-        "data": [
-            [
-                "1",
-                "Valide si 0x00"
-            ]
-        ]
+        "data": ""
     },
     "TC-02": {
         "type": "TC",
@@ -241,7 +245,7 @@
             [
                 "2",
                 "Read Address",
-                "?"
+                "0020"
             ]
         ]
     },
@@ -255,7 +259,7 @@
             [
                 "2",
                 "Read Address",
-                "?"
+                "0020"
             ]
         ]
     },
@@ -353,7 +357,7 @@
     },
     "TC-07": {
         "type": "TC",
-        "name": "Read RAM (no TM)",
+        "name": "READ RAM (no TM)",
         "header": "1234",
         "length": "04",
         "tag": "07",
@@ -372,7 +376,7 @@
     },
     "TC-87": {
         "type": "TC",
-        "name": "Read RAM (with TM)",
+        "name": "READ RAM (with TM)",
         "header": "1234",
         "length": "04",
         "tag": "87",
@@ -391,8 +395,9 @@
     },
     "TM-07": {
         "type": "TM",
-        "name": "Read RAM",
+        "name": "READ RAM",
         "header": "1234",
+        "length": "05",
         "tag": "07",
         "data": [
             [
@@ -409,16 +414,62 @@
             ]
         ]
     },
-    "TM-87": {
-        "type": "TM",
-        "name": "Read RAM",
+    "TC-08": {
+        "type": "TC",
+        "name": "WRITE RAM (no TM)",
         "header": "1234",
-        "length": "1",
-        "tag": "87",
+        "length": "03",
+        "tag": "08",
         "data": [
             [
+                "2",
+                "Address to Write",
+                "?"
+            ],
+            [
                 "1",
-                "Error flag"
+                "Data to write",
+                "?"
+            ]
+        ]
+    },
+    "TC-88": {
+        "type": "TC",
+        "name": "WRITE RAM (with TM)",
+        "header": "1234",
+        "length": "04",
+        "tag": "88",
+        "data": [
+            [
+                "2",
+                "Address to Write",
+                "?"
+            ],
+            [
+                "1",
+                "Data to write",
+                "?"
+            ]
+        ]
+    },
+    "TM-08": {
+        "type": "TM",
+        "name": "WRITE RAM",
+        "header": "1234",
+        "length": "05",
+        "tag": "08",
+        "data": [
+            [
+                "2",
+                "Address WRITTEN"
+            ],
+            [
+                "1",
+                "Data before write"
+            ],
+            [
+                "1",
+                "Data after write"
             ]
         ]
     },
@@ -483,6 +534,47 @@
             ]
         ]
     },
+    "TC-0A": {
+        "type": "TC",
+        "name": "GET ALL REGISTER (no TM)",
+        "header": "1234",
+        "length": "00",
+        "tag": "0A",
+        "data": [
+            [
+                "",
+                "",
+                ""
+            ]
+        ]
+    },
+    "TC-8A": {
+        "type": "TC",
+        "name": "GET ALL REGISTER (with TM)",
+        "header": "1234",
+        "length": "00",
+        "tag": "8A",
+        "data": [
+            [
+                "",
+                "",
+                ""
+            ]
+        ]
+    },
+    "TM-0A": {
+        "type": "TM",
+        "name": "GET ALL REGISTER",
+        "header": "1234",
+        "length": "159",
+        "tag": "0A",
+        "data": [
+            [
+                "159",
+                "Regsiter"
+            ]
+        ]
+    },
     "TC-7F": {
         "type": "TC",
         "name": "BAD INDEX (no TM)",
@@ -511,12 +603,25 @@
             ]
         ]
     },
+    "TM-20": {
+        "type": "TM",
+        "name": "GLOBAL_WDG_LEVEL",
+        "header": "1243",
+        "length": "01",
+        "tag": "00",
+        "data": [
+            [
+                "1",
+                "WDG Global level"
+            ]
+        ]
+    },
     "TM-2E": {
         "type": "TM",
         "name": "BAD CRC",
         "header": "1243",
         "length": "03",
-        "tag": "2E",
+        "tag": "2e",
         "data": [
             [
                 "1",
@@ -583,10 +688,38 @@
             ]
         ]
     },
+    "TM-21": {
+        "type": "TM",
+        "name": "Timeout UART",
+        "header": "1234",
+        "length": "02",
+        "tag": "24",
+        "data": [
+            [
+                "1",
+                "",
+                "00"
+            ],
+            [
+                "1",
+                "",
+                "00"
+            ]
+        ]
+    },
+    "TC-24": {
+        "type": "TC",
+        "name": "Goto Bootloader (no TM)",
+        "bootloader": "True",
+        "header": "1234",
+        "length": "00",
+        "tag": "24",
+        "data": ""
+    },
     "TC-A4": {
         "type": "TC",
-        "name": "Bootloader",
-        "bootloader": true,
+        "name": "bootloader",
+        "bootloader": "True",
         "header": "1234",
         "length": "00",
         "tag": "A4",
@@ -596,7 +729,7 @@
         "type": "TM",
         "name": "Bootloader status",
         "header": "4312",
-        "length": "03",
+        "length": "04",
         "tag": "AF",
         "data": [
             [
@@ -613,34 +746,39 @@
                 "1",
                 "App CRC in MRAM",
                 "00"
+            ],
+            [
+                "1",
+                "Bootloader version",
+                "00"
             ]
         ]
     },
     "TM-C2": {
         "type": "TM",
-        "name": "Flash page written",
+        "name": "Flash page writen",
         "header": "4312",
-        "length": "04",
+        "length": "02",
         "tag": "AF",
         "data": [
             [
-                "4",
-                "Page address written",
-                "00000000"
+                "2",
+                "Page address writen",
+                "0000"
             ]
         ]
     },
     "TM-C3": {
         "type": "TM",
-        "name": "Last flash page written",
+        "name": "Last flash page writen",
         "header": "4312",
-        "length": "06",
+        "length": "04",
         "tag": "AF",
         "data": [
             [
-                "4",
-                "Last page address written",
-                "00000000"
+                "2",
+                "Last page address writen",
+                "0000"
             ],
             [
                 "1",
@@ -649,7 +787,21 @@
             ],
             [
                 "1",
-                "MRAM TM request App boot",
+                "Bootloader version",
+                "00"
+            ]
+        ]
+    },
+    "TM-2D": {
+        "type": "TM",
+        "name": "DEBUG",
+        "header": "4312",
+        "length": "01",
+        "tag": "2D",
+        "data": [
+            [
+                "1",
+                "DEBUG",
                 "00"
             ]
         ]
