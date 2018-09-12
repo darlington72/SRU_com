@@ -11,7 +11,7 @@ settings.json
 dev/
 # C extensions
 *.so
-
+backups/
 text-editor.py
 test_fullscreen.py
 

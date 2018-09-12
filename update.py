@@ -3,9 +3,12 @@ import json
 from pprint import pprint
 import sys
 import tarfile
-from tqdm import tqdm
+from datetime import datetime
 from time import sleep
-
+import os
+import shutil
+import stat
+from tqdm import tqdm
 
 from version import __version__
 
@@ -23,6 +26,35 @@ COMMANDS = {
     "good": (32, "[+] "),
     "run": (97, "[~] "),
 }
+
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+
+
+def copytree(src, dst, symlinks=False, ignore=None):
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+        shutil.copystat(src, dst)
+    lst = os.listdir(src)
+    if ignore:
+        excl = ignore(src, lst)
+        lst = [x for x in lst if x not in excl]
+    for item in lst:
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if symlinks and os.path.islink(s):
+            if os.path.lexists(d):
+                os.remove(d)
+            os.symlink(os.readlink(s), d)
+            try:
+                st = os.lstat(s)
+                mode = stat.S_IMODE(st.st_mode)
+                os.lchmod(d, mode)
+            except:
+                pass  # lchmod not available
+        elif os.path.isdir(s):
+            copytree(s, d, symlinks, ignore)
+        else:
+            shutil.copy2(s, d)
 
 
 def print_c(string, message_type, endline=True):
@@ -49,15 +81,31 @@ def update():
         last_version_url = response["tarball_url"]
 
         if last_version_name > __version__:
-            print_c(f"New version {last_version_name} available !", "good")
-            # print_c("", "run")
+            print_c(
+                f"New version {last_version_name} is available at {last_version_url} !",
+                "good",
+            )
 
-            # pprint(response)
+            print_c("Backing up current version to tar file..", "run")
+
+            backup_dir = "backups"
+            if not os.path.exists(backup_dir):
+                os.makedirs(backup_dir)
+            current_date = datetime.now().strftime("%Y-%m-%d")
+            backup_name = "SRU_com-" + __version__ + "-" + current_date + ".tar.gz"
+
+            with tarfile.open(backup_dir + "/" + backup_name, mode="w:gz") as backup:
+                backup.add(
+                    CURRENT_DIR, arcname=os.path.basename(CURRENT_DIR), recursive=True
+                )
+
+            print_c(f"SRU_com has been backed up to {backup_dir}\{backup_name}", "good")
+
+            print_c(f"Downloading new version..", "run")
+
             r = requests.get(
                 last_version_url, stream=True, headers={"Accept-Encoding": "identity"}
             )
-
-            # pprint(r.headers)
 
             if r.status_code == 200:
                 last_version_name += ".tar.gz"
@@ -74,26 +122,36 @@ def update():
                             f.write(chunk)
                     else:
                         with tqdm(
-                            total=total_size,
-                            ncols=100,
-                            desc="\033[97m[~]\033[0m Downloading new version.. ",
+                            total=100, ncols=100, desc="\033[97m[~]\033[0m "
                         ) as pbar:
                             for chunk in r.iter_content(
-                                chunk_size=int(int(total_size or 400000) / 100)
+                                chunk_size=int(int(total_size) / 99)
                             ):
                                 f.write(chunk)
                                 pbar.update(1)
-                    print_c(f"Release downloaded <{last_version_name}>", "good")
 
-                    print_c("Decompressing..", "run", False)
+                print_c(f"Release downloaded <{last_version_name}>", "good")
 
-                    # print(tarfile.is_tarfile(last_version_name))
-                    tar_release = tarfile.open(last_version_name, mode="r:gz")
-                    tar_release.extractall()
+                print_c("Decompressing..", "run", False)
+                tar_release = tarfile.open(last_version_name)
+                tar_release.extractall()
+                tar_release_name = tar_release.getnames()[0]
+                print(" Done.")
 
-                    print(" Done.")
+                print_c("Installing new version..", "run", endline=False)
+                copytree(tar_release_name + "/", CURRENT_DIR + "/")
+                print(" Done.")
+
+                print_c("Deleting temporary files..", "run", endline=False)
+                os.remove(tar_release.name)
+                shutil.rmtree(tar_release_name)
+                print(" Done.")
+
+                print_c(f"New version {last_version_name} has been installed !", "good")
 
         else:
             print_c("SRU_com is already up to date", "good")
             sys.exit(0)
 
+
+# update()
