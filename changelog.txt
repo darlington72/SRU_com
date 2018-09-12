@@ -1,3 +1,7 @@
+Version 1.2.0
+- Added auto updater
+-------------------------------
+
 Version 1.1.0
 - Added TC with configurable parameter(s)
 
