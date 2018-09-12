@@ -710,7 +710,7 @@
     "TC-24": {
         "type": "TC",
         "name": "Goto Bootloader (no TM)",
-        "bootloader": "True",
+        "bootloader": true,
         "header": "1234",
         "length": "00",
         "tag": "24",
@@ -719,7 +719,7 @@
     "TC-A4": {
         "type": "TC",
         "name": "bootloader",
-        "bootloader": "True",
+        "bootloader": true,
         "header": "1234",
         "length": "00",
         "tag": "A4",

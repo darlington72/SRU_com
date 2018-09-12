@@ -12,9 +12,6 @@ from tqdm import tqdm
 
 from version import __version__
 
-__version__ = "0.1.1"
-
-# https://api.github.com/repos/superlevure/SRU_com/releases/latest
 
 REPO = "https://api.github.com/repos/superlevure/SRU_com/releases/latest"
 
