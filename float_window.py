@@ -68,9 +68,12 @@ def do_upload_hex(ui, ser):
                         target=serial_com.upload_hex, args=(ui, ser, data)
                     )
                     thread_upload.start()
+                    ui.last_TC_sent[3] = True
+                    ui.last_TC_sent[4] = data
             except IOError as e:
                 show_message("Error", "{}".format(e), ui.root_container)
                 get_app().invalidate()
+                ui.last_TC_sent[4] = None
 
     ensure_future(coroutine())
 

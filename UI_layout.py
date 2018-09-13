@@ -48,7 +48,7 @@ class UI:
         self.TC_selectable_list = SelectableList(
             values=TC_list, handler=TC_send_handler
         )
-        self.last_TC_sent = ["", "", ""]
+        self.last_TC_sent = [None] * 5
 
         ######  WATCHDOG CLEAR ######
         self.watchdog_radio = RadioList_(values=[(False, "False"), (True, "True")])
@@ -62,6 +62,11 @@ class UI:
         ######  CONFIGURATION   #####
         self.verbose = Checkbox_(text="Verbose", checked=args.verbose)
         self.raw_data_onoff = Checkbox_(text="Raw Data Window", checked=True)
+
+        ####  KEYBOARD SHORTCUT ####
+        keyboard_shortcuts = Label(
+            text=f"<ctrl> + C: quit \n<tab>     : change focus \n<ctrl> + R: re-send last TC"
+        )
 
         ######  CREDITS   #####
         credit = Label(
@@ -117,6 +122,7 @@ class UI:
                             Frame(title="Watchdog Clear", body=self.watchdog_radio),
                             Frame(title="TC List", body=self.TC_selectable_list),
                             Frame(title="Configuration", body=self.verbose),
+                            Frame(title="Keyboard shortcuts", body=keyboard_shortcuts),
                             watchdog_cleared,
                             credit,
                         ],
@@ -170,9 +176,9 @@ class UI:
     def add_raw_TC_to_window(self, func):
         def wrapper(data):
             if isinstance(data, int):
-                data_formatted = format(data, 'x').zfill(2).upper()
+                data_formatted = format(data, "x").zfill(2).upper()
             elif isinstance(data, list):
-                data_formatted = format(data[0], 'x').zfill(2).upper()
+                data_formatted = format(data[0], "x").zfill(2).upper()
             else:
                 data_formatted = binascii.hexlify(data).decode().upper()
 

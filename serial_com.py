@@ -2,6 +2,7 @@ from time import sleep, time
 import sys
 import lib
 import binascii
+import threading
 
 # Prompt_toolkit
 from prompt_toolkit.application.current import get_app
@@ -253,6 +254,9 @@ def send_TC(TC_data, ui, ser, lock, resend_last_TC=False):
         frame_to_be_sent_str = ui.last_TC_sent[1]
         buffer_feed = ui.last_TC_sent[2]
 
+        last_TC_upload_hex = ui.last_TC_sent[3]
+        last_TC_hex = ui.last_TC_sent[4]
+
         with lock:
             for key, int_ in enumerate(frame_to_be_sent_bytes):
                 ser.write([int_])
@@ -261,6 +265,15 @@ def send_TC(TC_data, ui, ser, lock, resend_last_TC=False):
 
             ui.buffer_layout.insert_line(buffer_feed)
             lib.write_to_file(frame_to_be_sent_str + "\n")
+
+        if last_TC_upload_hex:
+            if last_TC_hex:
+                thread_upload = threading.Thread(
+                    target=upload_hex, args=(ui, ser, last_TC_hex)
+                )
+                thread_upload.start()                
+            else:
+                float_window.do_upload_hex(ui, ser)
 
 
     else:
@@ -312,8 +325,13 @@ def send_TC(TC_data, ui, ser, lock, resend_last_TC=False):
         try:
             if BD[ui.TC_selectable_list.current_value]["bootloader"] is True:
                 float_window.do_upload_hex(ui, ser)
+                ui.last_TC_sent[3] = True
+            else:
+                ui.last_TC_sent[3] = False
+                ui.last_TC_sent[4] = None
         except KeyError:
-            pass
+            ui.last_TC_sent[3] = False
+            ui.last_TC_sent[4] = None
 
 
 def upload_hex(ui, ser, data):
