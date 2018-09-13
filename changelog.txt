@@ -1,3 +1,8 @@
+Version 1.3.0 - 18-09-13
+- Added <ctrl> + R shortcut to resend last TC
+- Added keyboard shortcuts frame to UI 
+-------------------------------
+
 Version 1.2.2 - 18-09-12
 - Fixed BD
 - Fixed updater
