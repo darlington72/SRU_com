@@ -48,6 +48,7 @@ class UI:
         self.TC_selectable_list = SelectableList(
             values=TC_list, handler=TC_send_handler
         )
+        self.last_TC_sent = ["", "", ""]
 
         ######  WATCHDOG CLEAR ######
         self.watchdog_radio = RadioList_(values=[(False, "False"), (True, "True")])
@@ -146,6 +147,11 @@ class UI:
         # @bindings.add("q", eager=True)
         def _(event):
             event.app.exit()
+
+        @self.bindings.add("c-r", eager=True)
+        def send_last_TC_again(event):
+            if self.last_TC_sent[0]:
+                serial_com.send_TC(None, self, ser, lock, resend_last_TC=True)
 
         self.application = Application(
             layout=Layout(self.root_container),
