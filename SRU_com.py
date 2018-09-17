@@ -18,7 +18,7 @@ if __name__ == "__main__":
     if args.update:
         update()
         sys.exit()
-        
+
     # Serial
     if args.test:
         ser = lib.SerialTest()

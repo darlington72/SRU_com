@@ -1,16 +1,17 @@
-from time import sleep, time
-import sys
-import lib
-import binascii
+"""serial_com.py
+
+Handles the serial communication with SRU.
+"""
+
+from time import sleep
 import threading
 
 # Prompt_toolkit
 from prompt_toolkit.application.current import get_app
-from prompt_toolkit.shortcuts import message_dialog
 
 # Project
+import lib
 from lib import BD, conf
-import UI_layout
 from args import args
 import float_window
 
@@ -286,7 +287,7 @@ def send_TC(TC_data, ui, ser, lock, resend_last_TC=False):
         frame_to_be_sent_bytes = bytearray.fromhex(frame_to_be_sent_str)
         CRC = lib.compute_CRC(frame_to_be_sent_bytes)
         frame_to_be_sent_bytes.append(CRC)
-        frame_to_be_sent_str += format(CRC, "x").zfill(2)
+        frame_to_be_sent_str += format(CRC, "x").zfill(2).upper()
 
 
 
