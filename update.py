@@ -4,7 +4,6 @@ import tarfile
 from datetime import datetime
 import os
 import shutil
-from socket import gaierror
 from tqdm import tqdm
 import requests
 
