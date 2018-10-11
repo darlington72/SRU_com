@@ -251,21 +251,24 @@ def send_TC(TC_data, ui, ser, lock, resend_last_TC=False):
     """
 
     if resend_last_TC:
-        frame_to_be_sent_bytes = ui.last_TC_sent[0]
-        frame_to_be_sent_str = ui.last_TC_sent[1]
-        buffer_feed = ui.last_TC_sent[2]
+        if ui.last_TC_sent[0]:
+            frame_to_be_sent_bytes = ui.last_TC_sent[0]
+            frame_to_be_sent_str = ui.last_TC_sent[1]
+            buffer_feed = ui.last_TC_sent[2]
+
+
+
+            with lock:
+                for key, int_ in enumerate(frame_to_be_sent_bytes):
+                    ser.write([int_])
+                    if key != len(frame_to_be_sent_bytes) - 1:
+                        sleep(conf["COM"]["delay_inter_byte"])
+
+                ui.buffer_layout.insert_line(buffer_feed)
+                lib.write_to_file(frame_to_be_sent_str + "\n")
 
         last_TC_upload_hex = ui.last_TC_sent[3]
         last_TC_hex = ui.last_TC_sent[4]
-
-        with lock:
-            for key, int_ in enumerate(frame_to_be_sent_bytes):
-                ser.write([int_])
-                if key != len(frame_to_be_sent_bytes) - 1:
-                    sleep(conf["COM"]["delay_inter_byte"])
-
-            ui.buffer_layout.insert_line(buffer_feed)
-            lib.write_to_file(frame_to_be_sent_str + "\n")
 
         if last_TC_upload_hex:
             if last_TC_hex:
@@ -278,50 +281,54 @@ def send_TC(TC_data, ui, ser, lock, resend_last_TC=False):
 
 
     else:
-        frame_name = BD[ui.TC_selectable_list.current_value]["name"]
-        frame_header = BD[ui.TC_selectable_list.current_value]["header"]
-        frame_length = BD[ui.TC_selectable_list.current_value]["length"]
-        frame_tag = BD[ui.TC_selectable_list.current_value]["tag"]
-        frame_data = "".join(TC_data)
-        frame_to_be_sent_str = frame_header + frame_length + frame_tag + frame_data
-        frame_to_be_sent_bytes = bytearray.fromhex(frame_to_be_sent_str)
-        CRC = lib.compute_CRC(frame_to_be_sent_bytes)
-        frame_to_be_sent_bytes.append(CRC)
-        frame_to_be_sent_str += format(CRC, "x").zfill(2).upper()
+        if "no_TC" not in BD[ui.TC_selectable_list.current_value] or not BD[ui.TC_selectable_list.current_value]["no_TC"]:
+            frame_name = BD[ui.TC_selectable_list.current_value]["name"]
+            frame_header = BD[ui.TC_selectable_list.current_value]["header"]
+            frame_length = BD[ui.TC_selectable_list.current_value]["length"]
+            frame_tag = BD[ui.TC_selectable_list.current_value]["tag"]
+            frame_data = "".join(TC_data)
+            frame_to_be_sent_str = frame_header + frame_length + frame_tag + frame_data
+            frame_to_be_sent_bytes = bytearray.fromhex(frame_to_be_sent_str)
+            CRC = lib.compute_CRC(frame_to_be_sent_bytes)
+            frame_to_be_sent_bytes.append(CRC)
+            frame_to_be_sent_str += format(CRC, "x").zfill(2).upper()
 
 
 
-        with lock:
-            for key, int_ in enumerate(frame_to_be_sent_bytes):
-                ser.write([int_])
-                if key != len(frame_to_be_sent_bytes) - 1:
-                    sleep(conf["COM"]["delay_inter_byte"])
+            with lock:
+                for key, int_ in enumerate(frame_to_be_sent_bytes):
+                    ser.write([int_])
+                    if key != len(frame_to_be_sent_bytes) - 1:
+                        sleep(conf["COM"]["delay_inter_byte"])
 
-            buffer_feed = "<tc>TC</tc> - "  # Line to be printed to TMTC feed
+                buffer_feed = "<tc>TC</tc> - "  # Line to be printed to TMTC feed
 
-            if ui.verbose.checked:
-                buffer_feed += lib.format_frame(
-                    "<syncword>" + frame_header + "</syncword>",
-                    "<datalen>" + frame_length + "</datalen>",
-                    "<tag>" + frame_tag + "</tag>",
-                    "<data>" + frame_data + "</data>",
-                    "<crc>" + frame_to_be_sent_str[-2:] + "</crc>",
-                    frame_name,
-                )
-            else:
-                buffer_feed += frame_name
+                if ui.verbose.checked:
+                    buffer_feed += lib.format_frame(
+                        "<syncword>" + frame_header + "</syncword>",
+                        "<datalen>" + frame_length + "</datalen>",
+                        "<tag>" + frame_tag + "</tag>",
+                        "<data>" + frame_data + "</data>",
+                        "<crc>" + frame_to_be_sent_str[-2:] + "</crc>",
+                        frame_name,
+                    )
+                else:
+                    buffer_feed += frame_name
 
-            buffer_feed += "\n"
-            
+                buffer_feed += "\n"
+                
 
-            ui.buffer_layout.insert_line(buffer_feed)
-            lib.write_to_file(frame_to_be_sent_str + "\n")
+                ui.buffer_layout.insert_line(buffer_feed)
+                lib.write_to_file(frame_to_be_sent_str + "\n")
 
 
-        # Let's save this TC in case user wants to resend it 
-        ui.last_TC_sent[0] = frame_to_be_sent_bytes
-        ui.last_TC_sent[1] = frame_to_be_sent_str
-        ui.last_TC_sent[2] = buffer_feed
+            # Let's save this TC in case user wants to resend it 
+            ui.last_TC_sent[0] = frame_to_be_sent_bytes
+            ui.last_TC_sent[1] = frame_to_be_sent_str
+            ui.last_TC_sent[2] = buffer_feed
+        
+        else:
+            ui.last_TC_sent[0] = False
 
         try:
             if BD[ui.TC_selectable_list.current_value]["bootloader"] is True:

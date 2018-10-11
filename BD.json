@@ -725,6 +725,12 @@
         "tag": "A4",
         "data": ""
     },
+    "TC-A5": {
+        "type": "TC",
+        "name": "bootloader no TC",
+        "bootloader": true,
+        "no_TC": true
+    },
     "TM-C0": {
         "type": "TM",
         "name": "Bootloader status",

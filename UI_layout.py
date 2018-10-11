@@ -40,7 +40,7 @@ class UI:
         self.TC_selectable_list = []
 
         def TC_send_handler():
-            if int(lib.BD[self.TC_selectable_list.current_value]["length"], 16) > 0:
+            if "lenght" in lib.BD[self.TC_selectable_list.current_value] and int(lib.BD[self.TC_selectable_list.current_value]["length"], 16) > 0:
                 float_window.do_conf_TC(0, [], self, ser, lock)
             else:
                 serial_com.send_TC([], self, ser, lock)
@@ -49,6 +49,12 @@ class UI:
             values=TC_list, handler=TC_send_handler
         )
         self.last_TC_sent = [None] * 5
+
+        # last_TC_sent[0] : frame_to_be_sent_bytes
+        # last_TC_sent[1] : frame_to_be_sent_str
+        # last_TC_sent[2] : buffer_feed
+        # last_TC_sent[3] : is Hex upload ?
+        # last_TC_sent[4] : Hex file to be sent
 
         ######  WATCHDOG CLEAR ######
         self.watchdog_radio = RadioList_(values=[(False, "False"), (True, "True")])
@@ -156,7 +162,7 @@ class UI:
 
         @self.bindings.add("c-r", eager=True)
         def send_last_TC_again(event):
-            if self.last_TC_sent[0]:
+            if self.last_TC_sent[0] or self.last_TC_sent[3]:
                 serial_com.send_TC(None, self, ser, lock, resend_last_TC=True)
 
         self.application = Application(
