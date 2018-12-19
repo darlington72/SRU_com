@@ -1,4 +1,6 @@
 import binascii
+import sys
+import serial
 
 # Prompt_toolkit
 from prompt_toolkit.layout.layout import Window
@@ -173,8 +175,14 @@ class UI:
             mouse_support=False,
         )
 
+        self.exit_status = None
+
     def run_app(self):
         self.application.run()
+
+        if self.exit_status == "serial":
+            print("Serial error.")
+
         print("Bye bye.")
         lib.conf_file.close()
         lib.BD_file.close()
@@ -199,14 +207,25 @@ class UI:
                 self.raw_serial_buffer.text += HTML("<TC>" + data_formatted + "</TC>")
                 self.raw_serial_window.text_len += len(data_formatted)
 
-            func(data)
+            try:
+                func(data)
+            except serial.SerialException:
+                # print('Serial error.')
+                self.exit_status = "serial"
+                self.application.exit()
+
 
         return wrapper
 
     def add_raw_TM_to_window(self, func):
         def wrapper(size):
-
-            read = func(size)
+            
+            try:
+                read = func(size)
+            except serial.SerialException:
+                self.exit_status = "serial"
+                # print('Serial error.')
+                self.application.exit()
 
             read_formatted = "".join([format(_, "x").zfill(2) for _ in read]).upper()
 
