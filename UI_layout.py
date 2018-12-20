@@ -44,7 +44,7 @@ class UI:
         self.TC_selectable_list = []
 
         def TC_send_handler():
-            if "lenght" in lib.BD[self.TC_selectable_list.current_value] and int(lib.BD[self.TC_selectable_list.current_value]["length"], 16) > 0:
+            if "length" in lib.BD[self.TC_selectable_list.current_value] and int(lib.BD[self.TC_selectable_list.current_value]["length"], 16) > 0:
                 # TC has parameter(s)
                 float_window.do_conf_TC(0, [], self, ser, lock)
             else:
