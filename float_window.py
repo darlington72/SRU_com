@@ -1,5 +1,5 @@
 import threading
-
+import sys
 # Prompt_toolkit
 from prompt_toolkit.layout.containers import Float, HSplit
 from prompt_toolkit.layout.dimension import D
@@ -84,7 +84,7 @@ def do_conf_TC(current_key, TC_data, ui, ser, lock):
         param_count = len(BD[ui.TC_selectable_list.current_value]["data"])
 
         if current_key == param_count:
-            serial_com.send_TC(TC_data, ui, ser, lock)
+            serial_com.send_TC(ui.TC_selectable_list.current_value, TC_data, ui, ser, lock)
         else:
             try:
                 param_size = int(

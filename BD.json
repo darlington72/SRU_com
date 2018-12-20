@@ -437,7 +437,7 @@
         "type": "TC",
         "name": "WRITE RAM (with TM)",
         "header": "1234",
-        "length": "04",
+        "length": "03",
         "tag": "88",
         "data": [
             [

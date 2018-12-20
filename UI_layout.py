@@ -38,7 +38,7 @@ class UI:
     def __init__(self, ser, lock):
 
         self.ser = ser
-        
+        self.lock = lock
         # TC list and sending
         TC_list = [(_, lib.BD[_]["name"]) for _ in lib.BD if lib.BD[_]["type"] == "TC"]
         self.TC_selectable_list = []
@@ -48,7 +48,7 @@ class UI:
                 # TC has parameter(s)
                 float_window.do_conf_TC(0, [], self, ser, lock)
             else:
-                serial_com.send_TC([], self, ser, lock)
+                serial_com.send_TC(self.TC_selectable_list.current_value, [], self, ser, lock)
 
         self.TC_selectable_list = SelectableList(
             values=TC_list, handler=TC_send_handler
@@ -177,7 +177,7 @@ class UI:
         @self.bindings.add("c-r", eager=True)
         def send_last_TC_again(event):
             if self.last_TC_sent[0] or self.last_TC_sent[3]:
-                serial_com.send_TC(None, self, ser, lock, resend_last_TC=True)
+                serial_com.send_TC(self.TC_selectable_list.current_value, None, self, ser, lock, resend_last_TC=True)
 
         self.application = Application(
             layout=Layout(self.root_container),

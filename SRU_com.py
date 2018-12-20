@@ -22,6 +22,9 @@ if __name__ == "__main__":
     # Serial
     if args.test:
         ser = lib.SerialTest()
+        # !! Warning !!
+        # When using serial test, if there's an error in the length of a TM/TC in the BD, SRU_com will be stuck in
+        # a infinite loop because there's no timeout on reception
     else:
 
         try:
