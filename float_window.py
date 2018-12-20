@@ -50,7 +50,7 @@ class TextInputDialog(object):
         return self.dialog
 
 
-def do_upload_hex(ui, ser):
+def do_upload_hex(ui):
     def coroutine():
         open_dialog = TextInputDialog(
             title="Application Upload to SRU",
@@ -65,7 +65,7 @@ def do_upload_hex(ui, ser):
                 with open(path, "rb", buffering=0) as f:
                     data = f.readall()
                     thread_upload = threading.Thread(
-                        target=serial_com.upload_hex, args=(ui, ser, data)
+                        target=serial_com.upload_hex, args=(ui, data)
                     )
                     thread_upload.start()
                     ui.last_TC_sent[3] = True

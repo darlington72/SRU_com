@@ -32,17 +32,20 @@ from version import __version__
 import serial_com
 import lib
 import float_window
-
+import tools
 
 class UI:
     def __init__(self, ser, lock):
 
+        self.ser = ser
+        
         # TC list and sending
         TC_list = [(_, lib.BD[_]["name"]) for _ in lib.BD if lib.BD[_]["type"] == "TC"]
         self.TC_selectable_list = []
 
         def TC_send_handler():
             if "lenght" in lib.BD[self.TC_selectable_list.current_value] and int(lib.BD[self.TC_selectable_list.current_value]["length"], 16) > 0:
+                # TC has parameter(s)
                 float_window.do_conf_TC(0, [], self, ser, lock)
             else:
                 serial_com.send_TC([], self, ser, lock)
@@ -66,6 +69,14 @@ class UI:
         watchdog_cleared = Window(
             BufferControl(buffer=self.watchdog_cleared_buffer, focusable=False)
         )
+
+        ######      TOOLS       #####
+
+        def tools_handler():
+            tools.tools_handler(self)
+
+        self.tools_selectable_list = SelectableList(values=tools.tools_list, handler=tools_handler)
+
 
         ######  CONFIGURATION   #####
         self.verbose = Checkbox_(text="Verbose", checked=args.verbose)
@@ -129,6 +140,7 @@ class UI:
                         [
                             Frame(title="Watchdog Clear", body=self.watchdog_radio),
                             Frame(title="TC List", body=self.TC_selectable_list),
+                            Frame(title="Tools", body=self.tools_selectable_list),
                             Frame(title="Configuration", body=self.verbose),
                             Frame(title="Keyboard shortcuts", body=keyboard_shortcuts),
                             watchdog_cleared,

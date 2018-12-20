@@ -277,7 +277,7 @@ def send_TC(TC_data, ui, ser, lock, resend_last_TC=False):
                 )
                 thread_upload.start()                
             else:
-                float_window.do_upload_hex(ui, ser)
+                float_window.do_upload_hex(ui)
 
 
     else:
@@ -332,7 +332,7 @@ def send_TC(TC_data, ui, ser, lock, resend_last_TC=False):
 
         try:
             if BD[ui.TC_selectable_list.current_value]["bootloader"] is True:
-                float_window.do_upload_hex(ui, ser)
+                float_window.do_upload_hex(ui)
                 ui.last_TC_sent[3] = True
             else:
                 ui.last_TC_sent[3] = False
@@ -342,7 +342,7 @@ def send_TC(TC_data, ui, ser, lock, resend_last_TC=False):
             ui.last_TC_sent[4] = None
 
 
-def upload_hex(ui, ser, data):
+def upload_hex(ui, data):
     """Upload a hex file to SRU
     Called by do_upload_hex()
     
@@ -364,7 +364,7 @@ def upload_hex(ui, ser, data):
         ui.watchdog_radio.set_value(0)
 
     if args.loop:
-        ser.write(bytearray.fromhex("123456A4"))
+        ui.ser.write(bytearray.fromhex("123456A4"))
 
     data = data.split("\n")
 
@@ -372,13 +372,13 @@ def upload_hex(ui, ser, data):
         if line:
             if line[0] == ":":
                 for char in line:
-                    ser.write(char.encode())
+                    ui.ser.write(char.encode())
                     sleep(conf["hex_upload"]["delay_inter_char"])
 
                 sleep(conf["hex_upload"]["delay_inter_line"])
 
     if args.loop:
-        ser.write(bytearray.fromhex("FF"))
+        ui.ser.write(bytearray.fromhex("FF"))
 
     get_app().invalidate()
     info_message.remove_dialog_as_float(ui.root_container)
