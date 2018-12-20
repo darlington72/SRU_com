@@ -1,0 +1,631 @@
+[
+    {
+        "name": "REBOOT",
+        "header": "1234",
+        "length": "16",
+        "tag": "00",
+        "data": [
+            [
+                "01",
+                "SRU Used"
+            ],
+            [
+                "01",
+                "BOOT Status MRAM"
+            ],
+            [
+                "01",
+                "MRAM Appli CRC"
+            ],
+            [
+                "01",
+                "Watchdog Key"
+            ],
+            [
+                "01",
+                "Watchdog Level"
+            ],
+            [
+                "01",
+                "Nbr Appli reload"
+            ],
+            [
+                "01",
+                "Nbr SRU Reboot"
+            ],
+            [
+                "01",
+                "Nbr SRU Reboot Life"
+            ],
+            [
+                "01",
+                "Nbr Zynq Reboot"
+            ],
+            [
+                "01",
+                "TM Appli Requested"
+            ],
+            [
+                "01",
+                "TM Boot Requested"
+            ],
+            [
+                "01",
+                "Boot Version"
+            ],
+            [
+                "01",
+                "Appli Version"
+            ],
+            [
+                "01",
+                "Tempo WDG IT"
+            ],
+            [
+                "01",
+                "Tempo WDG IT After Reboot Zynq"
+            ],
+            [
+                "01",
+                "Mram Alive"
+            ],
+            [
+                "01",
+                "Crc computed"
+            ],
+            [
+                "01",
+                "Next Boot"
+            ]
+        ]
+    },
+    {
+        "name": "CLEAR_WDG",
+        "header": "1243",
+        "length": "00",
+        "tag": "01",
+        "data": [[""]]
+    },
+    {
+        "name": "STATUS KEY WDG",
+        "header": "1234",
+        "length": "04",
+        "tag": "02",
+        "data": [
+            [
+                "01",
+                "Status WDG (55 En, AA Dis)",
+                "63"
+            ],
+            [
+                "01",
+                "WDG Threshold Before Reboot Zynq",
+                "63"
+            ],
+            [
+                "01",
+                "WDG Threshold After Reboot Zynq",
+                "63"
+            ],
+            [
+                "01",
+                "Current WDG Threshold",
+                "63"
+            ]
+        ]
+    },
+    {
+        "name": "ENABLE WDG",
+        "header": "1234",
+        "length": "03",
+        "tag": "03",
+        "data": [
+            [
+                "01",
+                "Request (55 En, AA Dis)",
+                "63"
+            ],
+            [
+                "01",
+                "Old State (55 En, AA Dis)",
+                "63"
+            ],
+            [
+                "01",
+                "Status (55 En, AA Dis, FF Not valid)",
+                "63"
+            ]
+        ]
+    },
+    {
+        "name": "DISABLE WDG",
+        "header": "1234",
+        "length": "03",
+        "tag": "04",
+        "data": [
+            [
+                "01",
+                "Request (55 En, AA Dis)",
+                "63"
+            ],
+            [
+                "01",
+                "Old State (55 En, AA Dis)",
+                "63"
+            ],
+            [
+                "01",
+                "Status (55 En, AA Dis, FF Not valid)",
+                "63"
+            ]
+        ]
+    },
+    {
+        "name": "HK",
+        "header": "1234",
+        "length": "10",
+        "tag": "05",
+        "data": [
+            [
+                "01",
+                "SRU USED (SRU-A: 0x55, SRU-B: 0xAA)"
+            ],
+            [
+                "01",
+                "BOOT Status MRAM"
+            ],
+            [
+                "01",
+                "APPLI CRC MRAM"
+            ],
+            [
+                "01",
+                "WDG Status (Enable: 0x55, Disable: 0xAA)"
+            ],
+            [
+                "01",
+                "WDG Level"
+            ],            [
+                "01",
+                "Nbr Appli Reload"
+            ],
+            [
+                "01",
+                "Nbr SRU Reboot"
+            ],
+            [
+                "01",
+                "Nbr SRU Reboot Life"
+            ],
+            [
+                "01",
+                "Nbr Zynq Reboot"
+            ],
+            [
+                "01",
+                "TM Appli Requested"
+            ],
+            [
+                "01",
+                "TM Boot Requested"
+            ],
+            [
+                "01",
+                "Vesion Boot"
+            ],
+            [
+                "01",
+                "Version Appli"
+            ],
+            [
+                "01",
+                "WDG Threshold IT"
+            ],
+            [
+                "01",
+                "WDG Threshold IT After Zynq Reboot"
+            ],
+            [
+                "01",
+                "MRAM Alive (Ok: 0x63)"
+            ]
+        ]
+    },
+    {
+        "name": "READ ADDRESS",
+        "header": "1243",
+        "length": "05",
+        "tag": "06",
+        "data": [
+            [
+                "04",
+                "Read Address",
+                "00000000"
+            ],
+            [
+                "01",
+                "Data Read",
+                "00"
+            ]
+        ]
+    },
+    {
+        "name": "WRITE ADDRESS",
+        "header": "1243",
+        "length": "06",
+        "tag": "07",
+        "data": [
+            [
+                "04",
+                "Address WRITTEN"
+            ],
+            [
+                "01",
+                "Data to write"
+            ],
+            [
+                "01",
+                "Data before write"
+            ],
+            [
+                "01",
+                "Data after write"
+            ]
+        ]
+    },
+    {
+        "name": "Change TIMEOUT WDG",
+        "header": "1234",
+        "length": "02",
+        "tag": "0A",
+        "data": [
+            [
+                "01",
+                "Timeout WDG IT"
+            ],
+            [
+                "01",
+                "Timeout WDG IT after Reboot ZYNQ"
+            ]
+        ]
+    },
+    {
+        "name": "Erase MRAM Appli",
+        "header": "1243",
+        "length": "00",
+        "tag": "0C",
+        "data": [[""]]
+    },
+    {
+        "name": "Chargement Hex Line",
+        "header": "1243",
+        "length": "01",
+        "tag": "0D",
+        "data": [
+            [
+                "01",
+                "",
+                ""
+
+            ]
+        ]
+    },
+    {
+        "name": "DUMP Appli MRAM",
+        "header": "1243",
+        "length": "12",
+        "tag": "0E",
+        "data": [
+            [
+                "12",
+                "DUMP Appli MRAM",
+                ""
+            ]
+        ]
+    },
+    {
+        "name": "CRC Appli MRAM",
+        "header": "1243",
+        "length": "04",
+        "tag": "0F",
+        "data": [
+            [
+                "01",
+                "CRC Appli send",
+                ""
+            ],
+            [
+                "01",
+                "CRC Appli computed",
+                ""
+            ],
+            [
+                "01",
+                "CRC Appli Validity (Valid : 0x55, Unvalid : 0xAA) in MRAM",
+                ""
+            ],
+            [
+                "01",
+                "CRC Appli in MRAM",
+                ""
+            ]
+        ]
+    },
+    {
+        "name": "Global WDG Level",
+        "header": "1243",
+        "length": "01",
+        "tag": "20",
+        "data": [
+            [
+                "01",
+                "WDG Level",
+                ""
+            ]
+        ]
+    },
+    {
+        "name": "TIMEOUT UART",
+        "header": "1243",
+        "length": "00",
+        "tag": "21",
+        "data": [[""]]
+    },
+    {
+        "name": "BAD CRC",
+        "header": "1243",
+        "length": "03",
+        "tag": "2E",
+        "data": [
+            [
+                "01",
+                "CRC computed by SRU",
+                "00"
+            ],
+            [
+                "01",
+                "CRC sent",
+                "00"
+            ],
+            [
+                "01",
+                "Data length",
+                "00"
+            ]
+        ]
+    },
+    {
+        "name": "TM UNKNOWN",
+        "header": "1234",
+        "length": "03",
+        "tag": "2F",
+        "data": [
+            [
+                "01",
+                "",
+                "00"
+            ],
+            [
+                "01",
+                "TAG UNKNOWN",
+                "00"
+            ],
+            [
+                "01",
+                "",
+                "00"
+            ]
+        ]
+    },
+    {
+        "name": "Init MRAM",
+        "header": "4312",
+        "length": "04",
+        "tag": "23",
+        "data": [
+            [
+                "04",
+                "Counter",
+                "00000000"
+            ]
+        ]
+    },
+    {
+        "name": "Load Appli backup MRAM",
+        "header": "4312",
+        "length": "05",
+        "tag": "2C",
+        "data": [
+            [
+                "04",
+                "Address Clear",
+                "00000000"
+            ],
+            [
+                "01",
+                "Pattern Clear",
+                "00"
+            ]
+        ]
+    },
+    {
+        "name": "REBOOT",
+        "header": "4312",
+        "length": "12",
+        "tag": "C0",
+        "data": [
+            [
+                "01",
+                "SRU Used"
+            ],
+            [
+                "01",
+                "BOOT Status MRAM"
+            ],
+            [
+                "01",
+                "MRAM Appli CRC"
+            ],
+            [
+                "01",
+                "Watchdog Key"
+            ],
+            [
+                "01",
+                "Watchdog Level"
+            ],
+            [
+                "01",
+                "Nbr Appli reload"
+            ],
+            [
+                "01",
+                "Nbr SRU Reboot"
+            ],
+            [
+                "01",
+                "Nbr SRU Reboot Life"
+            ],
+            [
+                "01",
+                "Nbr Zynq Reboot"
+            ],
+            [
+                "01",
+                "TM Appli Requested"
+            ],
+            [
+                "01",
+                "TM Boot Requested"
+            ],
+            [
+                "01",
+                "Boot Version"
+            ],
+            [
+                "01",
+                "Appli Version"
+            ],
+            [
+                "01",
+                "Tempo WDG IT"
+            ],
+            [
+                "01",
+                "Tempo WDG IT After Reboot Zynq"
+            ],
+            [
+                "01",
+                "Mram Alive"
+            ],
+            [
+                "01",
+                "Crc computed"
+            ],
+            [
+                "01",
+                "Next Boot"
+            ]
+        ]
+    },
+    {
+        "name": "Timeout Reload App",
+        "header": "4312",
+        "length": "00",
+        "tag": "C1",
+        "data": [[""]]
+    },
+    {
+        "name": "Flash page writen",
+        "header": "4312",
+        "length": "02",
+        "tag": "C2",
+        "data": [
+            [
+                "02",
+                "Page address writen",
+                "0000"
+            ]
+        ]
+    },
+    {
+        "name": "Last flash page writen",
+        "header": "4312",
+        "length": "04",
+        "tag": "C3",
+        "data": [
+            [
+                "02",
+                "Last page address writen",
+                "0000"
+            ],
+            [
+                "01",
+                "App CRC",
+                "00"
+            ],
+            [
+                "01",
+                "Bootloader version",
+                "00"
+            ]
+        ]
+    },
+    {
+        "name": "Load App Backup in Flash",
+        "header": "4312",
+        "length": "01",
+        "tag": "C4",
+        "data": [
+            [
+                "01",
+                "Page countdown",
+                "00"
+            ]
+        ]
+    },
+    {
+        "name": "Bad Cks Hex line",
+        "header": "4312",
+        "length": "02",
+        "tag": "C5",
+        "data": [
+            [
+                "01",
+                "Cks computed",
+                "00"
+            ],
+            [
+                "01",
+                "Cks in HEX line",
+                "00"
+            ]
+        ]
+    },
+    {
+        "name": "Load App Backup in MRAM",
+        "header": "4312",
+        "length": "02",
+        "tag": "C6",
+        "data": [
+            [
+                "02",
+                "Address Writen in MRAM",
+                "0000"
+            ]
+        ]
+    },
+    {
+        "name": "DEBUG",
+        "header": "4312",
+        "length": "01",
+        "tag": "2D",
+        "data": [
+            [
+                "01",
+                "DEBUG",
+                "00"
+            ]
+        ]
+    }
+]

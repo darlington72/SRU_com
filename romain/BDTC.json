@@ -1,0 +1,185 @@
+[
+    {
+        "name": "REBOOT",
+        "header": "1234",
+        "length": "00",
+        "tag": "80",
+        "data": [[""]]
+    },
+    {
+        "name": "CLEAR_WDG",
+        "header": "1234",
+        "length": "00",
+        "tag": "81",
+        "data": [[""]]
+    },
+    {
+        "name": "STATUS KEY WDG",
+        "header": "1234",
+        "length": "00",
+        "tag": "82",
+        "data": [
+            [
+                "1",
+                "Key",
+                ""
+            ]
+        ]
+    },
+    {
+        "name": "ENABLE WDG",
+        "header": "1234",
+        "length": "01",
+        "tag": "83",
+        "data": [
+            [
+                "1",
+                "Enable WDG",
+                "55"
+            ]
+        ]
+    },
+    {
+        "name": "DISABLE WDG",
+        "header": "1234",
+        "length": "01",
+        "tag": "84",
+        "data": [
+            [
+                "1",
+                "Disable WDG",
+                "AA"
+            ]
+        ]
+    },
+    {
+        "name": "HK",
+        "header": "1234",
+        "length": "00",
+        "tag": "85",
+        "data": [[""]]
+    },
+    {
+        "name": "READ ADDRESS",
+        "header": "1234",
+        "length": "04",
+        "tag": "86",
+        "data": [
+            [
+                "4",
+                "Read Address",
+                "?"
+            ]
+        ]
+    }, 
+    {
+        "name": "WRITE ADDRESS",
+        "header": "1234",
+        "length": "05",
+        "tag": "87",
+        "data": [
+            [
+                "4",
+                "Address to Write",
+                "?"
+            ],
+            [
+                "1",
+                "Data to write",
+                "?"
+            ]
+        ]
+    },
+    {
+        "name": "Change TIMEOUT WDG",
+        "header": "1234",
+        "length": "02",
+        "tag": "8A",
+        "data": [
+            [
+                "01",
+                "Timeout WDG IT",
+                "?"
+            ],
+            [
+                "01",
+                "Timeout WDG IT after Reboot ZYNQ",
+                "?"
+            ]
+        ]
+    },
+    {
+        "name": "Erase MRAM Appli",
+        "header": "1234",
+        "length": "00",
+        "tag": "8C",
+        "data": [[""]]
+    },
+    {
+        "name": "DUMP MRAM Appli",
+        "header": "1234",
+        "length": "00",
+        "tag": "8E",
+        "data": [[""]]
+    },
+    {
+        "name": "CRC Appli MRAM",
+        "header": "1234",
+        "length": "01",
+        "tag": "8F",
+        "data": [
+            [
+                "01",
+                "CRC Appli send",
+                "?"
+            ]
+        ]
+    },
+    {
+        "name": "Reload Appli in MRAM",
+        "header": "1234",
+        "length": "00",
+        "tag": "90",
+        "data": [[""]]
+    },
+    {
+        "name": "BAD INDEX",
+        "header": "1234",
+        "length": "00",
+        "tag": "FF",
+        "data": [[""]]
+    },
+    {
+        "name": "Init MRAM",
+        "header": "4321",
+        "length": "01",
+        "tag": "A3",
+        "data": [
+            [
+                "1",
+                "Data",
+                "63"
+            ]
+        ]
+    },
+    {
+        "name": "Goto Bootloader",
+        "header": "1234",
+        "length": "00",
+        "tag": "A4",
+        "data": [[""]]
+    },
+    {
+        "name": "Load Appli backup MRAM",
+        "header": "4321",
+        "length": "01",
+        "tag": "AC",
+        "data": [
+            [
+                "1",
+                "Data",
+                "63"
+            ]
+        ]
+    }
+]
