@@ -1,5 +1,7 @@
 import threading
 import sys
+import asyncio
+
 # Prompt_toolkit
 from prompt_toolkit.layout.containers import Float, HSplit
 from prompt_toolkit.layout.dimension import D
@@ -10,7 +12,7 @@ from prompt_toolkit.eventloop import Future, ensure_future, Return, From
 
 # Project
 import serial_com
-from lib import BD
+from lib import BD_TM, BD_TC
 import serial_com
 
 
@@ -64,10 +66,12 @@ def do_upload_hex(ui):
             try:
                 with open(path, "rb", buffering=0) as f:
                     data = f.readall()
-                    thread_upload = threading.Thread(
-                        target=serial_com.upload_hex, args=(ui, data)
-                    )
-                    thread_upload.start()
+                    # thread_upload = threading.Thread(
+                    #     target=serial_com.upload_hex, args=(ui, data)
+                    # )
+                    # thread_upload.start()
+                    # serial_com.upload_hex(ui, data)
+                    asyncio.ensure_future(serial_com.upload_hex(ui, data))
                     ui.last_TC_sent[3] = True
                     ui.last_TC_sent[4] = data
             except IOError as e:
@@ -81,14 +85,16 @@ def do_upload_hex(ui):
 def do_conf_TC(current_key, TC_data, ui, ser, lock):
     def coroutine():
         error = False
-        param_count = len(BD[ui.TC_selectable_list.current_value]["data"])
+        param_count = len(BD_TC[ui.TC_selectable_list.current_value]["data"])
 
         if current_key == param_count:
-            serial_com.send_TC(ui.TC_selectable_list.current_value, TC_data, ui, ser, lock)
+            serial_com.send_TC(
+                ui.TC_selectable_list.current_value, TC_data, ui, ser, lock
+            )
         else:
             try:
                 param_size = int(
-                    BD[ui.TC_selectable_list.current_value]["data"][current_key][0]
+                    BD_TC[ui.TC_selectable_list.current_value]["data"][current_key][0]
                 )
             except:
                 show_message(
@@ -97,8 +103,12 @@ def do_conf_TC(current_key, TC_data, ui, ser, lock):
                     ui.root_container,
                 )
 
-            param_name = BD[ui.TC_selectable_list.current_value]["data"][current_key][1]
-            param_data = BD[ui.TC_selectable_list.current_value]["data"][current_key][2]
+            param_name = BD_TC[ui.TC_selectable_list.current_value]["data"][
+                current_key
+            ][1]
+            param_data = BD_TC[ui.TC_selectable_list.current_value]["data"][
+                current_key
+            ][2]
 
             if param_data is not "?":
                 TC_data.append(param_data)

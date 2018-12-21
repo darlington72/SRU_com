@@ -1,8 +1,10 @@
 import binascii
 import sys
 import serial
+from asyncio import get_event_loop
 
 # Prompt_toolkit
+from prompt_toolkit.eventloop import use_asyncio_event_loop
 from prompt_toolkit.layout.layout import Window
 from prompt_toolkit.styles import Style
 from prompt_toolkit.widgets import VerticalLine, HorizontalLine, Label
@@ -34,21 +36,35 @@ import lib
 import float_window
 import tools
 
+
 class UI:
     def __init__(self, ser, lock):
 
         self.ser = ser
         self.lock = lock
         # TC list and sending
-        TC_list = [(_, lib.BD[_]["name"]) for _ in lib.BD if lib.BD[_]["type"] == "TC"]
+        TC_list = [
+            (_, lib.BD_TC[_]["name"])
+            for _ in lib.BD_TC
+            if (
+                "hidden" not in lib.BD_TC[_]
+                or ("hidden" in lib.BD_TC[_] and lib.BD_TC[_]["hidden"] == False)
+            )
+        ]
         self.TC_selectable_list = []
 
         def TC_send_handler():
-            if "length" in lib.BD[self.TC_selectable_list.current_value] and int(lib.BD[self.TC_selectable_list.current_value]["length"], 16) > 0:
+            if (
+                "length" in lib.BD_TC[self.TC_selectable_list.current_value]
+                and int(lib.BD_TC[self.TC_selectable_list.current_value]["length"], 16)
+                > 0
+            ):
                 # TC has parameter(s)
                 float_window.do_conf_TC(0, [], self, ser, lock)
             else:
-                serial_com.send_TC(self.TC_selectable_list.current_value, [], self, ser, lock)
+                serial_com.send_TC(
+                    self.TC_selectable_list.current_value, [], self, ser, lock
+                )
 
         self.TC_selectable_list = SelectableList(
             values=TC_list, handler=TC_send_handler
@@ -75,8 +91,9 @@ class UI:
         def tools_handler():
             tools.tools_handler(self)
 
-        self.tools_selectable_list = SelectableList(values=tools.tools_list, handler=tools_handler)
-
+        self.tools_selectable_list = SelectableList(
+            values=tools.tools_list, handler=tools_handler
+        )
 
         ######  CONFIGURATION   #####
         self.verbose = Checkbox_(text="Verbose", checked=args.verbose)
@@ -84,7 +101,7 @@ class UI:
 
         ####  KEYBOARD SHORTCUT ####
         keyboard_shortcuts = Label(
-            text=f"<ctrl> + C: quit \n<tab>     : change focus \n<ctrl> + R: re-send last TC"
+            text=f"<ctrl> + C: quit \n<tab>     : change focus \n<ctrl> + R: re-send last TC \n<ctrl> + P: clear TMTC feed"
         )
 
         ######  CREDITS   #####
@@ -109,9 +126,20 @@ class UI:
         horizontal_line = HorizontalLine()
 
         ######  RAW DATA   #####
-        self.raw_serial_buffer = FormattedTextControl(HTML(""), show_cursor=False)
+        # self.raw_serial_buffer = FormattedTextControl(HTML(""), show_cursor=False)
+        # self.raw_serial_window = Window(
+        #     content=self.raw_serial_buffer, height=10, wrap_lines=True
+        # )
+
+        self.raw_serial_buffer = Buffer_()
         self.raw_serial_window = Window(
-            content=self.raw_serial_buffer, height=10, wrap_lines=True
+            BufferControl(
+                buffer=self.raw_serial_buffer,
+                focusable=False,
+                input_processors=[FormatText()],
+            ),
+            height=10,
+            wrap_lines=True,
         )
 
         style = Style.from_dict(
@@ -177,7 +205,19 @@ class UI:
         @self.bindings.add("c-r", eager=True)
         def send_last_TC_again(event):
             if self.last_TC_sent[0] or self.last_TC_sent[3]:
-                serial_com.send_TC(self.TC_selectable_list.current_value, None, self, ser, lock, resend_last_TC=True)
+                serial_com.send_TC(
+                    self.TC_selectable_list.current_value,
+                    None,
+                    self,
+                    ser,
+                    lock,
+                    resend_last_TC=True,
+                )
+
+        @self.bindings.add("c-p", eager=True)
+        def clear_TMTC_feed(event):
+            self.buffer_layout.text = ""
+            self.raw_serial_buffer.text = ""
 
         self.application = Application(
             layout=Layout(self.root_container),
@@ -190,14 +230,19 @@ class UI:
         self.exit_status = None
 
     def run_app(self):
-        self.application.run()
+        use_asyncio_event_loop()
+        get_event_loop().run_until_complete(
+            self.application.run_async().to_asyncio_future()
+        )
+        # self.application.run()
 
         if self.exit_status == "serial":
             print("Serial error.")
 
         print("Bye bye.")
         lib.conf_file.close()
-        lib.BD_file.close()
+        lib.BD_TM_file.close()
+        lib.BD_TC_file.close()
 
     def add_raw_TC_to_window(self, func):
         def wrapper(data):
@@ -208,30 +253,21 @@ class UI:
             else:
                 data_formatted = binascii.hexlify(data).decode().upper()
 
-            window_size = (
-                self.raw_serial_window.current_width * self.raw_serial_window.height
+            self.raw_serial_buffer.insert_line(
+                "<TC>" + data_formatted + "</TC>", with_time_tag=False
             )
-
-            if self.raw_serial_window.text_len > window_size:
-                self.raw_serial_buffer.text = HTML("<TC>" + data_formatted + "</TC>")
-                self.raw_serial_window.text_len = len(data_formatted)
-            else:
-                self.raw_serial_buffer.text += HTML("<TC>" + data_formatted + "</TC>")
-                self.raw_serial_window.text_len += len(data_formatted)
 
             try:
                 func(data)
             except serial.SerialException:
-                # print('Serial error.')
                 self.exit_status = "serial"
                 self.application.exit()
-
 
         return wrapper
 
     def add_raw_TM_to_window(self, func):
         def wrapper(size):
-            
+
             try:
                 read = func(size)
             except serial.SerialException:
@@ -240,17 +276,9 @@ class UI:
                 self.application.exit()
 
             read_formatted = "".join([format(_, "x").zfill(2) for _ in read]).upper()
-
-            window_size = (
-                self.raw_serial_window.current_width * self.raw_serial_window.height
+            self.raw_serial_buffer.insert_line(
+                "<TM>" + read_formatted + "</TM>", with_time_tag=False
             )
-
-            if self.raw_serial_window.text_len > window_size:
-                self.raw_serial_buffer.text = HTML("<TM>" + read_formatted + "</TM>")
-                self.raw_serial_window.text_len = len(read_formatted)
-            else:
-                self.raw_serial_buffer.text += HTML("<TM>" + read_formatted + "</TM>")
-                self.raw_serial_window.text_len += len(read_formatted)
 
             return read
 

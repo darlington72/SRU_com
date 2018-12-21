@@ -1,5 +1,5 @@
-[
-    {
+{
+    "TM-00": {
         "name": "REBOOT",
         "header": "1234",
         "length": "16",
@@ -79,7 +79,7 @@
             ]
         ]
     },
-    {
+    "TM-01": {
         "name": "CLEAR_WDG",
         "header": "1243",
         "length": "00",
@@ -90,7 +90,7 @@
             ]
         ]
     },
-    {
+    "TM-02": {
         "name": "STATUS KEY WDG",
         "header": "1234",
         "length": "04",
@@ -118,7 +118,7 @@
             ]
         ]
     },
-    {
+    "TM-03": {
         "name": "ENABLE WDG",
         "header": "1234",
         "length": "03",
@@ -141,7 +141,7 @@
             ]
         ]
     },
-    {
+    "TM-04": {
         "name": "DISABLE WDG",
         "header": "1234",
         "length": "03",
@@ -164,7 +164,7 @@
             ]
         ]
     },
-    {
+    "TM-05": {
         "name": "HK",
         "header": "1234",
         "length": "10",
@@ -236,7 +236,7 @@
             ]
         ]
     },
-    {
+    "TM-06": {
         "name": "READ ADDRESS",
         "header": "1243",
         "length": "05",
@@ -254,7 +254,7 @@
             ]
         ]
     },
-    {
+    "TM-07": {
         "name": "WRITE ADDRESS",
         "header": "1243",
         "length": "06",
@@ -278,7 +278,7 @@
             ]
         ]
     },
-    {
+    "TM-0A": {
         "name": "Change TIMEOUT WDG",
         "header": "1234",
         "length": "02",
@@ -294,7 +294,7 @@
             ]
         ]
     },
-    {
+    "TM-0C": {
         "name": "Erase MRAM Appli",
         "header": "1243",
         "length": "00",
@@ -305,7 +305,7 @@
             ]
         ]
     },
-    {
+    "TM-0D": {
         "name": "Chargement Hex Line",
         "header": "1243",
         "length": "01",
@@ -318,7 +318,7 @@
             ]
         ]
     },
-    {
+    "TM-0E": {
         "name": "DUMP Appli MRAM",
         "header": "1243",
         "length": "12",
@@ -331,7 +331,7 @@
             ]
         ]
     },
-    {
+    "TM-0F": {
         "name": "CRC Appli MRAM",
         "header": "1243",
         "length": "04",
@@ -359,7 +359,7 @@
             ]
         ]
     },
-    {
+    "TM-20": {
         "name": "Global WDG Level",
         "header": "1243",
         "length": "01",
@@ -372,7 +372,7 @@
             ]
         ]
     },
-    {
+    "TM-21": {
         "name": "TIMEOUT UART",
         "header": "1243",
         "length": "00",
@@ -383,7 +383,7 @@
             ]
         ]
     },
-    {
+    "TM-2E": {
         "name": "BAD CRC",
         "header": "1243",
         "length": "03",
@@ -406,7 +406,7 @@
             ]
         ]
     },
-    {
+    "TM-2F": {
         "name": "TM UNKNOWN",
         "header": "1234",
         "length": "03",
@@ -429,7 +429,7 @@
             ]
         ]
     },
-    {
+    "TM-23": {
         "name": "Init MRAM",
         "header": "4312",
         "length": "04",
@@ -442,7 +442,7 @@
             ]
         ]
     },
-    {
+    "TM-25": {
         "name": "Erase GOLDEN",
         "header": "4312",
         "length": "00",
@@ -453,7 +453,7 @@
             ]
         ]
     },
-    {
+    "TM-2C": {
         "name": "Load Appli backup MRAM",
         "header": "4312",
         "length": "05",
@@ -471,7 +471,7 @@
             ]
         ]
     },
-    {
+    "TM-C0": {
         "name": "REBOOT",
         "header": "4312",
         "length": "12",
@@ -551,7 +551,7 @@
             ]
         ]
     },
-    {
+    "TM-C1": {
         "name": "Timeout Reload App",
         "header": "4312",
         "length": "00",
@@ -562,7 +562,7 @@
             ]
         ]
     },
-    {
+    "TM-C2": {
         "name": "Flash page writen",
         "header": "4312",
         "length": "02",
@@ -575,7 +575,7 @@
             ]
         ]
     },
-    {
+    "TM-C3": {
         "name": "Last flash page writen",
         "header": "4312",
         "length": "04",
@@ -598,7 +598,7 @@
             ]
         ]
     },
-    {
+    "TM-C4": {
         "name": "Copy APPLI from MRAM to Flash",
         "header": "4312",
         "length": "01",
@@ -611,7 +611,7 @@
             ]
         ]
     },
-    {
+    "TM-C5": {
         "name": "Copy GOLDEN to Flash",
         "header": "4312",
         "length": "01",
@@ -624,7 +624,7 @@
             ]
         ]
     },
-    {
+    "TM-C6": {
         "name": "Bad Cks Hex line",
         "header": "4312",
         "length": "02",
@@ -642,7 +642,7 @@
             ]
         ]
     },
-    {
+    "TM-C7": {
         "name": "Load App Backup in MRAM",
         "header": "4312",
         "length": "02",
@@ -655,7 +655,7 @@
             ]
         ]
     },
-    {
+    "TM-C8": {
         "name": "Bootloader en MODETEST",
         "header": "4312",
         "length": "00",
@@ -666,7 +666,7 @@
             ]
         ]
     },
-    {
+    "TM-2D": {
         "name": "DEBUG",
         "header": "4312",
         "length": "04",
@@ -679,4 +679,4 @@
             ]
         ]
     }
-]
+}

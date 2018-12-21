@@ -811,5 +811,102 @@
                 "00"
             ]
         ]
+    },
+    "TM-0D": {
+        "type": "TM",
+        "name": "Chargement Hex Line",
+        "header": "1243",
+        "length": "15",
+        "tag": "0D",
+        "data": [
+            [
+                "21",
+                "Line",
+                ""
+            ]
+        ]
+    },
+    "TC-0D": {
+        "type": "TC",
+        "name": "Chargement Hex Line",
+        "header": "1234",
+        "length": "15",
+        "tag": "0D",
+        "data": [
+            [
+                "21",
+                "Line",
+                ""
+            ]
+        ]
+    },
+    "TC-8C": {
+        "type": "TC",
+        "name": "Erase MRAM Appli",
+        "header": "1234",
+        "length": "00",
+        "tag": "8C",
+        "data": [
+            [
+                ""
+            ]
+        ]
+    },
+    "TC-8F": {
+        "type": "TC",
+        "name": "CRC Appli MRAM",
+        "header": "1234",
+        "length": "01",
+        "tag": "8F",
+        "data": [
+            [
+                "01",
+                "CRC Appli send",
+                "?"
+            ]
+        ]
+    },
+    "TC-8E": {
+        "type": "TC",
+        "name": "DUMP MRAM Appli",
+        "header": "1234",
+        "length": "00",
+        "tag": "8E",
+        "data": [
+            [
+                ""
+            ]
+        ]
+    },
+    "TM-C5": {
+        "type": "TM",
+        "name": "Bad Cks Hex line",
+        "header": "4312",
+        "length": "02",
+        "tag": "C5",
+        "data": [
+            [
+                "01",
+                "Cks computed",
+                "00"
+            ],
+            [
+                "01",
+                "Cks in HEX line",
+                "00"
+            ]
+        ]
+    },
+    "TM-0C": {
+        "type": "TM",
+        "name": "Erase MRAM Appli",
+        "header": "1243",
+        "length": "00",
+        "tag": "0C",
+        "data": [
+            [
+                ""
+            ]
+        ]
     }
 }

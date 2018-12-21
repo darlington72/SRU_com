@@ -10,8 +10,14 @@ import UI_layout
 from args import args
 from update import update
 
-lock = threading.Lock()
+lock = threading.RLock()
 
+
+# TODO:
+# [x] shortcut clear screen
+# [x] raw tmtc feed to buffer
+# [x] bug latency TC erase -> comes from thread
+# [ ] dump TM
 
 if __name__ == "__main__":
 

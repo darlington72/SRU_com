@@ -12,10 +12,17 @@ except FileNotFoundError:
     sys.exit()
 
 try:
-    BD_file = open("BD.json", "r")
-    BD = json.load(BD_file)
+    BD_TM_file = open("BDTM.json", "r")
+    BD_TM = json.load(BD_TM_file)
 except FileNotFoundError:
-    print("BD file 'conf.json' not found.")
+    print("BDTM file 'conf.json' not found.")
+    sys.exit()
+
+try:
+    BD_TC_file = open("BDTC.json", "r")
+    BD_TC = json.load(BD_TC_file)
+except FileNotFoundError:
+    print("BDTC file 'conf.json' not found.")
     sys.exit()
 
 

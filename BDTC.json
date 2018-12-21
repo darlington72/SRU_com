@@ -1,19 +1,35 @@
-[
-    {
+{
+    "TC-80": {
         "name": "REBOOT",
         "header": "1234",
         "length": "00",
         "tag": "80",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
-    {
+    "TC-81": {
         "name": "CLEAR_WDG",
         "header": "1234",
         "length": "00",
         "tag": "81",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
-    {
+    "TC-01": {
+        "type": "TC",
+        "name": "CLEAR_WDG (no TM)",
+        "header": "1234",
+        "length": "00",
+        "tag": "01",
+        "data": ""
+    },
+    "TC-82": {
         "name": "STATUS KEY WDG",
         "header": "1234",
         "length": "00",
@@ -26,7 +42,7 @@
             ]
         ]
     },
-    {
+    "TC-83": {
         "name": "ENABLE WDG",
         "header": "1234",
         "length": "01",
@@ -39,7 +55,7 @@
             ]
         ]
     },
-    {
+    "TC-84": {
         "name": "DISABLE WDG",
         "header": "1234",
         "length": "01",
@@ -52,14 +68,18 @@
             ]
         ]
     },
-    {
+    "TC-85": {
         "name": "HK",
         "header": "1234",
         "length": "00",
         "tag": "85",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
-    {
+    "TC-86": {
         "name": "READ ADDRESS",
         "header": "1234",
         "length": "04",
@@ -71,8 +91,8 @@
                 "?"
             ]
         ]
-    }, 
-    {
+    },
+    "TC-87": {
         "name": "WRITE ADDRESS",
         "header": "1234",
         "length": "05",
@@ -90,7 +110,7 @@
             ]
         ]
     },
-    {
+    "TC-8A": {
         "name": "Change TIMEOUT WDG",
         "header": "1234",
         "length": "02",
@@ -108,21 +128,29 @@
             ]
         ]
     },
-    {
+    "TC-8C": {
         "name": "Erase MRAM Appli",
         "header": "1234",
         "length": "00",
         "tag": "8C",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
-    {
+    "TC-8E": {
         "name": "DUMP MRAM Appli",
         "header": "1234",
         "length": "00",
         "tag": "8E",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
-    {
+    "TC-8F": {
         "name": "CRC Appli MRAM",
         "header": "1234",
         "length": "01",
@@ -135,21 +163,29 @@
             ]
         ]
     },
-    {
+    "TC-90": {
         "name": "Reload Appli in MRAM",
         "header": "1234",
         "length": "00",
         "tag": "90",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
-    {
+    "TC-FF": {
         "name": "BAD INDEX",
         "header": "1234",
         "length": "00",
         "tag": "FF",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
-    {
+    "TC-A3": {
         "name": "Init MRAM",
         "header": "4321",
         "length": "01",
@@ -162,14 +198,18 @@
             ]
         ]
     },
-    {
+    "TC-A4": {
         "name": "Goto Bootloader",
         "header": "1234",
         "length": "00",
         "tag": "A4",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
-    {
+    "TC-AC": {
         "name": "Load Appli backup MRAM",
         "header": "4321",
         "length": "01",
@@ -181,5 +221,19 @@
                 "63"
             ]
         ]
+    },
+    "TC-0D": {
+        "name": "Chargement Hex Line",
+        "header": "1243",
+        "length": "?",
+        "tag": "0D",
+        "data": [
+            [
+                "01",
+                "",
+                ""
+            ]
+        ],
+        "hidden": true
     }
-]
+}
