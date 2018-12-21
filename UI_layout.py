@@ -42,6 +42,7 @@ class UI:
 
         self.ser = ser
         self.lock = lock
+
         # TC list and sending
         TC_list = [
             (_, lib.BD_TC[_]["name"])
@@ -69,13 +70,13 @@ class UI:
         self.TC_selectable_list = SelectableList(
             values=TC_list, handler=TC_send_handler
         )
-        self.last_TC_sent = [None] * 5
-
-        # last_TC_sent[0] : frame_to_be_sent_bytes
-        # last_TC_sent[1] : frame_to_be_sent_str
-        # last_TC_sent[2] : buffer_feed
-        # last_TC_sent[3] : is Hex upload ?
-        # last_TC_sent[4] : Hex file to be sent
+        self.last_TC_sent = {
+            "frame_bytes": "",
+            "frame_str": "",
+            "buffer_feed": "",
+            "hex_upload": False,
+            "hex_file": "",
+        }
 
         ######  WATCHDOG CLEAR ######
         self.watchdog_radio = RadioList_(values=[(False, "False"), (True, "True")])
@@ -132,6 +133,7 @@ class UI:
         # )
 
         self.raw_serial_buffer = Buffer_()
+        self.raw_serial_buffer.text_len = 0
         self.raw_serial_window = Window(
             BufferControl(
                 buffer=self.raw_serial_buffer,
@@ -204,7 +206,7 @@ class UI:
 
         @self.bindings.add("c-r", eager=True)
         def send_last_TC_again(event):
-            if self.last_TC_sent[0] or self.last_TC_sent[3]:
+            if self.last_TC_sent["frame_bytes"] or self.last_TC_sent["hex_upload"]:
                 serial_com.send_TC(
                     self.TC_selectable_list.current_value,
                     None,
@@ -253,9 +255,22 @@ class UI:
             else:
                 data_formatted = binascii.hexlify(data).decode().upper()
 
+            window_size = (
+                self.raw_serial_window.current_width * self.raw_serial_window.height
+            )
+
+            if self.raw_serial_buffer.text_len > window_size:
+                self.raw_serial_buffer.text = ""
+                self.raw_serial_buffer.text_len = 0
+            # self.raw_serial_buffer.insert_line(
+            #     f" {len(self.raw_serial_buffer.text)}/{window_size}",
+            #     with_time_tag=False,
+            # )
+
             self.raw_serial_buffer.insert_line(
                 "<TC>" + data_formatted + "</TC>", with_time_tag=False
             )
+            self.raw_serial_buffer.text_len += len(data_formatted)
 
             try:
                 func(data)
@@ -276,9 +291,19 @@ class UI:
                 self.application.exit()
 
             read_formatted = "".join([format(_, "x").zfill(2) for _ in read]).upper()
+
+            window_size = (
+                self.raw_serial_window.current_width * self.raw_serial_window.height
+            )
+
+            if self.raw_serial_buffer.text_len > window_size:
+                self.raw_serial_buffer.text = ""
+                self.raw_serial_buffer.text_len = 0
+
             self.raw_serial_buffer.insert_line(
                 "<TM>" + read_formatted + "</TM>", with_time_tag=False
             )
+            self.raw_serial_buffer.text_len += len(read_formatted)
 
             return read
 

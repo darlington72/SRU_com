@@ -8,6 +8,7 @@
     "debug": "True",
     "hex_upload": {
         "delay_inter_char": 0.003,
-        "delay_inter_line": 0.001
+        "delay_inter_line": 0.001,
+        "max_size_flash_app": "4000"
     }
 }

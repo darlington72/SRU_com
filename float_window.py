@@ -72,12 +72,10 @@ def do_upload_hex(ui):
                     # thread_upload.start()
                     # serial_com.upload_hex(ui, data)
                     asyncio.ensure_future(serial_com.upload_hex(ui, data))
-                    ui.last_TC_sent[3] = True
-                    ui.last_TC_sent[4] = data
+
             except IOError as e:
                 show_message("Error", "{}".format(e), ui.root_container)
                 get_app().invalidate()
-                ui.last_TC_sent[4] = None
 
     ensure_future(coroutine())
 

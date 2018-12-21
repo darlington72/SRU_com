@@ -288,10 +288,10 @@ def send_TC(TC_id, TC_data, ui, ser, lock, resend_last_TC=False):
     """
 
     if resend_last_TC:
-        if ui.last_TC_sent[0]:
-            frame_to_be_sent_bytes = ui.last_TC_sent[0]
-            frame_to_be_sent_str = ui.last_TC_sent[1]
-            buffer_feed = ui.last_TC_sent[2]
+        if ui.last_TC_sent["frame_bytes"]:
+            frame_to_be_sent_bytes = ui.last_TC_sent["frame_bytes"]
+            frame_to_be_sent_str = ui.last_TC_sent["frame_str"]
+            buffer_feed = ui.last_TC_sent["buffer_feed"]
 
             with lock:
                 for key, int_ in enumerate(frame_to_be_sent_bytes):
@@ -302,15 +302,13 @@ def send_TC(TC_id, TC_data, ui, ser, lock, resend_last_TC=False):
                 ui.buffer_layout.insert_line(buffer_feed)
                 lib.write_to_file(frame_to_be_sent_str + "\n")
 
-        last_TC_upload_hex = ui.last_TC_sent[3]
-        last_TC_hex = ui.last_TC_sent[4]
+        last_TC_upload_hex = ui.last_TC_sent["hex_upload"]
+        last_TC_hex = ui.last_TC_sent["hex_file"]
 
         if last_TC_upload_hex:
             if last_TC_hex:
-                thread_upload = threading.Thread(
-                    target=upload_hex, args=(ui, ser, last_TC_hex)
-                )
-                thread_upload.start()
+                asyncio.ensure_future(upload_hex(ui, last_TC_hex))
+
             else:
                 float_window.do_upload_hex(ui)
 
@@ -352,20 +350,20 @@ def send_TC(TC_id, TC_data, ui, ser, lock, resend_last_TC=False):
         lib.write_to_file(frame_to_be_sent_str + "\n")
 
         # Let's save this TC in case user wants to resend it
-        ui.last_TC_sent[0] = frame_to_be_sent_bytes
-        ui.last_TC_sent[1] = frame_to_be_sent_str
-        ui.last_TC_sent[2] = buffer_feed
+        ui.last_TC_sent["frame_bytes"] = frame_to_be_sent_bytes
+        ui.last_TC_sent["frame_str"] = frame_to_be_sent_str
+        ui.last_TC_sent["buffer_feed"] = buffer_feed
 
         try:
             if BD_TC[TC_id]["bootloader"] is True:
                 float_window.do_upload_hex(ui)
-                ui.last_TC_sent[3] = True
+                ui.last_TC_sent["hex_upload"] = True
             else:
-                ui.last_TC_sent[3] = False
-                ui.last_TC_sent[4] = None
+                ui.last_TC_sent["hex_upload"] = False
+                ui.last_TC_sent["hex_file"] = None
         except KeyError:
-            ui.last_TC_sent[3] = False
-            ui.last_TC_sent[4] = None
+            ui.last_TC_sent["hex_upload"] = False
+            ui.last_TC_sent["hex_file"] = None
 
 
 async def upload_hex(ui, data):
@@ -377,6 +375,9 @@ async def upload_hex(ui, data):
         ser {[type]} -- [description]
         data {[type]} -- [description]
     """
+
+    # Let's keep a backup of data for last TC resend shortcut
+    data_backup = data
 
     data = data.decode()
     info_message = float_window.InfoDialog(
@@ -428,12 +429,8 @@ async def upload_hex(ui, data):
         "Application Upload to SRU", "Upload done.", ui.root_container
     )
 
-    # TODO:
-    # dump MRAM in file
-    # compute crc of that file
-    # compute crc of local file that was sent (only the data, complete with ff following the adresses pointers)
-    # if same, send TC CRC with value computed
-    # if ok send TC RELOAD appli in MRAM
+    ui.last_TC_sent["hex_upload"] = True
+    ui.last_TC_sent["hex_file"] = data_backup
 
     # Let's turn the watchdog back on
     if watchdog_value:
