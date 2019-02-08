@@ -5,11 +5,11 @@ import queue
 from prompt_toolkit import HTML
 
 # Custom lib
-import lib
-import serial_com
-import UI_layout
-from args import args
-from update import update
+import src.lib as lib
+import src.serial_com as serial_com
+import src.UI_layout as UI_layout
+from src.args import args
+from src.update import update
 
 
 lock = threading.RLock()
