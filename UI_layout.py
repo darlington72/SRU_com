@@ -38,10 +38,11 @@ import tools
 
 
 class UI:
-    def __init__(self, ser, lock):
+    def __init__(self, ser, lock, last_TM):
 
         self.ser = ser
         self.lock = lock
+        self.last_TM = last_TM
 
         # TC list and sending
         TC_list = [
@@ -88,7 +89,6 @@ class UI:
         )
 
         ######      TOOLS       #####
-
         def tools_handler():
             tools.tools_handler(self)
 

@@ -52,10 +52,10 @@ class TextInputDialog(object):
         return self.dialog
 
 
-def do_upload_hex(ui):
+def do_upload_hex(ui, upload_type):
     def coroutine():
         open_dialog = TextInputDialog(
-            title="Application Upload to SRU",
+            title=f"{upload_type} Upload to SRU",
             label_text="Enter the path of the file:",
             completer=PathCompleter(),
         )
@@ -71,7 +71,7 @@ def do_upload_hex(ui):
                     # )
                     # thread_upload.start()
                     # serial_com.upload_hex(ui, data)
-                    asyncio.ensure_future(serial_com.upload_hex(ui, data))
+                    asyncio.ensure_future(serial_com.upload_hex(ui, data, upload_type))
 
             except IOError as e:
                 show_message("Error", "{}".format(e), ui.root_container)

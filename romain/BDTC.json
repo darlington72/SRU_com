@@ -4,14 +4,22 @@
         "header": "1234",
         "length": "00",
         "tag": "80",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
     {
         "name": "CLEAR_WDG",
         "header": "1234",
         "length": "00",
         "tag": "81",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
     {
         "name": "STATUS KEY WDG",
@@ -57,7 +65,11 @@
         "header": "1234",
         "length": "00",
         "tag": "85",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
     {
         "name": "READ ADDRESS",
@@ -71,7 +83,7 @@
                 "?"
             ]
         ]
-    }, 
+    },
     {
         "name": "WRITE ADDRESS",
         "header": "1234",
@@ -109,18 +121,37 @@
         ]
     },
     {
+        "name": "Erase MRAM Golden",
+        "header": "4321",
+        "length": "00",
+        "tag": "A5",
+        "data": [
+            [
+                ""
+            ]
+        ]
+    },
+    {
         "name": "Erase MRAM Appli",
         "header": "1234",
         "length": "00",
         "tag": "8C",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
     {
         "name": "DUMP MRAM Appli",
         "header": "1234",
         "length": "00",
         "tag": "8E",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
     {
         "name": "CRC Appli MRAM",
@@ -140,14 +171,22 @@
         "header": "1234",
         "length": "00",
         "tag": "90",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
     {
         "name": "BAD INDEX",
         "header": "1234",
         "length": "00",
         "tag": "FF",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
     {
         "name": "Init MRAM",
@@ -167,10 +206,14 @@
         "header": "1234",
         "length": "00",
         "tag": "A4",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
     {
-        "name": "Load Appli backup MRAM",
+        "name": "(BL) Load Appli backup MRAM",
         "header": "4321",
         "length": "01",
         "tag": "AC",
@@ -179,6 +222,17 @@
                 "1",
                 "Data",
                 "63"
+            ]
+        ]
+    },
+    {
+        "name": "(BL) Load Golden to MRAM",
+        "header": "4321",
+        "length": "?",
+        "tag": "0D",
+        "data": [
+            [
+                ""
             ]
         ]
     }

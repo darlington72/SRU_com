@@ -35,9 +35,10 @@ class Buffer_(Buffer):
         if with_time_tag:
             time_tag = (
                 "<grey>"
-                + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-4]
+                + datetime.datetime.now().strftime("%H:%M:%S.%f")[:-4]
                 + "</grey>: "
             )
+            # datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-4]
         else:
             time_tag = ""
 

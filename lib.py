@@ -41,6 +41,31 @@ def compute_CRC(frame):
     return crc % (2 ** 8)
 
 
+def compute_CRC_hex(hex_list, ui=None):
+    CRC = ""
+
+    for line in hex_list:
+        try:
+            if line[0] == ":":
+                length = int(line[1:3], 16)
+                CRC += line[9 : 9 + length]
+                ui.buffer_layout.insert_line(f"{CRC}\n")
+
+        except IndexError:
+            pass
+
+    ui.buffer_layout.insert_line(
+        f'{int(conf["hex_upload"]["max_size_flash_app"]) * 2}\n'
+    )
+    CRC = CRC.ljust(int(conf["hex_upload"]["max_size_flash_app"]) * 2, "F")
+    ui.buffer_layout.insert_line(f"{CRC}\n")
+
+    CRC = bytearray.fromhex(CRC)
+    CRC = compute_CRC(CRC)
+    CRC = hex(CRC)[2:]
+    return CRC.upper()
+
+
 def format_frame(*frame):
     frame_hexa = "".join(frame[:-1])
     formatted_frame = f"{frame_hexa:95} {frame[-1]}"

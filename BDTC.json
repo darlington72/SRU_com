@@ -10,6 +10,17 @@
             ]
         ]
     },
+    "TC-80(BL)": {
+        "name": "(BL) REBOOT",
+        "header": "4321",
+        "length": "00",
+        "tag": "80",
+        "data": [
+            [
+                ""
+            ]
+        ]
+    },
     "TC-81": {
         "name": "CLEAR_WDG",
         "header": "1234",
@@ -186,7 +197,7 @@
         ]
     },
     "TC-A3": {
-        "name": "Init MRAM",
+        "name": "(BL) Init MRAM",
         "header": "4321",
         "length": "01",
         "tag": "A3",
@@ -224,7 +235,7 @@
     },
     "TC-0D": {
         "name": "Chargement Hex Line",
-        "header": "1243",
+        "header": "1234",
         "length": "?",
         "tag": "0D",
         "data": [
@@ -235,5 +246,30 @@
             ]
         ],
         "hidden": true
+    },
+    "TC-0D(BL)": {
+        "name": "Chargement Hex Line",
+        "header": "4321",
+        "length": "?",
+        "tag": "0D",
+        "data": [
+            [
+                "01",
+                "",
+                ""
+            ]
+        ],
+        "hidden": true
+    },
+    "TC-A5": {
+        "name": "(BL) Erase MRAM Golden",
+        "header": "4321",
+        "length": "00",
+        "tag": "A5",
+        "data": [
+            [
+                ""
+            ]
+        ]
     }
 }

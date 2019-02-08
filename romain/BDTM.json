@@ -445,11 +445,13 @@
     {
         "name": "Erase GOLDEN",
         "header": "4312",
-        "length": "00",
+        "length": "02",
         "tag": "25",
         "data": [
             [
-                ""
+                "02",
+                "Counter",
+                "0000"
             ]
         ]
     },

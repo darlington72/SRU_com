@@ -6,6 +6,7 @@ Handles the serial communication with SRU.
 from time import sleep
 import threading
 import asyncio
+from queue import Empty
 
 # Prompt_toolkit
 from prompt_toolkit.application.current import get_app
@@ -82,7 +83,7 @@ def look_for_sync_words(ui, ser, first_frame):
     return first_byte, second_byte
 
 
-def serial_com_TM(ui, ser, lock):
+def serial_com_TM(ui, ser, lock, last_TM):
     """Infinite loop that handles bytes received 
     on the serial link
     
@@ -234,6 +235,9 @@ def serial_com_TM(ui, ser, lock):
                         + CRC
                         + "\n"
                     )
+                    # if last tm was not read, we clear it
+                    if not last_TM.full():
+                        last_TM.put(data)
 
 
 def serial_com_watchdog(ui, ser, lock):
@@ -309,8 +313,8 @@ def send_TC(TC_id, TC_data, ui, ser, lock, resend_last_TC=False):
             if last_TC_hex:
                 asyncio.ensure_future(upload_hex(ui, last_TC_hex))
 
-            else:
-                float_window.do_upload_hex(ui)
+            # else:
+            #     float_window.do_upload_hex(ui)
 
     else:
         frame_name = BD_TC[TC_id]["name"]
@@ -328,7 +332,7 @@ def send_TC(TC_id, TC_data, ui, ser, lock, resend_last_TC=False):
             for key, int_ in enumerate(frame_to_be_sent_bytes):
                 ser.write([int_])
                 if key != len(frame_to_be_sent_bytes) - 1:
-                    sleep(conf["COM"]["delay_inter_byte"])
+                    sleep(conf["COM"]["delay_inter_byte"] - 0.0001)
 
             buffer_feed = "<tc>TC</tc> - "  # Line to be printed to TMTC feed
 
@@ -354,19 +358,19 @@ def send_TC(TC_id, TC_data, ui, ser, lock, resend_last_TC=False):
         ui.last_TC_sent["frame_str"] = frame_to_be_sent_str
         ui.last_TC_sent["buffer_feed"] = buffer_feed
 
-        try:
-            if BD_TC[TC_id]["bootloader"] is True:
-                float_window.do_upload_hex(ui)
-                ui.last_TC_sent["hex_upload"] = True
-            else:
-                ui.last_TC_sent["hex_upload"] = False
-                ui.last_TC_sent["hex_file"] = None
-        except KeyError:
-            ui.last_TC_sent["hex_upload"] = False
-            ui.last_TC_sent["hex_file"] = None
+        # try:
+        #     if BD_TC[TC_id]["bootloader"] is True:
+        #         float_window.do_upload_hex(ui)
+        #         ui.last_TC_sent["hex_upload"] = True
+        #     else:
+        #         ui.last_TC_sent["hex_upload"] = False
+        #         ui.last_TC_sent["hex_file"] = None
+        # except KeyError:
+        #     ui.last_TC_sent["hex_upload"] = False
+        #     ui.last_TC_sent["hex_file"] = None
 
 
-async def upload_hex(ui, data):
+async def upload_hex(ui, data, upload_type=None):
     """Upload a hex file to SRU
     Called by do_upload_hex()
     
@@ -376,12 +380,21 @@ async def upload_hex(ui, data):
         data {[type]} -- [description]
     """
 
+    error = False
+
+    if upload_type == None:
+        # if upload_hex was called by <ctrl> + R
+        upload_type = ui.last_TC_sent["upload_type"]
+    else:
+        # if not, we save it for next <ctrl> + R
+        ui.last_TC_sent["upload_type"] = upload_type
+
     # Let's keep a backup of data for last TC resend shortcut
     data_backup = data
 
     data = data.decode()
     info_message = float_window.InfoDialog(
-        "Application Upload to SRU", "Erase in progress..", ui.root_container
+        f"{upload_type} Upload to SRU", "Erase in progress.. (1/3)", ui.root_container
     )
     get_app().invalidate()
 
@@ -390,49 +403,126 @@ async def upload_hex(ui, data):
     if watchdog_value:
         ui.watchdog_radio.set_value(0)
 
-    # let's send the TC erase MRAM app
-    send_TC("TC-8C", [], ui, ui.ser, ui.lock, resend_last_TC=False)
-    await asyncio.sleep(8)
-    get_app().invalidate()
-    info_message.remove_dialog_as_float(ui.root_container)
+    if upload_type == "Golden":
+        # let's send the TC erase MRAM golden
+        send_TC("TC-A5", [], ui, ui.ser, ui.lock, resend_last_TC=False)
 
-    info_message = float_window.InfoDialog(
-        "Application Upload to SRU", "Upload in progress..", ui.root_container
-    )
-    get_app().invalidate()
+        # let's wait 10 seconds so golden can be erased
+        await asyncio.sleep(conf["hex_upload"]["max_wait_erase_app"])
 
-    # if args.loop:
-    #     ui.ser.write(bytearray.fromhex("123456A4"))
+    elif upload_type == "Application":
 
-    data = data.split("\n")
+        # let's send the TC erase MRAM app
+        send_TC("TC-8C", [], ui, ui.ser, ui.lock, resend_last_TC=False)
 
-    for line in data:
-        if line:
-            if line[0] == ":":
-                line = line.strip()
-                # print(line[1:])
-                send_TC("TC-0D", [line[1:]], ui, ui.ser, ui.lock, resend_last_TC=False)
+        # let's wait for TM MRAM erased
+        if ui.last_TM.full():
+            ui.last_TM.get()
 
-                # for char in line:
-                #     ui.ser.write(char.encode())
-                #     sleep(conf["hex_upload"]["delay_inter_char"])
+        await asyncio.sleep(0.005)  # async sleep to refresh UI
 
-                await asyncio.sleep(conf["hex_upload"]["delay_inter_line"])
+        try:
+            ui.last_TM.get(block=True, timeout=conf["hex_upload"]["max_wait_erase_app"])
+        except Empty:
+            ui.buffer_layout.insert_line(
+                "<error>Error: TM MRAM erased not received</error>\n"
+            )
+            error = True
 
-    # if args.loop:
-    #     ui.ser.write(bytearray.fromhex("FF"))
+    else:
+        raise TypeError
 
     get_app().invalidate()
     info_message.remove_dialog_as_float(ui.root_container)
-    get_app().invalidate()
-    float_window.show_message(
-        "Application Upload to SRU", "Upload done.", ui.root_container
-    )
 
-    ui.last_TC_sent["hex_upload"] = True
-    ui.last_TC_sent["hex_file"] = data_backup
+    if not error:
 
-    # Let's turn the watchdog back on
-    if watchdog_value:
-        ui.watchdog_radio.set_value(1)
+        info_message = float_window.InfoDialog(
+            f"{upload_type} Upload to SRU",
+            "Upload in progress.. (2/3)",
+            ui.root_container,
+        )
+        get_app().invalidate()
 
+        await asyncio.sleep(0.005)
+        data = data.split("\n")
+
+        for line in data:
+            if line:
+                if line[0] == ":":
+                    line = line.strip()
+                    # print(line[1:])
+                    if upload_type == "Golden":
+                        send_TC(
+                            "TC-0D(BL)",
+                            [line[1:]],
+                            ui,
+                            ui.ser,
+                            ui.lock,
+                            resend_last_TC=False,
+                        )
+                    elif upload_type == "Application":
+                        send_TC(
+                            "TC-0D",
+                            [line[1:]],
+                            ui,
+                            ui.ser,
+                            ui.lock,
+                            resend_last_TC=False,
+                        )
+                    else:
+                        raise TypeError
+
+                    sleep(conf["hex_upload"]["delay_inter_line"])
+
+        if upload_type == "Application":
+            # CRC calculation
+            CRC_calculated = lib.compute_CRC_hex(data, ui)
+            ui.buffer_layout.insert_line(f"CRC calulated= {CRC_calculated}\n")
+
+            info_message.remove_dialog_as_float(ui.root_container)
+            info_message = float_window.InfoDialog(
+                f"{upload_type} Upload to SRU", "Sending CRC.. (3/3)", ui.root_container
+            )
+            get_app().invalidate()
+            await asyncio.sleep(0.005)  # async sleep to refresh UI
+
+            # Let's send calculated CRC
+            if ui.last_TM.full():
+                ui.last_TM.get()
+            send_TC(
+                "TC-8F", [CRC_calculated], ui, ui.ser, ui.lock, resend_last_TC=False
+            )
+            await asyncio.sleep(0.005)  # async sleep to refresh UI
+
+            # Wait for answer
+            CRC_data = ui.last_TM.get(
+                block=True, timeout=conf["hex_upload"]["max_wait_CRC_calculation"]
+            )
+            await asyncio.sleep(0.005)  # async sleep to refresh UI
+            if CRC_data:
+
+                if CRC_data != CRC_calculated:
+                    error = True
+                    ui.buffer_layout.insert_line("<error>ERROR: wrong CRC</error>\n")
+                else:
+                    send_TC("TC-90", [], ui, ui.ser, ui.lock, resend_last_TC=False)
+                    await asyncio.sleep(0.005)  # async sleep to refresh UI
+
+            else:
+                ui.buffer_layout.insert_line("no data received\n")
+
+        info_message.remove_dialog_as_float(ui.root_container)
+        get_app().invalidate()
+
+        if not error:
+            float_window.show_message(
+                f"{upload_type} Upload to SRU", "Upload done.", ui.root_container
+            )
+
+        ui.last_TC_sent["hex_upload"] = True
+        ui.last_TC_sent["hex_file"] = data_backup
+
+        # Let's turn the watchdog back on
+        if watchdog_value:
+            ui.watchdog_radio.set_value(1)
