@@ -11,6 +11,8 @@ settings.json
 dev/
 # C extensions
 *.so
+*.dist
+*.build
 backups/
 text-editor.py
 test_fullscreen.py
@@ -113,3 +115,4 @@ venv.bak/
 .mypy_cache/
 .vscode/launch.json
 test.txt
+release/SRU_com_1.5.0/.bash_history
