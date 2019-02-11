@@ -289,6 +289,7 @@ def send_TC(TC_id, TC_data, ui, ser, lock, resend_last_TC=False):
         ui   -- UI instance
         ser  -- Serial instance
         lock -- Thread lock
+        resend_last_TC -- 
     """
 
     if resend_last_TC:
@@ -357,6 +358,7 @@ def send_TC(TC_id, TC_data, ui, ser, lock, resend_last_TC=False):
         ui.last_TC_sent["frame_bytes"] = frame_to_be_sent_bytes
         ui.last_TC_sent["frame_str"] = frame_to_be_sent_str
         ui.last_TC_sent["buffer_feed"] = buffer_feed
+        ui.last_TC_sent["hex_upload"] = False
 
         # try:
         #     if BD_TC[TC_id]["bootloader"] is True:
@@ -478,7 +480,9 @@ async def upload_hex(ui, data, upload_type=None):
         if upload_type == "Application":
             # CRC calculation
             CRC_calculated = lib.compute_CRC_hex(data, ui)
-            ui.buffer_layout.insert_line(f"CRC calulated = 0x{CRC_calculated}\n")
+            ui.buffer_layout.insert_line(
+                f"CRC calulated = 0x{CRC_calculated}. Sending CRC frame to SRU..\n"
+            )
 
             info_message.remove_dialog_as_float(ui.root_container)
             info_message = float_window.InfoDialog(
@@ -502,8 +506,7 @@ async def upload_hex(ui, data, upload_type=None):
                 block=True, timeout=conf["hex_upload"]["max_wait_CRC_calculation"]
             )
             await asyncio.sleep(0.005)  # async sleep to refresh UI
-            if CRC_data:
-
+            try:
                 if CRC_data[1] != CRC_calculated:
                     error = True
                     ui.buffer_layout.insert_line(
@@ -512,9 +515,10 @@ async def upload_hex(ui, data, upload_type=None):
                 else:
                     send_TC("TC-90", [], ui, ui.ser, ui.lock, resend_last_TC=False)
                     await asyncio.sleep(0.005)  # async sleep to refresh UI
-
-            else:
-                ui.buffer_layout.insert_line("no data received\n")
+            except IndexError:
+                ui.buffer_layout.insert_line(
+                    "<error>Error:</error> CRC frame from SRU is not correct.\n"
+                )
 
         info_message.remove_dialog_as_float(ui.root_container)
         get_app().invalidate()
@@ -526,6 +530,7 @@ async def upload_hex(ui, data, upload_type=None):
 
         ui.last_TC_sent["hex_upload"] = True
         ui.last_TC_sent["hex_file"] = data_backup
+        ui.last_TC_sent["frame_bytes"] = False
 
         # Let's turn the watchdog back on
         if watchdog_value:

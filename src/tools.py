@@ -1,3 +1,5 @@
+from prompt_toolkit import print_formatted_text
+
 import src.float_window as float_window
 import src.serial_com as serial_com
 
@@ -31,7 +33,4 @@ def send_hex_to_MRAM(UI):
 def load_GOLDEN_in_boot_mode(UI):
 
     float_window.do_upload_hex(UI, "Golden")
-    # [x] send TC Erase MRAM Golden
-    # [x] tempo 10s
-    # [x] send golden
-
+    UI.last_TC_sent["hex_upload"] = True
