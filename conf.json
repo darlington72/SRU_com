@@ -2,12 +2,11 @@
     "COM": {
         "port": "ttyUSB0",
         "baudrate": "57600",
-        "timeout": 0.020,
+        "timeout": 0.1,
         "delay_inter_byte": 0.001
     },
     "debug": "True",
     "hex_upload": {
-        "delay_inter_char": 0.003,
         "delay_inter_line": 0.010,
         "max_size_flash_app": "16384",
         "max_wait_erase_app": 10,

@@ -409,30 +409,28 @@ async def upload_hex(ui, data, upload_type=None):
         # let's send the TC erase MRAM golden
         send_TC("TC-A5", [], ui, ui.ser, ui.lock, resend_last_TC=False)
 
-        # let's wait 10 seconds so golden can be erased
-        await asyncio.sleep(conf["hex_upload"]["max_wait_erase_app"])
-
     elif upload_type == "Application":
 
         # let's send the TC erase MRAM app
         send_TC("TC-8C", [], ui, ui.ser, ui.lock, resend_last_TC=False)
 
-        # let's wait for TM MRAM erased
-        if ui.last_TM.full():
-            ui.last_TM.get()
-
-        await asyncio.sleep(0.005)  # async sleep to refresh UI
-
-        try:
-            ui.last_TM.get(block=True, timeout=conf["hex_upload"]["max_wait_erase_app"])
-        except Empty:
-            ui.buffer_layout.insert_line(
-                "<error>Error: TM MRAM erased not received</error>\n"
-            )
-            error = True
-
     else:
         raise TypeError
+
+    # let's wait for TM MRAM erased
+    if ui.last_TM.full():
+        ui.last_TM.get()
+
+    await asyncio.sleep(0.005)  # async sleep to refresh UI
+
+    try:
+        ui.last_TM.get(block=True, timeout=conf["hex_upload"]["max_wait_erase_app"])
+        # TODO: check for TM content
+    except Empty:
+        ui.buffer_layout.insert_line(
+            "<error>Error: TM MRAM erased not received</error>\n"
+        )
+        error = True
 
     get_app().invalidate()
     info_message.remove_dialog_as_float(ui.root_container)
