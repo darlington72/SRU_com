@@ -331,10 +331,23 @@
             ]
         ]
     },
+    "TM-11": {
+        "name": "DUMP Golden MRAM",
+        "header": "4312",
+        "length": "12",
+        "tag": "11",
+        "data": [
+            [
+                "12",
+                "DUMP Golden MRAM",
+                ""
+            ]
+        ]
+    },
     "TM-0F": {
         "name": "CRC Appli MRAM",
         "header": "1243",
-        "length": "04",
+        "length": "03",
         "tag": "0F",
         "data": [
             [
@@ -349,12 +362,30 @@
             ],
             [
                 "01",
-                "CRC Appli Validity (Valid : 0x55, Unvalid : 0xAA) in MRAM",
+                "CRC Appli in MRAM",
+                ""
+            ]
+        ]
+    },
+    "TM-26": {
+        "name": "CRC Golden MRAM",
+        "header": "4321",
+        "length": "03",
+        "tag": "26",
+        "data": [
+            [
+                "01",
+                "CRC Golden send",
                 ""
             ],
             [
                 "01",
-                "CRC Appli in MRAM",
+                "CRC Golden computed",
+                ""
+            ],
+            [
+                "01",
+                "CRC Golden in MRAM",
                 ""
             ]
         ]

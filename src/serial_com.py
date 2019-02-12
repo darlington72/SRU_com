@@ -36,7 +36,7 @@ HEADER_FROM = HEADER_DEF[0]
 HEADER_TYPE = {**HEADER_DEF[1][0], **HEADER_DEF[1][1]}
 
 
-def look_for_sync_words(ui, ser, first_frame):
+def look_for_sync_words(ui, first_frame):
     """
     Blocking function that synchronize to the beginning
     of a new frame
@@ -50,14 +50,14 @@ def look_for_sync_words(ui, ser, first_frame):
     """
 
     while True:
-        first_byte = ser.read(1).hex()
+        first_byte = ui.ser.read(1).hex()
         # ui.buffer_layout.insert_line(f"{first_byte} \n")
 
         if first_byte in HEADER_DEF[0].keys():
             # We set the timeout for the frame
-            ser.timeout = conf["COM"]["timeout"]
+            ui.ser.timeout = conf["COM"]["timeout"]
 
-            second_byte = ser.read(1).hex()
+            second_byte = ui.ser.read(1).hex()
 
             if len(str(second_byte)) < 1:
                 # Timeout occured after syncword reception
@@ -83,7 +83,7 @@ def look_for_sync_words(ui, ser, first_frame):
     return first_byte, second_byte
 
 
-def serial_com_TM(ui, ser, lock, last_TM):
+def serial_com_TM(ui, last_TM):
     """Infinite loop that handles bytes received 
     on the serial link
     
@@ -103,10 +103,10 @@ def serial_com_TM(ui, ser, lock, last_TM):
                 with_time_tag=False,
             )
 
-        sync_word = look_for_sync_words(ui, ser, first_frame)
+        sync_word = look_for_sync_words(ui, first_frame)
         first_frame = False
 
-        data_length = int.from_bytes(ser.read(1), "big")
+        data_length = int.from_bytes(ui.ser.read(1), "big")
         # ui.buffer_layout.insert_line(f"DATA LENGTH ={data_length}")
 
         buffer_feed = "<tm>TM</tm> - "  # Line to be printed to TMTC feed
@@ -122,8 +122,8 @@ def serial_com_TM(ui, ser, lock, last_TM):
             first_frame = True
 
         else:
-            with lock:
-                frame = ser.read(data_length + 2)  # TAG + data + CRC
+            with ui.lock:
+                frame = ui.ser.read(data_length + 2)  # TAG + data + CRC
                 if len(frame) < data_length + 2:
                     # Timeout occurred
 
@@ -155,7 +155,7 @@ def serial_com_TM(ui, ser, lock, last_TM):
                     tag, *data, CRC = [format(_, "x").zfill(2).upper() for _ in frame]
 
                     # We set back the timeout to none as next time we'll be looking for syncwords
-                    ser.timeout = None
+                    ui.ser.timeout = None
 
                     try:
                         frame_name = BD_TM[HEADER_TYPE[sync_word[1]] + "-" + tag][
@@ -228,19 +228,20 @@ def serial_com_TM(ui, ser, lock, last_TM):
 
                     ui.buffer_layout.insert_line(buffer_feed)
                     lib.write_to_file(
+                        ui.file_,
                         "".join(sync_word)
                         + format(data_length, "x").zfill(2)
                         + tag
                         + "".join(data)
                         + CRC
-                        + "\n"
+                        + "\n",
                     )
                     # if last tm was not read, we clear it
                     if not last_TM.full():
-                        last_TM.put(data)
+                        last_TM.put({"tag": tag, "data": data})
 
 
-def serial_com_watchdog(ui, ser, lock):
+def serial_com_watchdog(ui):
     """Infinite loop that sends the watchdog TC every second
     if watchdog_radio is ON
     
@@ -265,10 +266,10 @@ def serial_com_watchdog(ui, ser, lock):
             frame_to_be_sent_bytes.append(CRC)
             frame_to_be_sent_str += format(CRC, "x").zfill(2)
 
-            with lock:
-                ser.write(frame_to_be_sent_bytes)
+            with ui.lock:
+                ui.ser.write(frame_to_be_sent_bytes)
 
-            lib.write_to_file(frame_to_be_sent_str + "\n")
+            lib.write_to_file(ui.file_, frame_to_be_sent_str + "\n")
 
             # UI
             ui.watchdog_cleared_buffer.text = "      Watchdog Cleared"
@@ -280,9 +281,9 @@ def serial_com_watchdog(ui, ser, lock):
             sleep(1)
 
 
-def send_TC(TC_id, TC_data, ui, ser, lock, resend_last_TC=False):
+def send_TC(TC_id, TC_data, ui, resend_last_TC=False):
     """Sends a TC over the serial link
-    Called by UI instance 
+    Called by UI instance or hex_upload
     
     Arguments:
         TC_data {list} -- List of string, each element is a TC parameter 
@@ -305,7 +306,7 @@ def send_TC(TC_id, TC_data, ui, ser, lock, resend_last_TC=False):
                         sleep(conf["COM"]["delay_inter_byte"])
 
                 ui.buffer_layout.insert_line(buffer_feed)
-                lib.write_to_file(frame_to_be_sent_str + "\n")
+                lib.write_to_file(ui.file_, frame_to_be_sent_str + "\n")
 
         last_TC_upload_hex = ui.last_TC_sent["hex_upload"]
         last_TC_hex = ui.last_TC_sent["hex_file"]
@@ -329,11 +330,11 @@ def send_TC(TC_id, TC_data, ui, ser, lock, resend_last_TC=False):
         frame_to_be_sent_bytes.append(CRC)
         frame_to_be_sent_str += format(CRC, "x").zfill(2).upper()
 
-        with lock:
+        with ui.lock:
             for key, int_ in enumerate(frame_to_be_sent_bytes):
-                ser.write([int_])
+                ui.ser.write([int_])
                 if key != len(frame_to_be_sent_bytes) - 1:
-                    sleep(conf["COM"]["delay_inter_byte"] - 0.0001)
+                    sleep(conf["COM"]["delay_inter_byte"])
 
             buffer_feed = "<tc>TC</tc> - "  # Line to be printed to TMTC feed
 
@@ -352,7 +353,7 @@ def send_TC(TC_id, TC_data, ui, ser, lock, resend_last_TC=False):
 
         ui.buffer_layout.insert_line(buffer_feed)
         # ui.raw_serial_buffer.text += HTML("<TC>" + buffer_feed[:-1] + "</TC>")
-        lib.write_to_file(frame_to_be_sent_str + "\n")
+        lib.write_to_file(ui.file_, frame_to_be_sent_str + "\n")
 
         # Let's save this TC in case user wants to resend it
         ui.last_TC_sent["frame_bytes"] = frame_to_be_sent_bytes
@@ -407,12 +408,22 @@ async def upload_hex(ui, data, upload_type=None):
 
     if upload_type == "Golden":
         # let's send the TC erase MRAM golden
-        send_TC("TC-A5", [], ui, ui.ser, ui.lock, resend_last_TC=False)
+        send_TC(
+            "TC-" + conf["hex_upload"]["TC_erase_MRAM_GOLDEN_tag"],
+            [],
+            ui,
+            resend_last_TC=False,
+        )
 
     elif upload_type == "Application":
 
         # let's send the TC erase MRAM app
-        send_TC("TC-8C", [], ui, ui.ser, ui.lock, resend_last_TC=False)
+        send_TC(
+            "TC-" + conf["hex_upload"]["TC_erase_MRAM_APP_tag"],
+            [],
+            ui,
+            resend_last_TC=False,
+        )
 
     else:
         raise TypeError
@@ -424,13 +435,28 @@ async def upload_hex(ui, data, upload_type=None):
     await asyncio.sleep(0.005)  # async sleep to refresh UI
 
     try:
-        ui.last_TM.get(block=True, timeout=conf["hex_upload"]["max_wait_erase_app"])
-        # TODO: check for TM content
+        TM_received = ui.last_TM.get(
+            block=True, timeout=conf["hex_upload"]["max_wait_erase_app"]
+        )
     except Empty:
         ui.buffer_layout.insert_line(
             "<error>Error: TM MRAM erased not received</error>\n"
         )
         error = True
+    else:
+        if upload_type == "Application":
+            if TM_received["tag"] != conf["hex_upload"]["TM_MRAM_APP_erased_tag"]:
+                ui.buffer_layout.insert_line(
+                    "<error>Error: Was expecting TM MRAM erased</error>\n"
+                )
+                error = True
+
+        else:
+            if TM_received["tag"] != conf["hex_upload"]["TM_MRAM_GOLDEN_erased_tag"]:
+                ui.buffer_layout.insert_line(
+                    "<error>Error: Was expecting TM MRAM erased</error>\n"
+                )
+                error = True
 
     get_app().invalidate()
     info_message.remove_dialog_as_float(ui.root_container)
@@ -439,7 +465,7 @@ async def upload_hex(ui, data, upload_type=None):
 
         info_message = float_window.InfoDialog(
             f"{upload_type} Upload to SRU",
-            "Upload in progress.. (2/3)",
+            "Upload in progress.. (2/3) \n(can take up to 30s)",
             ui.root_container,
         )
         get_app().invalidate()
@@ -454,69 +480,98 @@ async def upload_hex(ui, data, upload_type=None):
                     # print(line[1:])
                     if upload_type == "Golden":
                         send_TC(
-                            "TC-0D(BL)",
+                            "TC-"
+                            + conf["hex_upload"]["TC_hex_line_upload_tag"]
+                            + "(BL)",
                             [line[1:]],
                             ui,
-                            ui.ser,
-                            ui.lock,
                             resend_last_TC=False,
                         )
                     elif upload_type == "Application":
                         send_TC(
-                            "TC-0D",
+                            "TC-" + conf["hex_upload"]["TC_hex_line_upload_tag"],
                             [line[1:]],
                             ui,
-                            ui.ser,
-                            ui.lock,
                             resend_last_TC=False,
                         )
                     else:
                         raise TypeError
 
-                    sleep(conf["hex_upload"]["delay_inter_line"])
+                    if conf["hex_upload"]["refresh_ui_during_upload"]:
+                        await asyncio.sleep(conf["hex_upload"]["delay_inter_line"])
+                    else:
+                        sleep(conf["hex_upload"]["delay_inter_line"])
+
+        # CRC calculation
+        CRC_calculated = lib.compute_CRC_hex(data, ui)
+        ui.buffer_layout.insert_line(
+            f"CRC calulated = 0x{CRC_calculated}. Sending CRC frame to SRU..\n"
+        )
+
+        info_message.remove_dialog_as_float(ui.root_container)
+        info_message = float_window.InfoDialog(
+            f"{upload_type} Upload to SRU",
+            "Waiting for SRU CRC calculation.. (3/3)",
+            ui.root_container,
+        )
+        get_app().invalidate()
+        await asyncio.sleep(0.005)  # async sleep to refresh UI
+
+        # Let's send calculated CRC
+        if ui.last_TM.full():
+            ui.last_TM.get()
 
         if upload_type == "Application":
-            # CRC calculation
-            CRC_calculated = lib.compute_CRC_hex(data, ui)
-            ui.buffer_layout.insert_line(
-                f"CRC calulated = 0x{CRC_calculated}. Sending CRC frame to SRU..\n"
-            )
 
-            info_message.remove_dialog_as_float(ui.root_container)
-            info_message = float_window.InfoDialog(
-                f"{upload_type} Upload to SRU",
-                "Waiting for SRU CRC calculation.. (3/3)",
-                ui.root_container,
-            )
-            get_app().invalidate()
-            await asyncio.sleep(0.005)  # async sleep to refresh UI
-
-            # Let's send calculated CRC
-            if ui.last_TM.full():
-                ui.last_TM.get()
             send_TC(
-                "TC-8F", [CRC_calculated], ui, ui.ser, ui.lock, resend_last_TC=False
+                "TC-" + conf["hex_upload"]["TC_CRC_APP_tag"],
+                [CRC_calculated],
+                ui,
+                resend_last_TC=False,
             )
-            await asyncio.sleep(0.005)  # async sleep to refresh UI
+        else:
+            send_TC(
+                "TC-" + conf["hex_upload"]["TC_CRC_GOLDEN_tag"],
+                [CRC_calculated],
+                ui,
+                resend_last_TC=False,
+            )
 
-            # Wait for answer
-            CRC_data = ui.last_TM.get(
-                block=True, timeout=conf["hex_upload"]["max_wait_CRC_calculation"]
-            )
-            await asyncio.sleep(0.005)  # async sleep to refresh UI
-            try:
-                if CRC_data[1] != CRC_calculated:
-                    error = True
-                    ui.buffer_layout.insert_line(
-                        f"<error>CRC ERROR: received 0x{CRC_data[1] }, calculated 0x{CRC_calculated}</error>\n"
-                    )
-                else:
-                    send_TC("TC-90", [], ui, ui.ser, ui.lock, resend_last_TC=False)
-                    await asyncio.sleep(0.005)  # async sleep to refresh UI
-            except IndexError:
+        await asyncio.sleep(0.005)  # async sleep to refresh UI
+
+        # Wait for answer
+        CRC_data = ui.last_TM.get(
+            block=True, timeout=conf["hex_upload"]["max_wait_CRC_calculation"]
+        )["data"]
+        await asyncio.sleep(0.005)  # async sleep to refresh UI
+        try:
+            if CRC_data[1] != CRC_calculated:
+                error = True
                 ui.buffer_layout.insert_line(
-                    "<error>Error:</error> CRC frame from SRU is not correct.\n"
+                    f"<error>CRC ERROR: received 0x{CRC_data[1] }, calculated 0x{CRC_calculated}</error>\n"
                 )
+            else:
+                if upload_type == "Application":
+                    if conf["hex_upload"]["send_TC_reboot_after_app_upload"]:
+                        send_TC(
+                            "TC-" + conf["hex_upload"]["TC_reboot_tag"],
+                            [],
+                            ui,
+                            resend_last_TC=False,
+                        )
+                else:
+                    if conf["hex_upload"]["send_TC_reboot_after_golden_upload"]:
+                        send_TC(
+                            "TC-" + conf["hex_upload"]["TC_reboot_tag"] + "(BL)",
+                            [],
+                            ui,
+                            resend_last_TC=False,
+                        )
+                await asyncio.sleep(0.005)  # async sleep to refresh UI
+        except IndexError:
+            ui.buffer_layout.insert_line(
+                "<error>Error:</error> CRC frame from SRU is not correct.\n"
+            )
 
         info_message.remove_dialog_as_float(ui.root_container)
         get_app().invalidate()

@@ -79,15 +79,13 @@ def do_upload_hex(ui, upload_type):
     ensure_future(coroutine())
 
 
-def do_conf_TC(current_key, TC_data, ui, ser, lock):
+def do_conf_TC(current_key, TC_data, ui):
     def coroutine():
         error = False
         param_count = len(BD_TC[ui.TC_selectable_list.current_value]["data"])
 
         if current_key == param_count:
-            serial_com.send_TC(
-                ui.TC_selectable_list.current_value, TC_data, ui, ser, lock
-            )
+            serial_com.send_TC(ui.TC_selectable_list.current_value, TC_data, ui)
         else:
             try:
                 param_size = int(
@@ -146,7 +144,7 @@ def do_conf_TC(current_key, TC_data, ui, ser, lock):
                             TC_data.append(result)
 
             if not error:
-                do_conf_TC(current_key + 1, TC_data, ui, ser, lock)
+                do_conf_TC(current_key + 1, TC_data, ui)
 
     ensure_future(coroutine())
 

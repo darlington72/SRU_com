@@ -68,10 +68,9 @@ def format_frame(*frame):
     return formatted_frame
 
 
-def write_to_file(line):
-    if args.file is not None:
-        with open(args.file + ".txt", mode="a") as file:
-            file.write(line)
+def write_to_file(file_, line):
+    if file_ is not None:
+        file_.write(line)
 
 
 class SerialTest:

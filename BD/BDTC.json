@@ -154,7 +154,29 @@
         "name": "DUMP MRAM Appli",
         "header": "1234",
         "length": "00",
-        "tag": "8E",
+        "tag": "12",
+        "data": [
+            [
+                ""
+            ]
+        ]
+    },
+    "TC-11": {
+        "name": "DUMP Golden Appli",
+        "header": "1234",
+        "length": "00",
+        "tag": "91",
+        "data": [
+            [
+                ""
+            ]
+        ]
+    },
+    "TC-11(BL)": {
+        "name": "DUMP Golden Appli (BL)",
+        "header": "4321",
+        "length": "00",
+        "tag": "91",
         "data": [
             [
                 ""
@@ -170,6 +192,19 @@
             [
                 "01",
                 "CRC Appli send",
+                "?"
+            ]
+        ]
+    },
+    "TC-A6": {
+        "name": "(BL) CRC Golden MRAM",
+        "header": "4321",
+        "length": "01",
+        "tag": "A6",
+        "data": [
+            [
+                "01",
+                "CRC Golden send",
                 "?"
             ]
         ]

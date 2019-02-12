@@ -29,6 +29,11 @@ if __name__ == "__main__":
         update()
         sys.exit()
 
+    if args.file:
+        file_ = open(args.file + ".txt", mode="a")
+    else:
+        file_ = None
+
     # Serial
     if args.test:
         ser = lib.SerialTest()
@@ -51,7 +56,7 @@ if __name__ == "__main__":
     last_TM = queue.Queue(maxsize=1)
 
     # Main UI instance
-    ui = UI_layout.UI(ser, lock, last_TM)
+    ui = UI_layout.UI(ser, lock, last_TM, file_)
 
     # Let's wrap serial's read & write to display raw TM/TC exchange
     # in the raw TM/TC window
@@ -60,18 +65,17 @@ if __name__ == "__main__":
 
     # Thread1 : when watchdog clear is enabled
     # the thread send the TC clear watchdog everysecond
-    thread1 = threading.Thread(
-        target=serial_com.serial_com_watchdog, args=(ui, ser, lock)
-    )
+    thread1 = threading.Thread(target=serial_com.serial_com_watchdog, args=(ui,))
     thread1.daemon = True
     thread1.start()
 
     # Thread2: this one deals with TM reception on the uart link
     # see the function serial_com_TM for details
-    thread2 = threading.Thread(
-        target=serial_com.serial_com_TM, args=(ui, ser, lock, last_TM)
-    )
+    thread2 = threading.Thread(target=serial_com.serial_com_TM, args=(ui, last_TM))
     thread2.daemon = True
     thread2.start()
 
     ui.run_app()
+
+    if args.file:
+        file_.close()

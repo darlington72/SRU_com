@@ -38,11 +38,12 @@ import src.tools as tools
 
 
 class UI:
-    def __init__(self, ser, lock, last_TM):
+    def __init__(self, ser, lock, last_TM, file_):
 
         self.ser = ser
         self.lock = lock
         self.last_TM = last_TM
+        self.file_ = file_
 
         # TC list and sending
         TC_list = [
@@ -62,11 +63,9 @@ class UI:
                 > 0
             ):
                 # TC has parameter(s)
-                float_window.do_conf_TC(0, [], self, ser, lock)
+                float_window.do_conf_TC(0, [], self)
             else:
-                serial_com.send_TC(
-                    self.TC_selectable_list.current_value, [], self, ser, lock
-                )
+                serial_com.send_TC(self.TC_selectable_list.current_value, [], self)
 
         self.TC_selectable_list = SelectableList(
             values=TC_list, handler=TC_send_handler
