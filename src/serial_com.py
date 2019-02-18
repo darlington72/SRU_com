@@ -95,34 +95,35 @@ def serial_com_TM(ui, last_TM):
 
     first_frame = True
     while True:
+        with ui.lock:
 
-        # Looking for sync word
-        if first_frame:
-            ui.buffer_layout.insert_line(
-                "<waiting_sync>Waiting for sync word...</waiting_sync>\n",
-                with_time_tag=False,
-            )
+            # Looking for sync word
+            if first_frame:
+                ui.buffer_layout.insert_line(
+                    "<waiting_sync>Waiting for sync word...</waiting_sync>\n",
+                    with_time_tag=False,
+                )
 
-        sync_word = look_for_sync_words(ui, first_frame)
-        first_frame = False
+            sync_word = look_for_sync_words(ui, first_frame)
+            first_frame = False
 
-        data_length = int.from_bytes(ui.ser.read(1), "big")
-        # ui.buffer_layout.insert_line(f"DATA LENGTH ={data_length}")
+            data_length = int.from_bytes(ui.ser.read(1), "big")
+            # ui.buffer_layout.insert_line(f"DATA LENGTH ={data_length}")
 
-        buffer_feed = "<tm>TM</tm> - "  # Line to be printed to TMTC feed
+            buffer_feed = "<tm>TM</tm> - "  # Line to be printed to TMTC feed
 
-        if len(str(data_length)) < 1:
-            # Timeout occured after syncword reception
-            buffer_feed += (
-                "<syncword>"
-                + "".join(sync_word)
-                + "</syncword><error> Timeout error</error>"
-            )
-            ui.buffer_layout.insert_line(buffer_feed)
-            first_frame = True
+            if len(str(data_length)) < 1:
+                # Timeout occured after syncword reception
+                buffer_feed += (
+                    "<syncword>"
+                    + "".join(sync_word)
+                    + "</syncword><error> Timeout error</error>"
+                )
+                ui.buffer_layout.insert_line(buffer_feed)
+                first_frame = True
 
-        else:
-            with ui.lock:
+            else:
+                
                 frame = ui.ser.read(data_length + 2)  # TAG + data + CRC
                 if len(frame) < data_length + 2:
                     # Timeout occurred
