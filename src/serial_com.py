@@ -481,7 +481,7 @@ async def upload_hex(ui, data, upload_type=None):
                     if upload_type == "Golden":
                         send_TC(
                             "TC-"
-                            + conf["hex_upload"]["TC_hex_line_upload_tag"]
+                            + conf["hex_upload"]["TC_GOLDEN_hex_line_upload_tag"]
                             + "(BL)",
                             [line[1:]],
                             ui,
@@ -489,7 +489,7 @@ async def upload_hex(ui, data, upload_type=None):
                         )
                     elif upload_type == "Application":
                         send_TC(
-                            "TC-" + conf["hex_upload"]["TC_hex_line_upload_tag"],
+                            "TC-" + conf["hex_upload"]["TC_APP_hex_line_upload_tag"],
                             [line[1:]],
                             ui,
                             resend_last_TC=False,

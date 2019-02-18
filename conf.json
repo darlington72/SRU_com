@@ -19,7 +19,8 @@
         "TM_MRAM_GOLDEN_erased_tag": "25",
         "TC_erase_MRAM_APP_tag": "8C",
         "TC_erase_MRAM_GOLDEN_tag": "A5",
-        "TC_hex_line_upload_tag": "0D",
+        "TC_APP_hex_line_upload_tag": "0D",
+        "TC_GOLDEN_hex_line_upload_tag": "0D",
         "TC_CRC_APP_tag": "8F",
         "TC_CRC_GOLDEN_tag": "A6"
     }
