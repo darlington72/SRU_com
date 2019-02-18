@@ -299,9 +299,9 @@ def send_TC(TC_id, TC_data, ui, resend_last_TC=False):
             frame_to_be_sent_str = ui.last_TC_sent["frame_str"]
             buffer_feed = ui.last_TC_sent["buffer_feed"]
 
-            with lock:
+            with ui.lock:
                 for key, int_ in enumerate(frame_to_be_sent_bytes):
-                    ser.write([int_])
+                    ui.ser.write([int_])
                     if key != len(frame_to_be_sent_bytes) - 1:
                         sleep(conf["COM"]["delay_inter_byte"])
 

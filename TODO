@@ -4,10 +4,12 @@ Todo:
   ✘ Loading bar for hex upload @cancelled(19-02-12 14:29)
   ✔ What TC to send after golden upload ? -> nothing @done(19-02-12 16:21)
   ✔ Why Load appli backup MRAM answer something weird ? @done(19-02-12 16:47)
-  ☐ Why TC dump has changed ?
+  ✔ Why TC dump has changed ? @done(19-02-12 18:34)
   ✔ Why when i send it i get no error, just nothin ? @done(19-02-12 18:07)
   ✔ add tag in conf @done(19-02-12 17:50)
   ✔ # TODO: check for TM content @done(19-02-12 17:50)
   ✔ remettre le chargement @done(19-02-12 17:50)
+  ☐ fix update
+  ☐ check for buffer len 
 
 
