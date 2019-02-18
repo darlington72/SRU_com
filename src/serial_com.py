@@ -505,7 +505,7 @@ async def upload_hex(ui, data, upload_type=None):
                         sleep(conf["hex_upload"]["delay_inter_line"])
 
         # CRC calculation
-        CRC_calculated = lib.compute_CRC_hex(data, ui)
+        CRC_calculated = lib.compute_CRC_hex(data, ui).zfill(2)
         ui.buffer_layout.insert_line(
             f"CRC calulated = 0x{CRC_calculated}. Sending CRC frame to SRU..\n"
         )
