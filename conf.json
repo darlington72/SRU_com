@@ -6,6 +6,7 @@
         "delay_inter_byte": 0.001
     },
     "debug": "True",
+    "TC_watchdog_tag": "01",
     "hex_upload": {
         "delay_inter_line": 0.015,
         "max_size_flash_app": "16384",
