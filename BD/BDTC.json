@@ -1,28 +1,29 @@
 {
-    "TC-80": {
-        "name": "REBOOT",
+    "TC-00": {
+        "name": "Reboot",
         "header": "1234",
         "length": "00",
-        "tag": "80",
+        "tag": "00",
         "data": [
             [
                 ""
             ]
         ]
     },
-    "TC-80(BL)": {
-        "name": "(BL) REBOOT",
-        "header": "4321",
+    "TC-01": {
+        "name": "Clear WDG (without TM)",
+        "header": "1234",
         "length": "00",
-        "tag": "80",
+        "tag": "01",
         "data": [
             [
                 ""
             ]
-        ]
+        ],
+        "hidden": true
     },
     "TC-81": {
-        "name": "CLEAR_WDG",
+        "name": "Clear WDG",
         "header": "1234",
         "length": "00",
         "tag": "81",
@@ -32,55 +33,45 @@
             ]
         ]
     },
-    "TC-01": {
-        "type": "TC",
-        "name": "CLEAR_WDG (no TM)",
-        "header": "1234",
-        "length": "00",
-        "tag": "01",
-        "data": ""
-    },
     "TC-82": {
-        "name": "STATUS KEY WDG",
+        "name": "WDG Status",
         "header": "1234",
         "length": "00",
         "tag": "82",
         "data": [
             [
-                "1",
-                "Key",
                 ""
             ]
         ]
     },
     "TC-83": {
-        "name": "ENABLE WDG",
+        "name": "Enable WDG",
         "header": "1234",
         "length": "01",
         "tag": "83",
         "data": [
             [
-                "1",
-                "Enable WDG",
+                "01",
+                "Enable Key",
                 "55"
             ]
         ]
     },
     "TC-84": {
-        "name": "DISABLE WDG",
+        "name": "Disable WDG",
         "header": "1234",
         "length": "01",
         "tag": "84",
         "data": [
             [
-                "1",
-                "Disable WDG",
+                "01",
+                "Disable Key",
                 "AA"
             ]
         ]
     },
     "TC-85": {
-        "name": "HK",
+        "name": "House Keeping TM",
         "header": "1234",
         "length": "00",
         "tag": "85",
@@ -91,20 +82,20 @@
         ]
     },
     "TC-86": {
-        "name": "READ ADDRESS",
+        "name": "Read Address (Peek)",
         "header": "1234",
         "length": "04",
         "tag": "86",
         "data": [
             [
                 "4",
-                "Read Address",
+                "Address to Read",
                 "?"
             ]
         ]
     },
     "TC-87": {
-        "name": "WRITE ADDRESS",
+        "name": "Write Address (Poke)",
         "header": "1234",
         "length": "05",
         "tag": "87",
@@ -116,34 +107,77 @@
             ],
             [
                 "1",
-                "Data to write",
+                "Byte to Write",
                 "?"
             ]
         ]
     },
-    "TC-8A": {
-        "name": "Change TIMEOUT WDG",
+    "TC-88": {
+        "name": "Change Tempo WDG",
         "header": "1234",
         "length": "02",
-        "tag": "8A",
+        "tag": "88",
         "data": [
             [
                 "01",
-                "Timeout WDG IT",
+                "Timeout WDG IT (en sec)",
                 "?"
             ],
             [
                 "01",
-                "Timeout WDG IT after Reboot ZYNQ",
+                "Timeout WDG IT after Reboot ZYNQ (en sec)",
                 "?"
             ]
         ]
     },
-    "TC-8C": {
-        "name": "Erase MRAM Appli",
+    "TC-89": {
+        "name": "Stay in BootMode",
         "header": "1234",
         "length": "00",
+        "tag": "89",
+        "data": [
+            [
+                ""
+            ]
+        ]
+    },
+    "TC-8A": {
+        "name": "Erase Appli in MRAM",
+        "header": "1234",
+        "length": "00",
+        "tag": "8A",
+        "data": [
+            [
+                ""
+            ]
+        ]
+    },
+    "TC-0B": {
+        "name": "Chargement Hex Line",
+        "header": "1234",
+        "length": "?",
+        "tag": "0B",
+        "data": [[""]],
+        "hidden": true
+    },
+    "TC-8C": {
+        "name": "Crc Appli in MRAM",
+        "header": "1234",
+        "length": "01",
         "tag": "8C",
+        "data": [
+            [
+                "01",
+                "Crc Appli in MRAM",
+                "?"
+            ]
+        ]
+    },
+    "TC-8D": {
+        "name": "Request Reload Appli from MRAM",
+        "header": "1234",
+        "length": "00",
+        "tag": "8D",
         "data": [
             [
                 ""
@@ -151,32 +185,10 @@
         ]
     },
     "TC-8E": {
-        "name": "DUMP MRAM Appli",
+        "name": "Dump Appli from MRAM",
         "header": "1234",
         "length": "00",
-        "tag": "12",
-        "data": [
-            [
-                ""
-            ]
-        ]
-    },
-    "TC-11": {
-        "name": "DUMP Golden Appli",
-        "header": "1234",
-        "length": "00",
-        "tag": "91",
-        "data": [
-            [
-                ""
-            ]
-        ]
-    },
-    "TC-11(BL)": {
-        "name": "DUMP Golden Appli (BL)",
-        "header": "4321",
-        "length": "00",
-        "tag": "91",
+        "tag": "8E",
         "data": [
             [
                 ""
@@ -184,33 +196,18 @@
         ]
     },
     "TC-8F": {
-        "name": "CRC Appli MRAM",
+        "name": "Dump Golden from MRAM",
         "header": "1234",
-        "length": "01",
+        "length": "00",
         "tag": "8F",
         "data": [
             [
-                "01",
-                "CRC Appli send",
-                "?"
-            ]
-        ]
-    },
-    "TC-A6": {
-        "name": "(BL) CRC Golden MRAM",
-        "header": "4321",
-        "length": "01",
-        "tag": "A6",
-        "data": [
-            [
-                "01",
-                "CRC Golden send",
-                "?"
+                ""
             ]
         ]
     },
     "TC-90": {
-        "name": "Reload Appli in MRAM",
+        "name": "Dump Appli from Flash",
         "header": "1234",
         "length": "00",
         "tag": "90",
@@ -220,90 +217,79 @@
             ]
         ]
     },
-    "TC-FF": {
-        "name": "BAD INDEX",
-        "header": "1234",
+    "TC-00(BL)": {
+        "name": "(BL) Reboot",
+        "header": "4321",
         "length": "00",
-        "tag": "FF",
+        "tag": "40",
         "data": [
             [
                 ""
             ]
         ]
     },
-    "TC-A3": {
+    "TC-C1": {
         "name": "(BL) Init MRAM",
         "header": "4321",
-        "length": "01",
-        "tag": "A3",
-        "data": [
-            [
-                "1",
-                "Data",
-                "63"
-            ]
-        ]
-    },
-    "TC-A4": {
-        "name": "Goto Bootloader",
-        "header": "1234",
         "length": "00",
-        "tag": "A4",
+        "tag": "C1",
         "data": [
             [
                 ""
             ]
         ]
     },
-    "TC-AC": {
-        "name": "Load Appli backup MRAM",
+    "TC-C2": {
+        "name": "(BL) Erase Golden in MRAM",
         "header": "4321",
-        "length": "01",
-        "tag": "AC",
+        "length": "00",
+        "tag": "C2",
         "data": [
-            [
-                "1",
-                "Data",
-                "63"
-            ]
+            [""]
         ]
     },
-    "TC-0D": {
-        "name": "Chargement Hex Line",
-        "header": "1234",
+    "TC-43(BL)": {
+        "name": "(BL) Chargement Hex Line",
+        "header": "4321",
         "length": "?",
-        "tag": "0D",
+        "tag": "43",
+        "data": [[""]],
+        "hidden": true
+    },
+    "TC-C4": {
+        "name": "(BL) Crc Golden in MRAM",
+        "header": "4321",
+        "length": "01",
+        "tag": "C4",
         "data": [
             [
                 "01",
-                "",
+                "Crc Golden in MRAM",
+                "?"
+            ]
+        ]
+    },
+    "TC-C5": {
+        "name": "(BL) Dump Golden from MRAM",
+        "header": "4321",
+        "length": "00",
+        "tag": "C5",
+        "data": [
+            [
                 ""
             ]
-        ],
-        "hidden": true
+        ]
     },
-    "TC-0D(BL)": {
-        "name": "Chargement Hex Line",
+    "TC-C9": {
+        "name": "(BL) Hello SRU",
         "header": "4321",
-        "length": "?",
-        "tag": "0D",
+        "length": "01",
+        "tag": "C9",
         "data": [
             [
                 "01",
-                "",
-                ""
-            ]
-        ],
-        "hidden": true
-    },
-    "TC-A5": {
-        "name": "(BL) Erase MRAM Golden",
-        "header": "4321",
-        "length": "00",
-        "tag": "A5",
-        "data": [
-            [
-                ""
+                "Hello SRU data",
+                "63"
             ]
         ]
     }

@@ -1,86 +1,6 @@
 {
-    "TM-00": {
-        "name": "REBOOT",
-        "header": "1234",
-        "length": "16",
-        "tag": "00",
-        "data": [
-            [
-                "01",
-                "SRU Used"
-            ],
-            [
-                "01",
-                "BOOT Status MRAM"
-            ],
-            [
-                "01",
-                "MRAM Appli CRC"
-            ],
-            [
-                "01",
-                "Watchdog Key"
-            ],
-            [
-                "01",
-                "Watchdog Level"
-            ],
-            [
-                "01",
-                "Nbr Appli reload"
-            ],
-            [
-                "01",
-                "Nbr SRU Reboot"
-            ],
-            [
-                "01",
-                "Nbr SRU Reboot Life"
-            ],
-            [
-                "01",
-                "Nbr Zynq Reboot"
-            ],
-            [
-                "01",
-                "TM Appli Requested"
-            ],
-            [
-                "01",
-                "TM Boot Requested"
-            ],
-            [
-                "01",
-                "Boot Version"
-            ],
-            [
-                "01",
-                "Appli Version"
-            ],
-            [
-                "01",
-                "Tempo WDG IT"
-            ],
-            [
-                "01",
-                "Tempo WDG IT After Reboot Zynq"
-            ],
-            [
-                "01",
-                "Mram Alive"
-            ],
-            [
-                "01",
-                "Crc computed"
-            ],
-            [
-                "01",
-                "Next Boot"
-            ]
-        ]
-    },
     "TM-01": {
-        "name": "CLEAR_WDG",
+        "name": "Clear Wdg",
         "header": "1243",
         "length": "00",
         "tag": "01",
@@ -91,621 +11,413 @@
         ]
     },
     "TM-02": {
-        "name": "STATUS KEY WDG",
+        "name": "Config WDG",
         "header": "1234",
-        "length": "04",
+        "length": "03",
         "tag": "02",
         "data": [
             [
                 "01",
-                "Status WDG (55 En, AA Dis)",
-                "63"
+                "Status WDG (55 Enable, AA Disable)",
+                ""
             ],
             [
                 "01",
-                "WDG Threshold Before Reboot Zynq",
-                "63"
+                "WDG Threshold (en sec)",
+                ""
             ],
             [
                 "01",
-                "WDG Threshold After Reboot Zynq",
-                "63"
-            ],
-            [
-                "01",
-                "Current WDG Threshold",
-                "63"
+                "WDG Threshold After Reboot Zynq (en sec)",
+                ""
             ]
         ]
     },
     "TM-03": {
-        "name": "ENABLE WDG",
+        "name": "WDG Enabled",
         "header": "1234",
         "length": "03",
         "tag": "03",
         "data": [
             [
                 "01",
-                "Request (55 En, AA Dis)",
-                "63"
+                "Requested (55 Enable, AA Disable)",
+                ""
             ],
             [
                 "01",
-                "Old State (55 En, AA Dis)",
-                "63"
+                "Old State (55 Enable, AA Disable)",
+                ""
             ],
             [
                 "01",
-                "Status (55 En, AA Dis, FF Not valid)",
-                "63"
+                "Status (55 Enable, AA Disable)",
+                ""
+            ]
+        ]
+    },
+    "TM-83": {
+        "name": "WDG Enabled Error",
+        "header": "1234",
+        "length": "03",
+        "tag": "83",
+        "data": [
+            [
+                "01",
+                "Requested (55 Enable, AA Disable)",
+                ""
+            ],
+            [
+                "01",
+                "Old State (55 Enable, AA Disable)",
+                ""
+            ],
+            [
+                "01",
+                "Status (55 Enable, AA Disable, FF Not valid)",
+                ""
             ]
         ]
     },
     "TM-04": {
-        "name": "DISABLE WDG",
+        "name": "WDG Disabled",
         "header": "1234",
         "length": "03",
         "tag": "04",
         "data": [
             [
                 "01",
-                "Request (55 En, AA Dis)",
-                "63"
+                "Requested (55 Enable, AA Disable)",
+                ""
             ],
             [
                 "01",
-                "Old State (55 En, AA Dis)",
-                "63"
+                "Old State (55 Enable, AA Disable)",
+                ""
             ],
             [
                 "01",
-                "Status (55 En, AA Dis, FF Not valid)",
-                "63"
+                "Status (55 Enable, AA Disable)",
+                ""
             ]
         ]
     },
-    "TM-05": {
-        "name": "HK",
+    "TM-84": {
+        "name": "WDG Disabled Error",
         "header": "1234",
-        "length": "10",
-        "tag": "05",
+        "length": "03",
+        "tag": "84",
         "data": [
             [
                 "01",
-                "SRU USED (SRU-A: 0x55, SRU-B: 0xAA)"
+                "Requested (55 Enable, AA Disable)",
+                ""
             ],
             [
                 "01",
-                "BOOT Status MRAM"
+                "Old State (55 Enable, AA Disable)",
+                ""
             ],
             [
                 "01",
-                "APPLI CRC MRAM"
-            ],
-            [
-                "01",
-                "WDG Status (Enable: 0x55, Disable: 0xAA)"
-            ],
-            [
-                "01",
-                "WDG Level"
-            ],
-            [
-                "01",
-                "Nbr Appli Reload"
-            ],
-            [
-                "01",
-                "Nbr SRU Reboot"
-            ],
-            [
-                "01",
-                "Nbr SRU Reboot Life"
-            ],
-            [
-                "01",
-                "Nbr Zynq Reboot"
-            ],
-            [
-                "01",
-                "TM Appli Requested"
-            ],
-            [
-                "01",
-                "TM Boot Requested"
-            ],
-            [
-                "01",
-                "Vesion Boot"
-            ],
-            [
-                "01",
-                "Version Appli"
-            ],
-            [
-                "01",
-                "WDG Threshold IT"
-            ],
-            [
-                "01",
-                "WDG Threshold IT After Zynq Reboot"
-            ],
-            [
-                "01",
-                "MRAM Alive (Ok: 0x63)"
+                "Status (55 Enable, AA Disable, FF Not valid)",
+                ""
             ]
         ]
     },
-    "TM-06": {
-        "name": "READ ADDRESS",
-        "header": "1243",
-        "length": "05",
-        "tag": "06",
+    "TM-09": {
+        "name": "Stay in BootMode (after Reboot, Modetest = 1)",
+        "header": "1234",
+        "length": "01",
+        "tag": "09",
         "data": [
             [
-                "04",
-                "Read Address",
-                "00000000"
-            ],
-            [
                 "01",
-                "Data Read",
-                "00"
-            ]
-        ]
-    },
-    "TM-07": {
-        "name": "WRITE ADDRESS",
-        "header": "1243",
-        "length": "06",
-        "tag": "07",
-        "data": [
-            [
-                "04",
-                "Address WRITTEN"
-            ],
-            [
-                "01",
-                "Data to write"
-            ],
-            [
-                "01",
-                "Data before write"
-            ],
-            [
-                "01",
-                "Data after write"
+                "BootStatus value (57 = BootMode)",
+                ""
             ]
         ]
     },
     "TM-0A": {
-        "name": "Change TIMEOUT WDG",
+        "name": "Erase Appli in MRAM",
         "header": "1234",
-        "length": "02",
-        "tag": "0A",
-        "data": [
-            [
-                "01",
-                "Timeout WDG IT"
-            ],
-            [
-                "01",
-                "Timeout WDG IT after Reboot ZYNQ"
-            ]
-        ]
-    },
-    "TM-0C": {
-        "name": "Erase MRAM Appli",
-        "header": "1243",
         "length": "00",
-        "tag": "0C",
+        "tag": "0A",
         "data": [
             [
                 ""
             ]
         ]
     },
-    "TM-0D": {
-        "name": "Chargement Hex Line",
-        "header": "1243",
-        "length": "01",
-        "tag": "0D",
+    "TM-0B": {
+        "name": "Crc Appli in MRAM",
+        "header": "1234",
+        "length": "03",
+        "tag": "0B",
         "data": [
             [
                 "01",
-                "",
+                "Crc sent (from TC)",
+                ""
+            ],
+            [
+                "01",
+                "Crc computed (by SRU)",
+                ""
+            ],
+            [
+                "01",
+                "Crc in MRAM",
+                ""
+            ]
+        ]
+    },
+    "TM-0C": {
+        "name": "Request Reload Appli from MRAM (after reboot, Modetest = 1)",
+        "header": "1234",
+        "length": "01",
+        "tag": "0C",
+        "data": [
+            [
+                "01",
+                "BootStatus value (63 = BootMode)",
                 ""
             ]
         ]
     },
     "TM-0E": {
-        "name": "DUMP Appli MRAM",
-        "header": "1243",
-        "length": "12",
+        "name": "Dump Golden from MRAM",
+        "header": "1234",
+        "length": "16",
         "tag": "0E",
         "data": [
             [
-                "12",
-                "DUMP Appli MRAM",
-                ""
-            ]
-        ]
-    },
-    "TM-11": {
-        "name": "DUMP Golden MRAM",
-        "header": "4312",
-        "length": "12",
-        "tag": "11",
-        "data": [
-            [
-                "12",
-                "DUMP Golden MRAM",
+                "10",
+                "Golden from MRAM",
                 ""
             ]
         ]
     },
     "TM-0F": {
-        "name": "CRC Appli MRAM",
-        "header": "1243",
-        "length": "03",
+        "name": "Dump Appli from MRAM",
+        "header": "1234",
+        "length": "16",
         "tag": "0F",
         "data": [
             [
-                "01",
-                "CRC Appli send",
-                ""
-            ],
-            [
-                "01",
-                "CRC Appli computed",
-                ""
-            ],
-            [
-                "01",
-                "CRC Appli in MRAM",
+                "10",
+                "Appli from MRAM",
                 ""
             ]
         ]
     },
-    "TM-26": {
-        "name": "CRC Golden MRAM",
-        "header": "4321",
-        "length": "03",
-        "tag": "26",
-        "data": [
-            [
-                "01",
-                "CRC Golden send",
-                ""
-            ],
-            [
-                "01",
-                "CRC Golden computed",
-                ""
-            ],
-            [
-                "01",
-                "CRC Golden in MRAM",
-                ""
-            ]
-        ]
-    },
-    "TM-20": {
-        "name": "Global WDG Level",
-        "header": "1243",
-        "length": "01",
-        "tag": "20",
-        "data": [
-            [
-                "01",
-                "WDG Level",
-                ""
-            ]
-        ]
-    },
-    "TM-21": {
-        "name": "TIMEOUT UART",
-        "header": "1243",
-        "length": "00",
-        "tag": "21",
-        "data": [
-            [
-                ""
-            ]
-        ]
-    },
-    "TM-2E": {
-        "name": "BAD CRC",
-        "header": "1243",
-        "length": "03",
-        "tag": "2E",
-        "data": [
-            [
-                "01",
-                "CRC computed by SRU",
-                "00"
-            ],
-            [
-                "01",
-                "CRC sent",
-                "00"
-            ],
-            [
-                "01",
-                "Data length",
-                "00"
-            ]
-        ]
-    },
-    "TM-2F": {
-        "name": "TM UNKNOWN",
+    "TM-10": {
+        "name": "Dump Appli from Flash",
         "header": "1234",
-        "length": "03",
-        "tag": "2F",
+        "length": "16",
+        "tag": "10",
         "data": [
             [
-                "01",
-                "",
-                "00"
-            ],
-            [
-                "01",
-                "TAG UNKNOWN",
-                "00"
-            ],
-            [
-                "01",
-                "",
-                "00"
+                "10",
+                "Appli from Flash",
+                ""
             ]
         ]
     },
     "TM-23": {
-        "name": "Init MRAM",
-        "header": "4312",
-        "length": "04",
+        "name": "Debug",
+        "header": "1234",
+        "length": "02",
         "tag": "23",
         "data": [
             [
-                "04",
-                "Counter",
-                "00000000"
+                "02",
+                "Debug",
+                ""
+            ]
+        ]
+    },
+    "TM-24": {
+        "name": "Bad Crc",
+        "header": "1234",
+        "length": "02",
+        "tag": "24",
+        "data": [
+            [
+                "01",
+                "Crc received",
+                ""
+            ],
+            [
+                "01",
+                "Crc computed",
+                ""
             ]
         ]
     },
     "TM-25": {
-        "name": "Erase GOLDEN",
-        "header": "4312",
-        "length": "00",
+        "name": "Unknow",
+        "header": "1234",
+        "length": "01",
         "tag": "25",
         "data": [
             [
+                "01",
+                "Unknown tag received",
                 ""
             ]
         ]
     },
-    "TM-2C": {
-        "name": "Load Appli backup MRAM",
-        "header": "4312",
-        "length": "05",
-        "tag": "2C",
-        "data": [
-            [
-                "04",
-                "Address Clear",
-                "00000000"
-            ],
-            [
-                "01",
-                "Pattern Clear",
-                "00"
-            ]
-        ]
-    },
-    "TM-C0": {
-        "name": "REBOOT",
-        "header": "4312",
-        "length": "12",
-        "tag": "C0",
-        "data": [
-            [
-                "01",
-                "SRU Used"
-            ],
-            [
-                "01",
-                "BOOT Status MRAM"
-            ],
-            [
-                "01",
-                "MRAM Appli CRC"
-            ],
-            [
-                "01",
-                "Watchdog Key"
-            ],
-            [
-                "01",
-                "Watchdog Level"
-            ],
-            [
-                "01",
-                "Nbr Appli reload"
-            ],
-            [
-                "01",
-                "Nbr SRU Reboot"
-            ],
-            [
-                "01",
-                "Nbr SRU Reboot Life"
-            ],
-            [
-                "01",
-                "Nbr Zynq Reboot"
-            ],
-            [
-                "01",
-                "TM Appli Requested"
-            ],
-            [
-                "01",
-                "TM Boot Requested"
-            ],
-            [
-                "01",
-                "Boot Version"
-            ],
-            [
-                "01",
-                "Appli Version"
-            ],
-            [
-                "01",
-                "Tempo WDG IT"
-            ],
-            [
-                "01",
-                "Tempo WDG IT After Reboot Zynq"
-            ],
-            [
-                "01",
-                "Mram Alive"
-            ],
-            [
-                "01",
-                "Crc computed"
-            ],
-            [
-                "01",
-                "Next Boot"
-            ]
-        ]
-    },
-    "TM-C1": {
-        "name": "Timeout Reload App",
+    "TM-40": {
+        "name": "(BL) Reboot",
         "header": "4312",
         "length": "00",
-        "tag": "C1",
+        "tag": "40",
         "data": [
             [
                 ""
             ]
         ]
     },
-    "TM-C2": {
-        "name": "Flash page writen",
-        "header": "4312",
-        "length": "02",
-        "tag": "C2",
-        "data": [
-            [
-                "02",
-                "Page address writen",
-                "0000"
-            ]
-        ]
-    },
-    "TM-C3": {
-        "name": "Last flash page writen",
-        "header": "4312",
-        "length": "04",
-        "tag": "C3",
-        "data": [
-            [
-                "02",
-                "Last page address writen",
-                "0000"
-            ],
-            [
-                "01",
-                "App CRC",
-                "00"
-            ],
-            [
-                "01",
-                "Bootloader version",
-                "00"
-            ]
-        ]
-    },
-    "TM-C4": {
-        "name": "Copy APPLI from MRAM to Flash",
-        "header": "4312",
-        "length": "01",
-        "tag": "C4",
-        "data": [
-            [
-                "01",
-                "Page countdown",
-                "00"
-            ]
-        ]
-    },
-    "TM-C5": {
-        "name": "Copy GOLDEN to Flash",
-        "header": "4312",
-        "length": "01",
-        "tag": "C5",
-        "data": [
-            [
-                "01",
-                "Page countdown",
-                "00"
-            ]
-        ]
-    },
-    "TM-C6": {
-        "name": "Bad Cks Hex line",
-        "header": "4312",
-        "length": "02",
-        "tag": "C6",
-        "data": [
-            [
-                "01",
-                "Cks computed",
-                "00"
-            ],
-            [
-                "01",
-                "Cks in HEX line",
-                "00"
-            ]
-        ]
-    },
-    "TM-C7": {
-        "name": "Load App Backup in MRAM",
-        "header": "4312",
-        "length": "02",
-        "tag": "C7",
-        "data": [
-            [
-                "02",
-                "Address Writen in MRAM",
-                "0000"
-            ]
-        ]
-    },
-    "TM-C8": {
-        "name": "Bootloader en MODETEST",
+    "TM-41": {
+        "name": "(BL) Init Mram",
         "header": "4312",
         "length": "00",
-        "tag": "C8",
+        "tag": "41",
         "data": [
             [
                 ""
             ]
         ]
     },
-    "TM-2D": {
-        "name": "DEBUG",
+    "TM-42": {
+        "name": "(BL) Erase Golden in MRAM",
         "header": "4312",
-        "length": "04",
-        "tag": "2D",
+        "length": "00",
+        "tag": "42",
+        "data": [
+            [""]
+        ]
+    },
+    "TM-44": {
+        "name": "(BL) Crc Golden MRAM",
+        "header": "4312",
+        "length": "03",
+        "tag": "44",
         "data": [
             [
-                "04",
-                "DEBUG",
+                "01",
+                "Crc Golden Sent",
+                ""
+            ],
+            [
+                "01",
+                "Crc Golden computed",
+                ""
+            ],
+            [
+                "01",
+                "Crc Golden in MRAM",
+                ""
+            ]
+        ]
+    },
+    "TM-45": {
+        "name": "(BL) Dump Golden from MRAM",
+        "header": "4312",
+        "length": "16",
+        "tag": "45",
+        "data": [
+            [
+                "10",
+                "Golden from MRAM",
+                ""
+            ]
+        ]
+    },
+    "TM-46": {
+        "name": "(BL) Copy Appli to Flash",
+        "header": "4312",
+        "length": "00",
+        "tag": "46",
+        "data": [[""]]
+    },
+    "TM-47": {
+        "name": "(BL) Copy Golden to Flash",
+        "header": "4312",
+        "length": "00",
+        "tag": "47",
+        "data": [[""]]
+    },
+    "TM-48": {
+        "name": "(BL) BootMode",
+        "header": "4312",
+        "length": "02",
+        "tag": "48",
+        "data": [
+            [
+                "01",
+                "Modetest status",
+                ""
+            ],
+            [
+                "01",
+                "Bootstatus in MRAM",
+                ""
+            ]
+        ]
+    },
+    "TM-49": {
+        "name": "(BL) Hello SRU",
+        "header": "4312",
+        "length": "01",
+        "tag": "49",
+        "data": [
+            [
+                "01",
+                "Hello SRU data",
+                ""
+            ]
+        ]
+    },
+    "TM-50": {
+        "name": "(BL) Debug",
+        "header": "4312",
+        "length": "02",
+        "tag": "50",
+        "data": [
+            [
+                "02",
+                "Debug",
+                ""
+            ]
+        ]
+    },
+    "TM-51": {
+        "name": "(BL) Bad Crc",
+        "header": "4312",
+        "length": "02",
+        "tag": "51",
+        "data": [
+            [
+                "01",
+                "Crc received",
+                ""
+            ],
+            [
+                "01",
+                "Crc computed",
+                ""
+            ]
+        ]
+    },
+    "TM-52": {
+        "name": "(BL) Unknow",
+        "header": "4312",
+        "length": "00",
+        "tag": "52",
+        "data": [
+            [
                 ""
             ]
         ]
