@@ -7,6 +7,7 @@ from time import sleep
 import threading
 import asyncio
 from queue import Empty
+import queue
 
 # Prompt_toolkit
 from prompt_toolkit.application.current import get_app
@@ -541,38 +542,45 @@ async def upload_hex(ui, data, upload_type=None):
         await asyncio.sleep(0.005)  # async sleep to refresh UI
 
         # Wait for answer
-        CRC_data = ui.last_TM.get(
-            block=True, timeout=conf["hex_upload"]["max_wait_CRC_calculation"]
-        )["data"]
-        await asyncio.sleep(0.005)  # async sleep to refresh UI
         try:
-            if CRC_data[1] != CRC_calculated:
-                error = True
-                ui.buffer_layout.insert_line(
-                    f"<error>CRC ERROR: received 0x{CRC_data[1] }, calculated 0x{CRC_calculated}</error>\n"
-                )
-            else:
-                if upload_type == "Application":
-                    if conf["hex_upload"]["send_TC_reboot_after_app_upload"]:
-                        send_TC(
-                            "TC-" + conf["hex_upload"]["TC_reboot_tag"],
-                            [],
-                            ui,
-                            resend_last_TC=False,
-                        )
-                else:
-                    if conf["hex_upload"]["send_TC_reboot_after_golden_upload"]:
-                        send_TC(
-                            "TC-" + conf["hex_upload"]["TC_reboot_tag"] + "(BL)",
-                            [],
-                            ui,
-                            resend_last_TC=False,
-                        )
-                await asyncio.sleep(0.005)  # async sleep to refresh UI
-        except IndexError:
+            CRC_data = ui.last_TM.get(
+                block=True, timeout=conf["hex_upload"]["max_wait_CRC_calculation"]
+            )["data"]
+        except queue.Empty:
+            error = True
             ui.buffer_layout.insert_line(
-                "<error>Error:</error> CRC frame from SRU is not correct.\n"
+                "<error>Error:</error> CRC frame from SRU not received.\n"
             )
+        else:
+            await asyncio.sleep(0.005)  # async sleep to refresh UI
+            try:
+                if CRC_data[1] != CRC_calculated:
+                    error = True
+                    ui.buffer_layout.insert_line(
+                        f"<error>CRC ERROR: received 0x{CRC_data[1] }, calculated 0x{CRC_calculated}</error>\n"
+                    )
+                else:
+                    if upload_type == "Application":
+                        if conf["hex_upload"]["send_TC_reboot_after_app_upload"]:
+                            send_TC(
+                                "TC-" + conf["hex_upload"]["TC_reboot_tag"],
+                                [],
+                                ui,
+                                resend_last_TC=False,
+                            )
+                    else:
+                        if conf["hex_upload"]["send_TC_reboot_after_golden_upload"]:
+                            send_TC(
+                                "TC-" + conf["hex_upload"]["TC_reboot_tag"] + "(BL)",
+                                [],
+                                ui,
+                                resend_last_TC=False,
+                            )
+                    await asyncio.sleep(0.005)  # async sleep to refresh UI
+            except IndexError:
+                ui.buffer_layout.insert_line(
+                    "<error>Error:</error> CRC frame from SRU is not correct.\n"
+                )
 
         info_message.remove_dialog_as_float(ui.root_container)
         get_app().invalidate()

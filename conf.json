@@ -22,7 +22,7 @@
         "TC_erase_MRAM_GOLDEN_tag": "C2",
         "TC_APP_hex_line_upload_tag": "0B",
         "TC_GOLDEN_hex_line_upload_tag": "43",
-        "TC_CRC_APP_tag": "8F",
+        "TC_CRC_APP_tag": "8C",
         "TC_CRC_GOLDEN_tag": "C4"
     }
 }
