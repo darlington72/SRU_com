@@ -210,8 +210,6 @@ class UI:
                     self.TC_selectable_list.current_value,
                     None,
                     self,
-                    ser,
-                    lock,
                     resend_last_TC=True,
                 )
 
