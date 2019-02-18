@@ -3,26 +3,26 @@
         "port": "ttyUSB0",
         "baudrate": "57600",
         "timeout": 0.1,
-        "delay_inter_byte": 0.001
+        "delay_inter_byte": 0
     },
     "debug": "True",
     "TC_watchdog_tag": "01",
     "hex_upload": {
-        "delay_inter_line": 0.015,
+        "delay_inter_line": 0.011,
         "max_size_flash_app": "16384",
         "max_wait_erase_app": 10,
         "max_wait_CRC_calculation": 10,
-        "refresh_ui_during_upload": true,
-        "send_TC_reboot_after_app_upload": true,
-        "send_TC_reboot_after_golden_upload": true,
-        "TC_reboot_tag": "80",
-        "TM_MRAM_APP_erased_tag": "0C",
-        "TM_MRAM_GOLDEN_erased_tag": "25",
-        "TC_erase_MRAM_APP_tag": "8C",
-        "TC_erase_MRAM_GOLDEN_tag": "A5",
-        "TC_APP_hex_line_upload_tag": "0D",
-        "TC_GOLDEN_hex_line_upload_tag": "0D",
+        "refresh_ui_during_upload": false,
+        "send_TC_reboot_after_app_upload": false,
+        "send_TC_reboot_after_golden_upload": false,
+        "TC_reboot_tag": "00",
+        "TM_MRAM_APP_erased_tag": "0A",
+        "TM_MRAM_GOLDEN_erased_tag": "42",
+        "TC_erase_MRAM_APP_tag": "8A",
+        "TC_erase_MRAM_GOLDEN_tag": "C2",
+        "TC_APP_hex_line_upload_tag": "0B",
+        "TC_GOLDEN_hex_line_upload_tag": "43",
         "TC_CRC_APP_tag": "8F",
-        "TC_CRC_GOLDEN_tag": "A6"
+        "TC_CRC_GOLDEN_tag": "C4"
     }
 }
