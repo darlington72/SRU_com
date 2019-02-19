@@ -1,7 +1,6 @@
 import threading
 import sys
 import serial
-import queue
 from prompt_toolkit import HTML
 
 # Custom lib
@@ -14,13 +13,6 @@ from src.update import update
 
 lock = threading.RLock()
 
-
-# TODO:
-# [x] shortcut clear screen
-# [x] raw tmtc feed to buffer
-# [x] bug latency TC erase -> comes from thread
-# [ ] dump TM
-
 if __name__ == "__main__":
 
     # If SRU_com is launched with the flag -U or --update
@@ -29,6 +21,8 @@ if __name__ == "__main__":
         update()
         sys.exit()
 
+    # If SRU_com is launched with the flag -f or --file
+    # we open a file and write every TM/TC into it
     if args.file:
         file_ = open(args.file + ".txt", mode="a")
     else:
@@ -37,6 +31,7 @@ if __name__ == "__main__":
     # Serial
     if args.test:
         ser = lib.SerialTest()
+        ser.test = True
         # !! Warning !!
         # When using serial test (or uart loop), if there's an error in the length of a TM/TC in the BD, SRU_com will be stuck in
         # a infinite loop because there's no timeout on reception
@@ -46,6 +41,7 @@ if __name__ == "__main__":
             ser = serial.Serial(
                 "/dev/" + lib.conf["COM"]["port"], lib.conf["COM"]["baudrate"]
             )
+            ser.test = False
 
         except serial.serialutil.SerialException as msg:
             print("Serial error. Please check connection:")
@@ -53,10 +49,8 @@ if __name__ == "__main__":
             print("Both modules usbserial and ftdi_sio should be loaded (modprobe xx)")
             sys.exit(0)
 
-    last_TM = queue.Queue(maxsize=1)
-
     # Main UI instance
-    ui = UI_layout.UI(ser, lock, last_TM, file_)
+    ui = UI_layout.UI(ser, lock, file_)
 
     # Let's wrap serial's read & write to display raw TM/TC exchange
     # in the raw TM/TC window
@@ -71,11 +65,13 @@ if __name__ == "__main__":
 
     # Thread2: this one deals with TM reception on the uart link
     # see the function serial_com_TM for details
-    thread2 = threading.Thread(target=serial_com.serial_com_TM, args=(ui, last_TM))
+    thread2 = threading.Thread(target=serial_com.serial_com_TM, args=(ui,))
     thread2.daemon = True
     thread2.start()
 
+    # Finally, lets launch the UI
     ui.run_app()
 
+    # Closing the file
     if args.file:
         file_.close()
