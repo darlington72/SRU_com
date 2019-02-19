@@ -196,19 +196,8 @@ def serial_com_TM(ui):
                     if frame_data:
                         if frame_data[0][0] != "":
                             pointer = 0
-                            buffer_feed += ": "
                             for key, value in enumerate(frame_data):
-                                if key != 0:
-                                    buffer_feed += "\n" + " " * (
-                                        18
-                                        + (
-                                            max(8 + data_length + 2, 21)
-                                            if ui.verbose.checked
-                                            else len(HEADER_FROM[sync_word[0]] + " - ")
-                                        )
-                                        + len(frame_name)
-                                        + 2
-                                    )  # ugly hack to align the data
+                                buffer_feed += "\n" + " " * 18
 
                                 field_length = (
                                     int(value[0])
@@ -226,7 +215,18 @@ def serial_com_TM(ui):
 
                                 buffer_feed += (
                                     field_name
-                                    + "=<data>0x"
+                                    + " "
+                                    + " "
+                                    * (
+                                        len(
+                                            max(
+                                                [data[1] for data in frame_data],
+                                                key=len,
+                                            )
+                                        )
+                                        - (len(field_name))
+                                    )
+                                    + "= <data>0x"
                                     + "".join(
                                         data[pointer : pointer + field_length]
                                     ).zfill(field_length * 2)
