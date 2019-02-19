@@ -13,7 +13,7 @@
         "max_wait_erase_app": 10,
         "max_wait_CRC_calculation": 10,
         "refresh_ui_during_upload": false,
-        "send_TC_reboot_after_app_upload": false,
+        "send_TC_reboot_after_app_upload": true,
         "send_TC_reboot_after_golden_upload": false,
         "TC_reboot_tag": "00",
         "TM_MRAM_APP_erased_tag": "0A",
@@ -23,6 +23,8 @@
         "TC_APP_hex_line_upload_tag": "0B",
         "TC_GOLDEN_hex_line_upload_tag": "43",
         "TC_CRC_APP_tag": "8C",
-        "TC_CRC_GOLDEN_tag": "C4"
+        "TC_CRC_GOLDEN_tag": "C4",
+        "TC_reload_APP_tag": "8D",
+        "TM_reload_APP_tag": "0C"
     }
 }
