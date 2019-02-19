@@ -2,6 +2,7 @@ import binascii
 import sys
 import serial
 from asyncio import get_event_loop
+import queue
 
 # Prompt_toolkit
 from prompt_toolkit.eventloop import use_asyncio_event_loop
@@ -33,16 +34,17 @@ from src.args import args
 from version import __version__
 import src.serial_com as serial_com
 import src.lib as lib
+from src.lib import conf
 import src.float_window as float_window
 import src.tools as tools
 
 
 class UI:
-    def __init__(self, ser, lock, last_TM, file_):
+    def __init__(self, ser, lock, file_):
 
         self.ser = ser
         self.lock = lock
-        self.last_TM = last_TM
+        self.last_TM = queue.Queue(maxsize=1)
         self.file_ = file_
 
         # TC list and sending
@@ -305,3 +307,16 @@ class UI:
             return read
 
         return wrapper
+
+    def clear_last_TM_buffer(self):
+        if self.last_TM.full():
+            self.last_TM.get()
+
+    def wait_for_TM(self, timeout):
+        try:
+            return self.last_TM.get(
+                block=True, timeout=timeout
+            )
+        except queue.Empty:
+            return False
+
