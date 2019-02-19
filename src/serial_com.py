@@ -233,7 +233,6 @@ def serial_com_TM(ui):
                                     + "</data>"
                                 )
                                 pointer = pointer + field_length
-                            # buffer_feed += ")"
 
                     buffer_feed += "\n"
 
