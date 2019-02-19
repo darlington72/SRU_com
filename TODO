@@ -13,9 +13,9 @@ Todo:
   ☐ check for buffer len 
 
 Todo before new release: 
-  ☐ Update changelog
-  ☐ Update version
-  ☐ Update README
+  ✔ Update changelog @done(19-02-19 18:30)
+  ✔ Update version @done(19-02-19 18:30)
+  ✔ Update README @done(19-02-19 18:31)
   ☐ Create tag
   ☐ Push with tags
   ☐ Go to github and create release

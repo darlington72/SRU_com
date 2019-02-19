@@ -3,7 +3,7 @@
 ```
 usage: SRU_com [-h] [--version] [-f [FILE_NAME]] [-w] [-v] [-t] [-U]
 
-SRU Com 1.5.1
+SRU Com 1.5.3
 
 optional arguments:
   -h, --help            show this help message and exit
