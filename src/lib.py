@@ -12,7 +12,11 @@ except FileNotFoundError:
     sys.exit()
 
 try:
-    BD_TM_file = open("BD/BDTM.json", "r")
+    if args.test:
+        BD_TM_file = open("BD/BDTC.json", "r")
+    else:
+        BD_TM_file = open("BD/BDTM.json", "r")
+
     BD_TM = json.load(BD_TM_file)
 except FileNotFoundError:
     print("BDTM file not found.")

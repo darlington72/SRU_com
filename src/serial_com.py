@@ -196,10 +196,20 @@ def serial_com_TM(ui):
                     if frame_data:
                         if frame_data[0][0] != "":
                             pointer = 0
-                            buffer_feed += " ("
+                            buffer_feed += ": "
                             for key, value in enumerate(frame_data):
                                 if key != 0:
-                                    buffer_feed += "|"
+                                    buffer_feed += "\n" + " " * (
+                                        18
+                                        + (
+                                            max(8 + data_length + 2, 21)
+                                            if ui.verbose.checked
+                                            else len(HEADER_FROM[sync_word[0]] + " - ")
+                                        )
+                                        + len(frame_name)
+                                        + 2
+                                    )  # ugly hack to align the data
+
                                 field_length = (
                                     int(value[0])
                                     if (value[0] != "?")
@@ -223,7 +233,7 @@ def serial_com_TM(ui):
                                     + "</data>"
                                 )
                                 pointer = pointer + field_length
-                            buffer_feed += ")"
+                            # buffer_feed += ")"
 
                     buffer_feed += "\n"
 
@@ -587,7 +597,10 @@ async def upload_hex(ui, data, upload_type=None):
                                     "<error>Error:</error> TM reloaded APP not received.\n"
                                 )
                             else:
-                                if (TM_received["tag"] != conf["hex_upload"]["TM_reload_APP_tag"]):
+                                if (
+                                    TM_received["tag"]
+                                    != conf["hex_upload"]["TM_reload_APP_tag"]
+                                ):
                                     if not ui.ser.test:
                                         error = True
                                     ui.buffer_layout.insert_line(
