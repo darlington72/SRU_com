@@ -7,10 +7,13 @@ Todo:
   ✔ Why TC dump has changed ? @done(19-02-12 18:34)
   ✔ Why when i send it i get no error, just nothin ? @done(19-02-12 18:07)
   ✔ add tag in conf @done(19-02-12 17:50)
-  ✔ # TODO: check for TM content @done(19-02-12 17:50)
+  ✔ check for TM content @done(19-02-12 17:50)
   ✔ remettre le chargement @done(19-02-12 17:50)
   ☐ fix update
-  ☐ check for buffer len 
+  ☐ check for buffer len ? 
+  ☐ Fix insert_line (cursor position)
+  ☐ Fix scroll on osx 
+
 
 Todo before new release: 
   ✔ Update changelog @done(19-02-19 18:30)
