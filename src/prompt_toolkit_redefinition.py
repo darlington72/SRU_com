@@ -45,8 +45,9 @@ class Buffer_(Buffer):
         self.text += time_tag + data
 
         if not get_app().layout.has_focus(self):
-            self.cursor_position = len(self.text) - 1
+            # self.cursor_position = len(self.text) - 1
             # self.cursor_position = len(self.text) - len(time_tag + data)
+            self.cursor_position = len(self.text) - 50
 
 
 class RadioList_(RadioList):
