@@ -654,6 +654,9 @@ class Buffer(object):
             if go_to_start_of_line_if_history_changes:
                 self.cursor_position += self.document.get_start_of_line_position()
 
+
+        
+
     def delete_before_cursor(self, count=1):
         """
         Delete specified number of characters before cursor and return the

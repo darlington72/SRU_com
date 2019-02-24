@@ -225,7 +225,7 @@ class UI:
             key_bindings=self.bindings,
             style=style,
             full_screen=True,
-            mouse_support=False,
+            mouse_support=True,
         )
 
         self.exit_status = None
@@ -267,7 +267,7 @@ class UI:
             # )
 
             self.raw_serial_buffer.insert_line(
-                "<TC>" + data_formatted + "</TC>", with_time_tag=False
+                "<TC>" + data_formatted + "</TC>", with_time_tag=False, newline=False
             )
             self.raw_serial_buffer.text_len += len(data_formatted)
 
@@ -300,7 +300,7 @@ class UI:
                 self.raw_serial_buffer.text_len = 0
 
             self.raw_serial_buffer.insert_line(
-                "<TM>" + read_formatted + "</TM>", with_time_tag=False
+                "<TM>" + read_formatted + "</TM>", with_time_tag=False, newline=False
             )
             self.raw_serial_buffer.text_len += len(read_formatted)
 
@@ -314,9 +314,7 @@ class UI:
 
     def wait_for_TM(self, timeout):
         try:
-            return self.last_TM.get(
-                block=True, timeout=timeout
-            )
+            return self.last_TM.get(block=True, timeout=timeout)
         except queue.Empty:
             return False
 

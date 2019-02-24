@@ -31,7 +31,7 @@ class FormatText(Processor):
 
 
 class Buffer_(Buffer):
-    def insert_line(self, data, with_time_tag=True):
+    def insert_line(self, data, with_time_tag=True, newline=True):
         if with_time_tag:
             time_tag = (
                 "<grey>"
@@ -42,12 +42,31 @@ class Buffer_(Buffer):
         else:
             time_tag = ""
 
+        if newline:
+            # cursor = self.cursor_position
+            # self.cursor_position = len(self.text)
+            # self.insert_line_below(copy_margin=False)
+            # self.cursor_position = cursor
+            # self.text += "\n"
+            time_tag = "\n" + time_tag
+
         self.text += time_tag + data
+        # self.set_document(self.document.insert_after(time_tag + data))
 
         if not get_app().layout.has_focus(self):
+            pass
+            self.auto_down_end()
+            # Buggy:
             # self.cursor_position = len(self.text) - 1
+            # Also buggy:
             # self.cursor_position = len(self.text) - len(time_tag + data)
-            self.cursor_position = len(self.text) - 50
+
+            # One empty line and buggy:
+            # self.cursor_position = len(self.text)
+
+    def auto_down_end(self):
+        while self.document.cursor_position_row < self.document.line_count - 1:
+            self.auto_down()
 
 
 class RadioList_(RadioList):

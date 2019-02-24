@@ -100,8 +100,8 @@ def serial_com_TM(ui):
         # Looking for sync word
         if first_frame:
             ui.buffer_layout.insert_line(
-                "<waiting_sync>Waiting for sync word...</waiting_sync>\n",
-                with_time_tag=False,
+                "<waiting_sync>Waiting for sync word...</waiting_sync>",
+                with_time_tag=False, newline=False
             )
 
         sync_word = look_for_sync_words(ui, first_frame)
@@ -234,7 +234,7 @@ def serial_com_TM(ui):
                                 )
                                 pointer = pointer + field_length
 
-                    buffer_feed += "\n"
+                    # buffer_feed += "\n"
 
                     ui.buffer_layout.insert_line(buffer_feed)
                     lib.write_to_file(
@@ -360,7 +360,7 @@ def send_TC(TC_id, TC_data, ui, resend_last_TC=False):
                 )
             else:
                 buffer_feed += frame_name
-        buffer_feed += "\n"
+        # buffer_feed += "\n"
 
         ui.buffer_layout.insert_line(buffer_feed)
         # ui.raw_serial_buffer.text += HTML("<TC>" + buffer_feed[:-1] + "</TC>")
