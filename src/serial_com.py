@@ -384,7 +384,7 @@ def send_TC(TC_id, TC_data, ui, resend_last_TC=False):
         #     ui.last_TC_sent["hex_file"] = None
 
 
-async def upload_hex(ui, data, upload_type=None):
+def upload_hex(ui, data, upload_type=None):
     """Upload a hex file to SRU
     Called by do_upload_hex()
     
@@ -421,7 +421,7 @@ async def upload_hex(ui, data, upload_type=None):
 
     if upload_type == "Golden":
         # let's send the TC erase MRAM golden
-        ui.buffer_layout.insert_line('Sending TC "(BL) Erase Golden in MRAM"\n')
+        ui.buffer_layout.insert_line('Sending TC "(BL) Erase Golden in MRAM"')
         send_TC(
             "TC-" + conf["hex_upload"]["TC_erase_MRAM_GOLDEN_tag"],
             [],
@@ -431,7 +431,7 @@ async def upload_hex(ui, data, upload_type=None):
 
     elif upload_type == "Application":
         # let's send the TC erase MRAM app
-        ui.buffer_layout.insert_line('Sending TC "Erase Appli in MRAM"\n')
+        ui.buffer_layout.insert_line('Sending TC "Erase Appli in MRAM"')
         send_TC(
             "TC-" + conf["hex_upload"]["TC_erase_MRAM_APP_tag"],
             [],
@@ -444,19 +444,19 @@ async def upload_hex(ui, data, upload_type=None):
     # let's wait for TM MRAM erased
     ui.clear_last_TM_buffer()
 
-    await asyncio.sleep(0.005)  # async sleep to refresh UI
+    # await asyncio.sleep(0.005)  # async sleep to refresh UI
 
     TM_received = ui.wait_for_TM(timeout=conf["hex_upload"]["max_wait_erase_app"])
     if not TM_received:
         ui.buffer_layout.insert_line(
-            "<error>Error: TM MRAM erased not received</error>\n"
+            "<error>Error: TM MRAM erased not received</error>"
         )
         error = True
     else:
         if upload_type == "Application":
             if TM_received["tag"] != conf["hex_upload"]["TM_MRAM_APP_erased_tag"]:
                 ui.buffer_layout.insert_line(
-                    "<error>Error: Was expecting TM MRAM erased</error>\n"
+                    "<error>Error: Was expecting TM MRAM erased</error>"
                 )
                 if not ui.ser.test:
                     error = True
@@ -464,7 +464,7 @@ async def upload_hex(ui, data, upload_type=None):
         else:
             if TM_received["tag"] != conf["hex_upload"]["TM_MRAM_GOLDEN_erased_tag"]:
                 ui.buffer_layout.insert_line(
-                    "<error>Error: Was expecting TM MRAM erased</error>\n"
+                    "<error>Error: Was expecting TM MRAM erased</error>"
                 )
                 if not ui.ser.test:
                     error = True
@@ -481,7 +481,7 @@ async def upload_hex(ui, data, upload_type=None):
         )
         get_app().invalidate()
 
-        await asyncio.sleep(0.005)
+        # await asyncio.sleep(0.005)
         data = data.split("\n")
 
         for line in data:
@@ -508,14 +508,15 @@ async def upload_hex(ui, data, upload_type=None):
                         raise TypeError
 
                     if conf["hex_upload"]["refresh_ui_during_upload"]:
-                        await asyncio.sleep(conf["hex_upload"]["delay_inter_line"])
+                        sleep(conf["hex_upload"]["delay_inter_line"])
+                        # await asyncio.sleep(conf["hex_upload"]["delay_inter_line"])
                     else:
                         sleep(conf["hex_upload"]["delay_inter_line"])
 
         # CRC calculation
         CRC_calculated = lib.compute_CRC_hex(data, ui).zfill(2)
         ui.buffer_layout.insert_line(
-            f"CRC calulated = 0x{CRC_calculated}. Sending CRC frame to SRU..\n"
+            f"CRC calulated = 0x{CRC_calculated}. Sending CRC frame to SRU.."
         )
 
         info_message.remove_dialog_as_float(ui.root_container)
@@ -525,7 +526,7 @@ async def upload_hex(ui, data, upload_type=None):
             ui.root_container,
         )
         get_app().invalidate()
-        await asyncio.sleep(0.005)  # async sleep to refresh UI
+        # await asyncio.sleep(0.005)  # async sleep to refresh UI
 
         # Let's send calculated CRC
         ui.clear_last_TM_buffer()
@@ -546,7 +547,7 @@ async def upload_hex(ui, data, upload_type=None):
                 resend_last_TC=False,
             )
 
-        await asyncio.sleep(0.005)  # async sleep to refresh UI
+        # await asyncio.sleep(0.005)  # async sleep to refresh UI
 
         # Wait for answer
         CRC_received = ui.wait_for_TM(
@@ -556,15 +557,15 @@ async def upload_hex(ui, data, upload_type=None):
         if not CRC_received:
             error = True
             ui.buffer_layout.insert_line(
-                "<error>Error:</error> CRC frame from SRU not received.\n"
+                "<error>Error:</error> CRC frame from SRU not received."
             )
         else:
-            await asyncio.sleep(0.005)  # async sleep to refresh UI
+            # await asyncio.sleep(0.005)  # async sleep to refresh UI
             try:
                 if not ui.ser.test and CRC_received["data"][1] != CRC_calculated:
                     error = True
                     ui.buffer_layout.insert_line(
-                        f"<error>CRC ERROR: received 0x{CRC_received['data'][1]}, calculated 0x{CRC_calculated}</error>\n"
+                        f"<error>CRC ERROR: received 0x{CRC_received['data'][1]}, calculated 0x{CRC_calculated}</error>"
                     )
                 else:
                     if upload_type == "Application":
@@ -575,7 +576,7 @@ async def upload_hex(ui, data, upload_type=None):
 
                             # Sending the TC Request Reload Appli
                             ui.buffer_layout.insert_line(
-                                'Sending TC "Request Reload Appli from MRAM"\n'
+                                'Sending TC "Request Reload Appli from MRAM"'
                             )
                             send_TC(
                                 "TC-" + conf["hex_upload"]["TC_reload_APP_tag"],
@@ -584,7 +585,7 @@ async def upload_hex(ui, data, upload_type=None):
                                 resend_last_TC=False,
                             )
 
-                            await asyncio.sleep(0.005)  # async sleep to refresh UI
+                            # await asyncio.sleep(0.005)  # async sleep to refresh UI
 
                             # Waiting for TM Reload Appli
                             TM_received = ui.wait_for_TM(
@@ -593,7 +594,7 @@ async def upload_hex(ui, data, upload_type=None):
 
                             if not TM_received:
                                 ui.buffer_layout.insert_line(
-                                    "<error>Error:</error> TM reloaded APP not received.\n"
+                                    "<error>Error:</error> TM reloaded APP not received."
                                 )
                             else:
                                 if (
@@ -603,7 +604,7 @@ async def upload_hex(ui, data, upload_type=None):
                                     if not ui.ser.test:
                                         error = True
                                     ui.buffer_layout.insert_line(
-                                        "<error>Error:</error> Was expecting TM reloaded APP.\n"
+                                        "<error>Error:</error> Was expecting TM reloaded APP."
                                     )
                                 else:
                                     ui.buffer_layout.insert_line(
@@ -617,17 +618,17 @@ async def upload_hex(ui, data, upload_type=None):
                                     )
                     else:
                         if conf["hex_upload"]["send_TC_reboot_after_golden_upload"]:
-                            ui.buffer_layout.insert_line('Sending TC "Reboot"\n')
+                            ui.buffer_layout.insert_line('Sending TC "Reboot"')
                             send_TC(
                                 "TC-" + conf["hex_upload"]["TC_reboot_tag"] + "(BL)",
                                 [],
                                 ui,
                                 resend_last_TC=False,
                             )
-                    await asyncio.sleep(0.005)  # async sleep to refresh UI
+                    # await asyncio.sleep(0.005)  # async sleep to refresh UI
             except IndexError:
                 ui.buffer_layout.insert_line(
-                    "<error>Error:</error> CRC frame from SRU is not correct.\n"
+                    "<error>Error:</error> CRC frame from SRU is not correct."
                 )
 
         info_message.remove_dialog_as_float(ui.root_container)

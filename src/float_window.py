@@ -8,7 +8,13 @@ from prompt_toolkit.layout.dimension import D
 from prompt_toolkit.completion import PathCompleter
 from prompt_toolkit.widgets import Dialog, Label, Button, TextArea
 from prompt_toolkit.application.current import get_app
-from prompt_toolkit.eventloop import Future, ensure_future, Return, From
+from prompt_toolkit.eventloop import (
+    Future,
+    ensure_future,
+    Return,
+    From,
+    run_in_executor,
+)
 
 # Project
 import src.serial_com as serial_com
@@ -70,7 +76,10 @@ def do_upload_hex(ui, upload_type):
                     # )
                     # thread_upload.start()
                     # serial_com.upload_hex(ui, data)
-                    asyncio.ensure_future(serial_com.upload_hex(ui, data, upload_type))
+                    # asyncio.ensure_future(serial_com.upload_hex(ui, data, upload_type))
+                    run_in_executor(
+                        lambda: serial_com.upload_hex(ui, data, upload_type)
+                    )
 
             except IOError as e:
                 show_message("Error", "{}".format(e), ui.root_container)

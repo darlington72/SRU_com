@@ -59,15 +59,15 @@ if __name__ == "__main__":
 
     # Thread1 : when watchdog clear is enabled
     # the thread send the TC clear watchdog everysecond
-    thread1 = threading.Thread(target=serial_com.serial_com_watchdog, args=(ui,))
-    thread1.daemon = True
-    thread1.start()
+    # thread1 = threading.Thread(target=serial_com.serial_com_watchdog, args=(ui,))
+    # thread1.daemon = True
+    # thread1.start()
 
     # Thread2: this one deals with TM reception on the uart link
     # see the function serial_com_TM for details
-    thread2 = threading.Thread(target=serial_com.serial_com_TM, args=(ui,))
-    thread2.daemon = True
-    thread2.start()
+    # thread2 = threading.Thread(target=serial_com.serial_com_TM, args=(ui,))
+    # thread2.daemon = True
+    # thread2.start()
 
     # Finally, lets launch the UI
     ui.run_app()

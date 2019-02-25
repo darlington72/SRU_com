@@ -5,7 +5,7 @@ from asyncio import get_event_loop
 import queue
 
 # Prompt_toolkit
-from prompt_toolkit.eventloop import use_asyncio_event_loop
+from prompt_toolkit.eventloop import use_asyncio_event_loop, run_in_executor
 from prompt_toolkit.layout.layout import Window
 from prompt_toolkit.styles import Style
 from prompt_toolkit.widgets import VerticalLine, HorizontalLine, Label
@@ -230,8 +230,19 @@ class UI:
 
         self.exit_status = None
 
+    def run_tm_and_watchdog(self):
+
+        # Thread1 : when watchdog clear is enabled
+        # the thread send the TC clear watchdog everysecond
+        run_in_executor(lambda: serial_com.serial_com_watchdog(self), _daemon=True)
+
+        # Thread2: this one deals with TM reception on the uart link
+        # see the function serial_com_TM for details
+        run_in_executor(lambda: serial_com.serial_com_TM(self), _daemon=True)
+
     def run_app(self):
         use_asyncio_event_loop()
+        self.run_tm_and_watchdog()
         get_event_loop().run_until_complete(
             self.application.run_async().to_asyncio_future()
         )
