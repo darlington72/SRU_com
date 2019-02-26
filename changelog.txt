@@ -1,3 +1,8 @@
+Version 1.5.4 - 19-02-
+- Made TM/TC feed read-only
+- Hex upload is now performed in another thread (allow to refresh UI)
+
+---------------------------------
 Version 1.5.3 - 19-02-19
 - Changed the way data are printed 
 - Added TC reload app when hex uploading 
