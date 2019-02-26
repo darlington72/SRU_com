@@ -499,7 +499,8 @@ class Buffer(object):
 
         # Don't allow editing of read-only buffers.
         if not bypass_readonly and self.read_only():
-            raise EditReadOnlyBuffer()
+            # raise EditReadOnlyBuffer()
+            pass
 
         # Set text and cursor position first.
         text_changed = self._set_text(value.text)

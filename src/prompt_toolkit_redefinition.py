@@ -22,11 +22,16 @@ from prompt_toolkit.layout.processors import (
     ConditionalProcessor,
     BeforeInput,
 )
+import xml
 
 
 class FormatText(Processor):
     def apply_transformation(self, ti):
-        fragments = to_formatted_text(HTML(fragment_list_to_text(ti.fragments)))
+        try:
+            fragments = to_formatted_text(HTML(fragment_list_to_text(ti.fragments)))
+        except xml.parsers.expat.ExpatError:
+            fragments = to_formatted_text(fragment_list_to_text(ti.fragments))
+
         return Transformation(fragments)
 
 
@@ -50,8 +55,8 @@ class Buffer_(Buffer):
             # self.text += "\n"
             time_tag = "\n" + time_tag
 
-        self.text += time_tag + data
-        # self.set_document(self.document.insert_after(time_tag + data))
+        # self.text += time_tag + data
+        self.set_document(self.document.insert_after(time_tag + data))
 
         if not get_app().layout.has_focus(self):
             pass

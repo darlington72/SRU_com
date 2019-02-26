@@ -114,7 +114,7 @@ class UI:
         ######  TMTC FEED   #####
         verticalline1 = VerticalLine()
 
-        self.buffer_layout = Buffer_()  # TM/TC live feed buffer
+        self.buffer_layout = Buffer_(read_only=True)  # TM/TC live feed buffer
 
         TM_window = Window(
             BufferControl(
@@ -225,7 +225,7 @@ class UI:
             key_bindings=self.bindings,
             style=style,
             full_screen=True,
-            mouse_support=True,
+            mouse_support=False,
         )
 
         self.exit_status = None
