@@ -20,7 +20,7 @@
                 ""
             ]
         ],
-        "hidden": true
+        "hidden": false
     },
     "TC-81": {
         "name": "Clear WDG",
@@ -82,7 +82,7 @@
         ]
     },
     "TC-86": {
-        "name": "Read Address (Peek)",
+        "name": "Read Address  (Peek)",
         "header": "1234",
         "length": "04",
         "tag": "86",
@@ -120,12 +120,12 @@
         "data": [
             [
                 "01",
-                "Timeout WDG IT (en sec)",
+                "Tempo before reboot ZYNQ (en sec)",
                 "?"
             ],
             [
                 "01",
-                "Timeout WDG IT after Reboot ZYNQ (en sec)",
+                "Tempo after reboot ZYNQ (en sec)",
                 "?"
             ]
         ]
@@ -142,7 +142,7 @@
         ]
     },
     "TC-8A": {
-        "name": "Erase Appli in MRAM",
+        "name": "Erase Appli in MRAM (wait 6 sec)",
         "header": "1234",
         "length": "00",
         "tag": "8A",
@@ -157,11 +157,15 @@
         "header": "1234",
         "length": "?",
         "tag": "0B",
-        "data": [[""]],
+        "data": [
+            [
+                ""
+            ]
+        ],
         "hidden": true
     },
     "TC-8C": {
-        "name": "Crc Appli in MRAM",
+        "name": "Crc Appli in MRAM (wait 6 sec)",
         "header": "1234",
         "length": "01",
         "tag": "8C",
@@ -217,6 +221,48 @@
             ]
         ]
     },
+    "TC-91": {
+        "name": "Hello SRU",
+        "header": "1234",
+        "length": "01",
+        "tag": "91",
+        "data": [
+            [
+                "01",
+                "Hello SRU data",
+                "?"
+            ]
+        ]
+    },
+    "TC-92": {
+        "name": "Power Zynq",
+        "header": "1234",
+        "length": "02",
+        "tag": "92",
+        "data": [
+            [
+                "01",
+                "Power Zynq (55 = ON, AA = OFF, 63 = Reboot)",
+                "?"
+            ],
+            [
+                "01",
+                "Memory Boot (55 = QSPI, AA = FLASH)",
+                "?"
+            ]
+        ]
+    },
+    "TC-04": {
+        "name": "Bad TC Len",
+        "header": "1234",
+        "length": "00",
+        "tag": "04",
+        "data": [
+            [
+                ""
+            ]
+        ]
+    },
     "TC-00(BL)": {
         "name": "(BL) Reboot",
         "header": "4321",
@@ -240,12 +286,14 @@
         ]
     },
     "TC-C2": {
-        "name": "(BL) Erase Golden in MRAM",
+        "name": "(BL) Erase Golden in MRAM (wait 6 sec)",
         "header": "4321",
         "length": "00",
         "tag": "C2",
         "data": [
-            [""]
+            [
+                ""
+            ]
         ]
     },
     "TC-43(BL)": {
@@ -253,11 +301,15 @@
         "header": "4321",
         "length": "?",
         "tag": "43",
-        "data": [[""]],
+        "data": [
+            [
+                ""
+            ]
+        ],
         "hidden": true
     },
     "TC-C4": {
-        "name": "(BL) Crc Golden in MRAM",
+        "name": "(BL) Crc Golden in MRAM (wait 6 sec)",
         "header": "4321",
         "length": "01",
         "tag": "C4",
@@ -285,6 +337,19 @@
         "header": "4321",
         "length": "01",
         "tag": "C9",
+        "data": [
+            [
+                "01",
+                "Hello SRU data",
+                "?"
+            ]
+        ]
+    },
+    "TC-49": {
+        "name": "(BL) Hello SRU (without TM)",
+        "header": "4321",
+        "length": "01",
+        "tag": "49",
         "data": [
             [
                 "01",

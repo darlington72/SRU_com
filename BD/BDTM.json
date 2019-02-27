@@ -110,17 +110,297 @@
         "data": [
             [
                 "01",
-                "Requested (55 Enable, AA Disable)",
+                "Requested (55 = Enable, AA = Disable)",
                 ""
             ],
             [
                 "01",
-                "Old State (55 Enable, AA Disable)",
+                "Old State (55 = Enable, AA = Disable)",
                 ""
             ],
             [
                 "01",
-                "Status (55 Enable, AA Disable, FF Not valid)",
+                "Status (55 = Enable, AA = Disable, FF = Not valid)",
+                ""
+            ]
+        ]
+    },
+    "TM-05": {
+        "name": "TM HK",
+        "header": "1234",
+        "length": "32",
+        "tag": "05",
+        "data": [
+            [
+                "01",
+                "SRU used MRAM in MRAM (55 = MRAM 1, AA = MRAM 2)",
+                ""
+            ],
+            [
+                "01",
+                "Boot Status in MRAM",
+                ""
+            ],
+            [
+                "01",
+                "CRC Flash in MRAM",
+                ""
+            ],
+            [
+                "01",
+                "BOOT Version in MRAM",
+                ""
+            ],
+            [
+                "01",
+                "MRAM Alive Tag in MRAM (0x63 = Alive)",
+                ""
+            ],
+            [
+                "01",
+                "CRC Appli in MRAM",
+                ""
+            ],
+            [
+                "01",
+                "CRC Golden in MRAM",
+                ""
+            ],
+            [
+                "01",
+                "APPLI Version in MRAM",
+                ""
+            ],
+            [
+                "01",
+                "WDG Activation in MRAM (55 = Activation, AA = Disable)",
+                ""
+            ],
+            [
+                "01",
+                "WDL Level in MRAM",
+                ""
+            ],
+            [
+                "01",
+                "WDG Threshold in MRAM (en sec)",
+                ""
+            ],
+            [
+                "01",
+                "WDG Threshold after Zynq reboot in MRAM (en sec)",
+                ""
+            ],
+            [
+                "01",
+                "Number of Appli reload in Flash in MRAM",
+                ""
+            ],
+            [
+                "01",
+                "Number of SRU reboot in MRAM",
+                ""
+            ],
+            [
+                "01",
+                "Number of SRU reboot in MRAM (from start)",
+                ""
+            ],
+            [
+                "01",
+                "Number of Zynq reboot in MRAM",
+                ""
+            ],
+            [
+                "01",
+                "Zynq Power State in MRAM (55 = ON, AA = OFF)",
+                ""
+            ],
+            [
+                "01",
+                "Zynq Memory Boot in MRAM (55 = QSPI, AA = FLASH)",
+                ""
+            ],
+            [
+                "01",
+                "Modetest state in MRAM(at boot)",
+                ""
+            ],
+            [
+                "01",
+                "MRAM to use (55 = MRAM 1, AA = MRAM 2)",
+                ""
+            ],
+            [
+                "01",
+                "Number of MRAM Write Error",
+                ""
+            ],
+            [
+                "01",
+                "Number of TMR MRAM Rewrite",
+                ""
+            ],
+            [
+                "01",
+                "Last Tag TC received",
+                ""
+            ],
+            [
+                "01",
+                "TM Requested State",
+                ""
+            ],
+            [
+                "01",
+                "Number of CRC Hex Line Error",
+                ""
+            ],
+            [
+                "01",
+                "WDL Pin state",
+                ""
+            ],
+            [
+                "01",
+                "WDL Stop Clear Status (55 = Clear, AA = STOP CLEAR)",
+                ""
+            ],
+            [
+                "01",
+                "WDG Level New",
+                ""
+            ],
+            [
+                "01",
+                "WDG Level Last",
+                ""
+            ],
+            [
+                "01",
+                "WDG Number of IT",
+                ""
+            ],
+            [
+                "01",
+                "WDG Number of IT Threshold",
+                ""
+            ],
+            [
+                "01",
+                "WDG Activation",
+                ""
+            ]
+        ]
+    },
+    "TM-06": {
+        "name": "Read Address (Peek)",
+        "header": "1234",
+        "length": "06",
+        "tag": "06",
+        "data": [
+            [
+                "04",
+                "Adresse Read",
+                ""
+            ],
+            [
+                "01",
+                "Ram or MRAM (55 = RAM, AA = MRAM)",
+                ""
+            ],
+            [
+                "01",
+                "Data Read",
+                ""
+            ]
+        ]
+    },
+    "TM-07": {
+        "name": "Write Address (Poke)",
+        "header": "1234",
+        "length": "08",
+        "tag": "07",
+        "data": [
+            [
+                "04",
+                "Address to Write",
+                ""
+            ],
+            [
+                "01",
+                "Ram or MRAM (55 = RAM, AA = MRAM)",
+                ""
+            ],
+            [
+                "01",
+                "Data to Write",
+                ""
+            ],
+            [
+                "01",
+                "Data before Write",
+                ""
+            ],
+            [
+                "01",
+                "Data after Write",
+                ""
+            ]
+        ]
+    },
+    "TM-08": {
+        "name": "Change Tempo WDG",
+        "header": "1234",
+        "length": "04",
+        "tag": "08",
+        "data": [
+            [
+                "01",
+                "Old Tempo before reboot ZYNQ (en sec)",
+                ""
+            ],
+            [
+                "01",
+                "Old Tempo after reboot ZYNQ (en sec)",
+                ""
+            ],
+            [
+                "01",
+                "New Tempo before reboot ZYNQ (en sec)",
+                ""
+            ],
+            [
+                "01",
+                "New Tempo after reboot ZYNQ (en sec)",
+                ""
+            ]
+        ]
+    },
+    "TM-88": {
+        "name": "Change Tempo WDG error",
+        "header": "1234",
+        "length": "04",
+        "tag": "88",
+        "data": [
+            [
+                "01",
+                "Tempo before reboot ZYNQ (en sec)",
+                ""
+            ],
+            [
+                "01",
+                "Tempo after reboot ZYNQ (en sec)",
+                ""
+            ],
+            [
+                "01",
+                "Tempo before reboot ZYNQ requested (en sec)",
+                ""
+            ],
+            [
+                "01",
+                "Tempo after reboot ZYNQ requested (en sec)",
                 ""
             ]
         ]
@@ -138,6 +418,17 @@
             ]
         ]
     },
+    "TM-89": {
+        "name": "Stay in BootMode Error (Modetest is disabled)",
+        "header": "1234",
+        "length": "00",
+        "tag": "89",
+        "data": [
+            [
+                ""
+            ]
+        ]
+    },
     "TM-0A": {
         "name": "Erase Appli in MRAM",
         "header": "1234",
@@ -149,11 +440,11 @@
             ]
         ]
     },
-    "TM-0B": {
+    "TM-0C": {
         "name": "Crc Appli in MRAM",
         "header": "1234",
         "length": "03",
-        "tag": "0B",
+        "tag": "0C",
         "data": [
             [
                 "01",
@@ -172,11 +463,11 @@
             ]
         ]
     },
-    "TM-0C": {
+    "TM-0D": {
         "name": "Request Reload Appli from MRAM (after reboot, Modetest = 1)",
         "header": "1234",
         "length": "01",
-        "tag": "0C",
+        "tag": "0D",
         "data": [
             [
                 "01",
@@ -220,6 +511,61 @@
             [
                 "10",
                 "Appli from Flash",
+                ""
+            ]
+        ]
+    },
+    "TM-11": {
+        "name": "Hello SRU",
+        "header": "1234",
+        "length": "01",
+        "tag": "11",
+        "data": [
+            [
+                "01",
+                "Hello SRU data",
+                ""
+            ]
+        ]
+    },
+    "TM-12": {
+        "name": "Power Zynq",
+        "header": "1234",
+        "length": "02",
+        "tag": "12",
+        "data": [
+            [
+                "01",
+                "Power Zynq State (55 = ON, AA = OFF, 63 = Reboot)",
+                ""
+            ],
+            [
+                "01",
+                "Memory Boot (55 = QSPI, AA = FLASH)",
+                ""
+            ]
+        ]
+    },
+    "TM-20": {
+        "name": "Timeout reception TC",
+        "header": "1234",
+        "length": "00",
+        "tag": "20",
+        "data": [
+            [
+                ""
+            ]
+        ]
+    },
+    "TM-21": {
+        "name": "Timeout WDG",
+        "header": "1234",
+        "length": "01",
+        "tag": "21",
+        "data": [
+            [
+                "01",
+                "WDG Level",
                 ""
             ]
         ]
@@ -268,6 +614,24 @@
             ]
         ]
     },
+    "TM-26": {
+        "name": "Bad TC Length",
+        "header": "1234",
+        "length": "02",
+        "tag": "26",
+        "data": [
+            [
+                "01",
+                "Number of data byte received",
+                ""
+            ],
+            [
+                "01",
+                "Number of data byte expected",
+                ""
+            ]
+        ]
+    },
     "TM-40": {
         "name": "(BL) Reboot",
         "header": "4312",
@@ -296,7 +660,31 @@
         "length": "00",
         "tag": "42",
         "data": [
-            [""]
+            [
+                ""
+            ]
+        ]
+    },
+    "TM-C2": {
+        "name": "(BL) Erase Golden in MRAM error (Modetest is disabled)",
+        "header": "4312",
+        "length": "00",
+        "tag": "C2",
+        "data": [
+            [
+                ""
+            ]
+        ]
+    },
+    "TM-C3": {
+        "name": "(BL) Chargement Hex Line error (Modetest is disabled)",
+        "header": "4312",
+        "length": "00",
+        "tag": "C3",
+        "data": [
+            [
+                ""
+            ]
         ]
     },
     "TM-44": {
@@ -340,14 +728,22 @@
         "header": "4312",
         "length": "00",
         "tag": "46",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
     "TM-47": {
         "name": "(BL) Copy Golden to Flash",
         "header": "4312",
         "length": "00",
         "tag": "47",
-        "data": [[""]]
+        "data": [
+            [
+                ""
+            ]
+        ]
     },
     "TM-48": {
         "name": "(BL) BootMode",
