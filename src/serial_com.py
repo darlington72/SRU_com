@@ -471,7 +471,7 @@ async def upload_hex(ui, data, upload_type=None):
     get_app().invalidate()
     info_message.remove_dialog_as_float(ui.root_container)
 
-    if not error or ui.ser.test or 1:
+    if not error or ui.ser.test or args.loop:
 
         info_message = float_window.InfoDialog(
             f"{upload_type} Upload to SRU",
@@ -634,7 +634,7 @@ async def upload_hex(ui, data, upload_type=None):
         info_message.remove_dialog_as_float(ui.root_container)
         get_app().invalidate()
 
-        if not error or ui.ser.test or 1:
+        if not error or ui.ser.test or args.loop:
             float_window.show_message(
                 f"{upload_type} Upload to SRU", "Upload done.", ui.root_container
             )

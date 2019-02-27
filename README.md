@@ -1,7 +1,7 @@
 # Usage
 
 ```
-usage: SRU_com [-h] [--version] [-f [FILE_NAME]] [-w] [-v] [-t] [-U]
+usage: SRU_com [-h] [--version] [-f [FILE_NAME]] [-w] [-v] [-t] [-l] [-U]
 
 SRU Com 1.5.4
 
@@ -13,7 +13,8 @@ optional arguments:
   -w, --watchdog        Set the watchdog to be cleared on startup
   -v                    Verbose mode
   -t, --test            Start in test mode (serial loop simulation)
-  -U, --update          Update SRU_com (BETA)
+  -l, --loop            Serial loop mode
+  -U, --update          Update SRU_com
 ```
 
 

@@ -29,7 +29,8 @@ parser.add_argument(
     action="store_true",
     help="Start in test mode (serial loop simulation)",
 )
+parser.add_argument("-l", "--loop", action="store_true", help="Serial loop mode")
 parser.add_argument(
-    "-U", "--update", dest="update", action="store_true", help="Update SRU_com (BETA)"
+    "-U", "--update", dest="update", action="store_true", help="Update SRU_com "
 )
 args = parser.parse_args()
