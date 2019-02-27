@@ -54,8 +54,8 @@ if __name__ == "__main__":
 
     # Let's wrap serial's read & write to display raw TM/TC exchange
     # in the raw TM/TC window
-    ser.write = ui.add_raw_TC_to_window(ser.write)
-    ser.read = ui.add_raw_TM_to_window(ser.read)
+    # ser.write = ui.add_raw_TC_to_window(ser.write)
+    # ser.read = ui.add_raw_TM_to_window(ser.read)
 
     # # Thread1 : when watchdog clear is enabled
     # # the thread send the TC clear watchdog everysecond
