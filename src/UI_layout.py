@@ -9,7 +9,7 @@ from prompt_toolkit.eventloop import use_asyncio_event_loop, run_in_executor
 from prompt_toolkit.layout.layout import Window
 from prompt_toolkit.styles import Style
 from prompt_toolkit.widgets import VerticalLine, HorizontalLine, Label
-from prompt_toolkit.buffer import Buffer
+from prompt_toolkit.buffer import Buffer, Document
 from prompt_toolkit.layout.controls import BufferControl, FormattedTextControl
 from prompt_toolkit import HTML
 from src.prompt_toolkit_redefinition import (
@@ -217,8 +217,8 @@ class UI:
 
         @self.bindings.add("c-p", eager=True)
         def clear_TMTC_feed(event):
-            self.buffer_layout.text = ""
-            self.raw_serial_buffer.text = ""
+            self.buffer_layout.set_document(Document(text=""))
+            self.raw_serial_buffer.set_document(Document(text=""))
 
         self.application = Application(
             layout=Layout(self.root_container),
@@ -272,7 +272,6 @@ class UI:
             if self.raw_serial_buffer.text_len > window_size:
                 self.raw_serial_buffer.text = ""
                 self.raw_serial_buffer.text_len = 0
-
 
             self.raw_serial_buffer.insert_line(
                 "<TC>" + data_formatted + "</TC>", with_time_tag=False, newline=False
