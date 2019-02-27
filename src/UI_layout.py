@@ -272,10 +272,7 @@ class UI:
             if self.raw_serial_buffer.text_len > window_size:
                 self.raw_serial_buffer.text = ""
                 self.raw_serial_buffer.text_len = 0
-            # self.raw_serial_buffer.insert_line(
-            #     f" {len(self.raw_serial_buffer.text)}/{window_size}",
-            #     with_time_tag=False,
-            # )
+
 
             self.raw_serial_buffer.insert_line(
                 "<TC>" + data_formatted + "</TC>", with_time_tag=False, newline=False

@@ -58,6 +58,7 @@ class TextInputDialog(object):
 
 
 def do_upload_hex(ui, upload_type):
+
     def coroutine():
         open_dialog = TextInputDialog(
             title=f"{upload_type} Upload to SRU",
@@ -75,11 +76,12 @@ def do_upload_hex(ui, upload_type):
                     #     target=serial_com.upload_hex, args=(ui, data)
                     # )
                     # thread_upload.start()
-                    # serial_com.upload_hex(ui, data)
-                    # asyncio.ensure_future(serial_com.upload_hex(ui, data, upload_type))
-                    run_in_executor(
-                        lambda: serial_com.upload_hex(ui, data, upload_type)
-                    )
+                    # serial_com.upload_hex(ui, data, upload_type)
+                    asyncio.ensure_future(serial_com.upload_hex(ui, data, upload_type))
+
+                    # run_in_executor(
+                    #     lambda: serial_com.upload_hex(ui, data, upload_type)
+                    # )
 
             except IOError as e:
                 show_message("Error", "{}".format(e), ui.root_container)

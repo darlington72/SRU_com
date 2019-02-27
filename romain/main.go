@@ -428,8 +428,7 @@ func TxUart(port *serial.Port, TC []byte, sizeTC int) {
 		}
 		_, err := port.Write(buf)
 
-		time.Sleep(1 * time.Millisecond)
-
+		// time.Sleep(1 * time.Millisecond)
 		if err != nil {
 			log.Fatalf("port.Write: %v", err)
 		}
@@ -717,6 +716,7 @@ func main() {
 			for Choix2int != 99 && Choix2int < len(ListeTC) {
 				if Choix2int != 0 {
 					tc, err := FormattageTC(ListeTC, Choix2int-1, s)
+
 					tc = append(tc, 0x00)
 					if err != 0 {
 						fmt.Printf("\nError : %d\n", err)
@@ -752,6 +752,12 @@ func main() {
 						}
 					}
 					TxUart(s, tc, len(tc))
+
+					for i := 0; i < 100; i++ {
+						TxUart(s, tc, len(tc))
+						time.Sleep(5 * time.Millisecond)
+					}
+
 				} else {
 					MenuTC(ListeTC)
 				}
