@@ -1,4 +1,5 @@
 from time import sleep
+import datetime
 import json
 import sys
 from queue import Queue
@@ -12,7 +13,7 @@ except FileNotFoundError:
     sys.exit()
 
 try:
-    if args.test:
+    if args.test or args.loop:
         BD_TM_file = open("BD/BDTC.json", "r")
     else:
         BD_TM_file = open("BD/BDTM.json", "r")
@@ -72,9 +73,15 @@ def format_frame(*frame):
     return formatted_frame
 
 
-def write_to_file(file_, line):
+def write_to_file(file_, data, type):
     if file_ is not None:
-        file_.write(line)
+
+        file_.write(
+            datetime.datetime.now().strftime("%H:%M:%S.%f")[:-4]
+            + f" ## {type} ## "
+            + data
+            + "\n"
+        )
 
 
 class SerialTest:

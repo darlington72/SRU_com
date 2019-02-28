@@ -13,16 +13,17 @@ Todo:
   ✘ check for buffer len ? @cancelled(19-02-27 18:18)
   ✔ Fix insert_line (cursor position) @done(19-02-24 16:04)
   ✔ Fix scroll on osx @done(19-02-24 15:09)
-  ☐ Add time into logs
-  ☐ fix raw window timing error
-  ☐ work on sockets 
-  ☐ Fix bug dump 
+  ✔ Add time into logs @done(19-02-28 14:13)
+  ✔ fix raw window timing error @done(19-02-28 13:52)
+  ☐ work on sockets
+  ✘ Fix bug dump @cancelled(19-02-28 14:39)
+  ✘ fix /n @cancelled(19-02-28 14:14)
 
 
 
 
 Todo before new release: 
-  ☐ Update changelog
+  ✔ Update changelog @done(19-02-28 14:42)
   ✔ Update version @done(19-02-26 17:16)
   ✔ Update README @done(19-02-26 17:16)
   ☐ Create tag

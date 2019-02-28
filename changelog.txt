@@ -1,6 +1,11 @@
-Version 1.5.4 - 19-02-
+Version 1.5.4 - 19-02-28
 - Made TM/TC feed read-only
-- Hex upload is now performed in another thread (allow to refresh UI)
+- Changed raw_data_window height 
+- added loop mode 
+- added time to log 
+- fixed update mode
+- updated BD
+- Improved timming for hex upload (disabled raw TMTC feed when uploading)
 
 ---------------------------------
 Version 1.5.3 - 19-02-19

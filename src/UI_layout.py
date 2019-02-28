@@ -5,7 +5,11 @@ from asyncio import get_event_loop
 import queue
 
 # Prompt_toolkit
-from prompt_toolkit.eventloop import use_asyncio_event_loop, run_in_executor
+from prompt_toolkit.eventloop import (
+    use_asyncio_event_loop,
+    run_in_executor,
+    call_from_executor,
+)
 from prompt_toolkit.layout.layout import Window
 from prompt_toolkit.styles import Style
 from prompt_toolkit.widgets import VerticalLine, HorizontalLine, Label
@@ -22,7 +26,13 @@ from src.prompt_toolkit_redefinition import (
 from prompt_toolkit.application import Application
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
-from prompt_toolkit.layout.containers import HSplit, VSplit, FloatContainer, Float
+from prompt_toolkit.layout.containers import (
+    HSplit,
+    VSplit,
+    FloatContainer,
+    Float,
+    Container,
+)
 from prompt_toolkit.layout.dimension import D
 from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.widgets import Frame
@@ -46,6 +56,7 @@ class UI:
         self.lock = lock
         self.last_TM = queue.Queue(maxsize=1)
         self.file_ = file_
+        self.add_data_to_raw_window_enabled = True
 
         # TC list and sending
         TC_list = [
@@ -141,7 +152,7 @@ class UI:
                 focusable=False,
                 input_processors=[FormatText()],
             ),
-            height=10,
+            height=5,
             wrap_lines=True,
         )
 
@@ -256,6 +267,29 @@ class UI:
         lib.BD_TM_file.close()
         lib.BD_TC_file.close()
 
+    def add_data_to_raw_window(self, data, type):
+
+        window_size = (
+            self.raw_serial_window.current_width * self.raw_serial_window.height
+        )
+
+        if self.raw_serial_buffer.text_len > window_size:
+            self.raw_serial_buffer.text = ""
+            self.raw_serial_buffer.text_len = 0
+
+        if type == "TC":
+            self.raw_serial_buffer.insert_line(
+                "<TC>" + data + "</TC>", with_time_tag=False, newline=False
+            )
+        else:
+            data = "".join([format(_, "x").zfill(2) for _ in data]).upper()
+
+            self.raw_serial_buffer.insert_line(
+                "<TM>" + data + "</TM>", with_time_tag=False, newline=False
+            )
+
+        self.raw_serial_buffer.text_len += len(data)
+
     def add_raw_TC_to_window(self, func):
         def wrapper(data):
             if isinstance(data, int):
@@ -265,24 +299,18 @@ class UI:
             else:
                 data_formatted = binascii.hexlify(data).decode().upper()
 
-            window_size = (
-                self.raw_serial_window.current_width * self.raw_serial_window.height
-            )
-
-            if self.raw_serial_buffer.text_len > window_size:
-                self.raw_serial_buffer.text = ""
-                self.raw_serial_buffer.text_len = 0
-
-            self.raw_serial_buffer.insert_line(
-                "<TC>" + data_formatted + "</TC>", with_time_tag=False, newline=False
-            )
-            self.raw_serial_buffer.text_len += len(data_formatted)
-
             try:
                 func(data)
             except serial.SerialException:
                 self.exit_status = "serial"
                 self.application.exit()
+
+            # 
+            if self.add_data_to_raw_window_enabled:
+                # self.add_data_to_raw_window(data_formatted, "TC")
+                call_from_executor(
+                    lambda: self.add_data_to_raw_window(data_formatted, "TC")
+                )
 
         return wrapper
 
@@ -293,23 +321,12 @@ class UI:
                 read = func(size)
             except serial.SerialException:
                 self.exit_status = "serial"
-                # print('Serial error.')
                 self.application.exit()
 
-            read_formatted = "".join([format(_, "x").zfill(2) for _ in read]).upper()
-
-            window_size = (
-                self.raw_serial_window.current_width * self.raw_serial_window.height
-            )
-
-            if self.raw_serial_buffer.text_len > window_size:
-                self.raw_serial_buffer.text = ""
-                self.raw_serial_buffer.text_len = 0
-
-            self.raw_serial_buffer.insert_line(
-                "<TM>" + read_formatted + "</TM>", with_time_tag=False, newline=False
-            )
-            self.raw_serial_buffer.text_len += len(read_formatted)
+            
+            if self.add_data_to_raw_window_enabled:
+                # self.add_data_to_raw_window(read, "TM")
+                call_from_executor(lambda: self.add_data_to_raw_window(read, "TM"))
 
             return read
 
