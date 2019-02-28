@@ -344,10 +344,13 @@ def send_TC(TC_id, TC_data, ui, resend_last_TC=False):
         frame_to_be_sent_str += format(CRC, "x").zfill(2).upper()
 
         with ui.lock:
-            for key, int_ in enumerate(frame_to_be_sent_bytes):
-                ui.ser.write([int_])
-                if key != len(frame_to_be_sent_bytes) - 1:
-                    sleep(conf["COM"]["delay_inter_byte"])
+            if conf["COM"]["delay_inter_byte"] == 0 or args.socket:
+                    ui.ser.write(frame_to_be_sent_bytes)
+            else:
+                for key, int_ in enumerate(frame_to_be_sent_bytes):
+                    ui.ser.write([int_])
+                    if key != len(frame_to_be_sent_bytes) - 1:
+                        sleep(conf["COM"]["delay_inter_byte"])
 
             buffer_feed = "<tc>TC</tc> - "  # Line to be printed to TMTC feed
 
