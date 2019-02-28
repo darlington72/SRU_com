@@ -18,6 +18,7 @@ from prompt_toolkit.eventloop import (
 
 # Project
 import src.serial_com as serial_com
+import src.scenario as scenario
 from src.lib import BD_TM, BD_TC
 
 
@@ -58,7 +59,6 @@ class TextInputDialog(object):
 
 
 def do_upload_hex(ui, upload_type):
-
     def coroutine():
         open_dialog = TextInputDialog(
             title=f"{upload_type} Upload to SRU",
@@ -84,6 +84,33 @@ def do_upload_hex(ui, upload_type):
                     # )
 
             except IOError as e:
+                show_message("Error", "{}".format(e), ui.root_container)
+                get_app().invalidate()
+
+    ensure_future(coroutine())
+
+
+def do_load_scenario(ui):
+    def coroutine():
+        open_dialog = TextInputDialog(
+            title="Scenario Mode",
+            label_text="Enter the path of the file:",
+            completer=PathCompleter(),
+        )
+
+        path = yield From(show_dialog_as_float(open_dialog, ui.root_container))
+
+        if path is not None:
+            try:
+                with open(path, "r") as f:
+                    scenario_file = f.read()
+
+                    scenario_parsed = scenario.parse_scenario(scenario_file)
+                    run_in_executor(
+                        lambda: serial_com.play_scenario(ui, scenario_parsed)
+                    )
+
+            except (ValueError, IOError) as e:
                 show_message("Error", "{}".format(e), ui.root_container)
                 get_app().invalidate()
 

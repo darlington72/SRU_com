@@ -652,3 +652,41 @@ async def upload_hex(ui, data, upload_type=None):
         # Let's turn the watchdog back on
         if watchdog_value:
             ui.watchdog_radio.set_value(1)
+
+def play_scenario(ui, scenario):
+    # ui.buffer_layout.insert_line(
+    #     str(scenario)
+    # )
+
+
+
+    step_count = len(scenario)
+    current_step = 1
+
+    for step in scenario:
+
+        if step['keyword'] == "wait":
+            ui.buffer_layout.insert_line(f"Scenario mode: waiting <data>{step['argument']}s</data>")
+
+            info_message = float_window.InfoDialog(
+                "Scenario Mode", 
+                f"Step {current_step}/{step_count}: \n    Type: wait {step['argument']}s", 
+                ui.root_container
+            )
+            get_app().invalidate()
+
+            sleep(step['argument'])
+            info_message.remove_dialog_as_float(ui.root_container)
+
+
+        elif step['keyword'] == "send":
+            ui.buffer_layout.insert_line(f"Scenario mode: sending <tc>{step['TC_tag']}</tc> with args <data>{step['TC_args']}</data>")
+            
+            send_TC(step['TC_tag'], step['TC_args'], ui, resend_last_TC=False)
+
+        current_step += 1
+    
+    float_window.show_message(
+        "Scenario Mode", "Scenario done.", ui.root_container
+    )
+

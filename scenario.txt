@@ -1,0 +1,6 @@
+send TC-00
+// comment
+wait 1
+send TC-82
+wait 4s
+send TC-87 AA, FF
