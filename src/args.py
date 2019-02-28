@@ -41,4 +41,5 @@ parser.add_argument(
     nargs="?",
     const="output",
 )
+parser.add_argument("-S", "--socket", action="store_true", help="Start in socket mode")
 args = parser.parse_args()
