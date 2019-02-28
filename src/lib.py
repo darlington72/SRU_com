@@ -1,4 +1,5 @@
 from time import sleep
+import socket
 import datetime
 import json
 import sys
@@ -112,3 +113,44 @@ class SerialTest:
 
         return data
 
+
+class SerialSocket:
+    def __init__(self):
+
+        # TC should be client
+        self.socket_TC = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.socket_TC.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.socket_TC_addr = "localhost"
+        self.socket_TC_port = 11001
+
+        # TM should be server
+        self.socket_TM = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.socket_TM.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.socket_TM_host = "localhost"
+        self.socket_TM_port = 11002
+
+        try:
+            self.socket_TC.connect((self.socket_TC_addr, self.socket_TC_port))
+            self.socket_TM.bind((self.socket_TM_host, self.socket_TM_port))
+        except socket.error:
+            print(
+                "Error while trying to launch socket server. Please check ethernet configuration"
+            )
+            sys.exit(0)
+
+    def write(self, data):
+        if isinstance(data, int):
+            self.socket_TC.sendto(
+                bytes([data]), (self.socket_TC_addr, self.socket_TC_port)
+            )
+        else:
+            for i in data:
+                self.socket_TC.sendto(
+                    bytes([i]), (self.socket_TC_addr, self.socket_TC_port)
+                )
+
+    def read(self, size=1) -> bytearray:
+        # data = bytearray()
+        data, addr = self.socket_TM.recvfrom(size)
+
+        return data
