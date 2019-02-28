@@ -35,6 +35,9 @@ if __name__ == "__main__":
         # !! Warning !!
         # When using serial test (or uart loop), if there's an error in the length of a TM/TC in the BD, SRU_com will be stuck in
         # a infinite loop because there's no timeout on reception
+    elif args.socket:
+        ser = lib.SerialSocket()
+        ser.test = False
     else:
 
         try:
