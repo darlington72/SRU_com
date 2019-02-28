@@ -1,6 +1,7 @@
 import threading
 import sys
 import asyncio
+from time import sleep
 
 # Prompt_toolkit
 from prompt_toolkit.layout.containers import Float, HSplit
@@ -101,20 +102,25 @@ def do_load_scenario(ui):
         path = yield From(show_dialog_as_float(open_dialog, ui.root_container))
 
         if path is not None:
-            try:
-                with open(path, "r") as f:
-                    scenario_file = f.read()
-
-                    scenario_parsed = scenario.parse_scenario(scenario_file)
-                    run_in_executor(
-                        lambda: serial_com.play_scenario(ui, scenario_parsed)
-                    )
-
-            except (ValueError, IOError) as e:
-                show_message("Error", "{}".format(e), ui.root_container)
-                get_app().invalidate()
+            open_scenario(ui, path)
 
     ensure_future(coroutine())
+
+
+def open_scenario(ui, path, on_startup=False):
+    try:
+        with open(path, "r") as f:
+            scenario_file = f.read()
+
+            scenario_parsed = scenario.parse_scenario(scenario_file)
+
+            run_in_executor(
+                lambda: serial_com.play_scenario(ui, scenario_parsed, on_startup)
+            )
+
+    except (ValueError, IOError) as e:
+        show_message("Error", "{}".format(e), ui.root_container)
+        get_app().invalidate()
 
 
 def do_conf_TC(current_key, TC_data, ui):

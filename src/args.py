@@ -33,4 +33,12 @@ parser.add_argument("-l", "--loop", action="store_true", help="Serial loop mode"
 parser.add_argument(
     "-U", "--update", dest="update", action="store_true", help="Update SRU_com "
 )
+parser.add_argument(
+    "-s",
+    "--scenario",
+    help="Load a scenario on startup",
+    metavar="FILE_NAME",
+    nargs="?",
+    const="output",
+)
 args = parser.parse_args()

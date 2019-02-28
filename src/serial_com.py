@@ -653,10 +653,22 @@ async def upload_hex(ui, data, upload_type=None):
         if watchdog_value:
             ui.watchdog_radio.set_value(1)
 
-def play_scenario(ui, scenario):
+def play_scenario(ui, scenario, on_startup):
     # ui.buffer_layout.insert_line(
     #     str(scenario)
     # )
+
+    # If scenario was called on startup, 
+    # let's wait for the UI to draw itself 
+    if on_startup:
+        info_message = float_window.InfoDialog(
+                "Scenario Mode", 
+                f"Scenario mode launched on startup..", 
+                ui.root_container
+            )
+        get_app().invalidate()
+        sleep(2)
+        info_message.remove_dialog_as_float(ui.root_container)
 
 
 

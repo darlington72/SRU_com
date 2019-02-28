@@ -3,7 +3,7 @@ import sys
 import serial
 from asyncio import get_event_loop
 import queue
-
+from time import sleep
 # Prompt_toolkit
 from prompt_toolkit.eventloop import (
     use_asyncio_event_loop,
@@ -254,6 +254,10 @@ class UI:
     def run_app(self):
         use_asyncio_event_loop()
         self.run_tm_and_watchdog()
+        
+        if args.scenario:
+            float_window.open_scenario(self, args.scenario, on_startup=True)
+
         get_event_loop().run_until_complete(
             self.application.run_async().to_asyncio_future()
         )
@@ -305,7 +309,7 @@ class UI:
                 self.exit_status = "serial"
                 self.application.exit()
 
-            # 
+            #
             if self.add_data_to_raw_window_enabled:
                 # self.add_data_to_raw_window(data_formatted, "TC")
                 call_from_executor(
@@ -323,7 +327,6 @@ class UI:
                 self.exit_status = "serial"
                 self.application.exit()
 
-            
             if self.add_data_to_raw_window_enabled:
                 # self.add_data_to_raw_window(read, "TM")
                 call_from_executor(lambda: self.add_data_to_raw_window(read, "TM"))
