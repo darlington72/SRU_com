@@ -663,23 +663,23 @@ async def upload_hex(ui, data, upload_type=None):
 
 
 def play_scenario(ui, scenario, on_startup):
-    # ui.buffer_layout.insert_line(
-    #     str(scenario)
-    # )
 
     # If scenario was called on startup,
     # let's wait for the UI to draw itself
 
     if on_startup:
         info_message = float_window.InfoDialog(
-            "Scenario Mode", f"Scenario mode launched on startup..", ui.root_container
+            "Scenario Mode",
+            f"Scenario parsing is OK\nPlaying scenario in 1s..",
+            ui.root_container,
         )
         get_app().invalidate()
-        sleep(2)
+        sleep(1)
         info_message.remove_dialog_as_float(ui.root_container)
 
     step_count = len(scenario)
     current_step = 1
+    error = False
 
     for step in scenario:
 
@@ -687,14 +687,14 @@ def play_scenario(ui, scenario, on_startup):
             # If step is a comment, we print it to the TM/TC feed
             ui.buffer_layout.insert_line(f"Scenario mode: {step['comment']}")
 
-        elif step["keyword"] == "wait":
+        elif step["keyword"] == "sleep":
             ui.buffer_layout.insert_line(
-                f"Scenario mode: waiting <data>{step['argument']}s</data>"
+                f"Scenario mode: sleeping <data>{step['argument']}s</data>"
             )
 
             info_message = float_window.InfoDialog(
                 "Scenario Mode",
-                f"Step {current_step}/{step_count}: \n    Type: wait {step['argument']}s",
+                f"Step {current_step}/{step_count}: \n    Type: sleep {step['argument']}s",
                 ui.root_container,
             )
             get_app().invalidate()
@@ -709,9 +709,49 @@ def play_scenario(ui, scenario, on_startup):
 
             send_TC(step["TC_tag"], step["TC_args"], ui, resend_last_TC=False)
 
+        elif step["keyword"] == "wait_tm":
+            ui.clear_last_TM_buffer()
+            ui.buffer_layout.insert_line(
+                f"Scenario mode: waiting for <tm>{step['TM_tag']}</tm> for <data>{step['timeout']}s</data> max"
+            )
+            info_message = float_window.InfoDialog(
+                "Scenario Mode",
+                f"Step {current_step}/{step_count}: \n    Type: wait for {step['TM_tag']} for {step['timeout']}s",
+                ui.root_container,
+            )
+            get_app().invalidate()
+
+            TM_received = ui.wait_for_TM(timeout=step["timeout"])
+
+            info_message.remove_dialog_as_float(ui.root_container)
+
+
+            if not TM_received:
+                ui.buffer_layout.insert_line(
+                    f"<error>Error:</error> {step['TM_tag']} was not received."
+                )
+                error = True
+                break
+
+            elif TM_received['tag'] != step["TM_tag"].split("-")[1]:
+                ui.buffer_layout.insert_line(
+                    f"<error>Error:</error> Received {TM_received}. Was expecting {step['TM_tag']}"
+                )
+                error = True
+                break
+
+
         current_step += 1
 
-    float_window.show_message("Scenario Mode", "Scenario done.", ui.root_container)
 
     if args.quit_after_scenario:
         ui.application.exit()
+
+
+    if not error:
+        float_window.show_message("Scenario Mode", "Scenario done.", ui.root_container)
+    else:
+        float_window.show_message("Scenario Mode", "Error in scenario !", ui.root_container)
+
+
+

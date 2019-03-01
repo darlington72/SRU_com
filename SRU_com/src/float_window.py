@@ -119,7 +119,9 @@ def open_scenario(ui, path, on_startup=False):
             )
 
     except (ValueError, IOError) as e:
+
         show_message("Error", "{}".format(e), ui.root_container)
+
         get_app().invalidate()
 
 

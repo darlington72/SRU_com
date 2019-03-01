@@ -5,7 +5,7 @@
     },
     "COM": {
         "port": "ttyUSB0",
-        "baudrate": "57600",
+        "baudrate": "115200",
         "timeout": 0.1,
         "delay_inter_byte": 0
     },

@@ -4,6 +4,7 @@ import serial
 from asyncio import get_event_loop
 import queue
 from time import sleep
+
 # Prompt_toolkit
 from prompt_toolkit.eventloop import (
     use_asyncio_event_loop,
@@ -231,12 +232,18 @@ class UI:
             self.buffer_layout.set_document(Document(text=""))
             self.raw_serial_buffer.set_document(Document(text=""))
 
+        def after_render(_):
+            if args.scenario:
+                float_window.open_scenario(self, args.scenario, on_startup=True)
+                args.scenario = None
+
         self.application = Application(
             layout=Layout(self.root_container),
             key_bindings=self.bindings,
             style=style,
             full_screen=True,
             mouse_support=False,
+            after_render=after_render,
         )
 
         self.exit_status = None
@@ -254,9 +261,6 @@ class UI:
     def run_app(self):
         use_asyncio_event_loop()
         self.run_tm_and_watchdog()
-        
-        if args.scenario:
-            float_window.open_scenario(self, args.scenario, on_startup=True)
 
         get_event_loop().run_until_complete(
             self.application.run_async().to_asyncio_future()
