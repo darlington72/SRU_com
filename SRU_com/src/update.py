@@ -116,7 +116,7 @@ def update():
                     print(" Done.")
 
                     print_c("Installing new version..", "run", endline=False)
-                    copy_tree(tar_release_name + "/", CURRENT_DIR + "/")
+                    copy_tree(tar_release_name + "/", str(CURRENT_DIR) + "/")
                     print(" Done.")
 
                     print_c("Deleting temporary files..", "run", endline=False)
