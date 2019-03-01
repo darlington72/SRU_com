@@ -483,7 +483,7 @@
         "tag": "0E",
         "data": [
             [
-                "10",
+                "16",
                 "Golden from MRAM",
                 ""
             ]
@@ -496,7 +496,7 @@
         "tag": "0F",
         "data": [
             [
-                "10",
+                "16",
                 "Appli from MRAM",
                 ""
             ]
@@ -509,7 +509,7 @@
         "tag": "10",
         "data": [
             [
-                "10",
+                "16",
                 "Appli from Flash",
                 ""
             ]
@@ -542,6 +542,29 @@
             [
                 "01",
                 "Memory Boot (55 = QSPI, AA = FLASH)",
+                ""
+            ]
+        ]
+    },
+    "TM-13": {
+        "name": "MUX Selection",
+        "header": "1234",
+        "length": "03",
+        "tag": "13",
+        "data": [
+            [
+                "01",
+                "Voie du MUX",
+                ""
+            ],
+            [
+                "01",
+                "Etat de sotie (55 = ON, AA = OFF)",
+                ""
+            ],
+            [
+                "01",
+                "Numéro du MUX (55 = MUX_1, AA = MUX_2)",
                 ""
             ]
         ]
@@ -646,10 +669,12 @@
     "TM-41": {
         "name": "(BL) Init Mram",
         "header": "4312",
-        "length": "00",
+        "length": "01",
         "tag": "41",
         "data": [
             [
+                "01",
+                "Erase + Init MRAM = 55, Erase MRAM = AA",
                 ""
             ]
         ]

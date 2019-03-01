@@ -252,6 +252,29 @@
             ]
         ]
     },
+    "TC-93": {
+        "name": "Mux Selection",
+        "header": "1234",
+        "length": "03",
+        "tag": "93",
+        "data": [
+            [
+                "01",
+                "Voie du MUX",
+                "?"
+            ],
+            [
+                "01",
+                "Etat de sotie (55 = ON, AA = OFF)",
+                "?"
+            ],
+            [
+                "01",
+                "Numéro du MUX (55 = MUX_1, AA = MUX_2)",
+                "?"
+            ]
+        ]
+    },
     "TC-04": {
         "name": "Bad TC Len",
         "header": "1234",
@@ -277,11 +300,13 @@
     "TC-C1": {
         "name": "(BL) Init MRAM",
         "header": "4321",
-        "length": "00",
+        "length": "01",
         "tag": "C1",
         "data": [
             [
-                ""
+                "01",
+                "Erase + Init MRAM = 55, Erase MRAM = AA",
+                "?"
             ]
         ]
     },
