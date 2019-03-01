@@ -34,6 +34,6 @@
         "TC_CRC_APP_tag": "8C",
         "TC_CRC_GOLDEN_tag": "C4",
         "TC_reload_APP_tag": "8D",
-        "TM_reload_APP_tag": "0C"
+        "TM_reload_APP_tag": "0D"
     }
 }

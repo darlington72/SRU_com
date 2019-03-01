@@ -23,17 +23,24 @@ parser.add_argument(
     help="Set the watchdog to be cleared on startup",
 )
 parser.add_argument("-v", dest="verbose", action="store_true", help="Verbose mode")
-parser.add_argument(
+
+test_group = parser.add_argument_group("Test / Simulation")
+
+test_group.add_argument(
     "-t",
     "--test",
     action="store_true",
     help="Start in test mode (serial loop simulation)",
 )
-parser.add_argument("-l", "--loop", action="store_true", help="Serial loop mode")
+test_group.add_argument("-l", "--loop", action="store_true", help="Serial loop mode")
+
 parser.add_argument(
     "-U", "--update", dest="update", action="store_true", help="Update SRU_com "
 )
-parser.add_argument(
+
+scenario_group = parser.add_argument_group("Scenario Mode")
+
+scenario_group.add_argument(
     "-s",
     "--scenario",
     help="Load a scenario on startup",
@@ -41,13 +48,13 @@ parser.add_argument(
     nargs="?",
     const="output",
 )
-parser.add_argument(
+scenario_group.add_argument(
     "-q",
     "--quit_after_scenario",
     action="store_true",
     help="Quit SRU_com after scenario is played",
 )
-parser.add_argument(
+scenario_group.add_argument(
     "--check_only", action="store_true", help="Check scenario syntax only"
 )
 parser.add_argument("-S", "--socket", action="store_true", help="Start in socket mode")
