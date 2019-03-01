@@ -47,6 +47,9 @@ parser.add_argument(
     action="store_true",
     help="Quit SRU_com after scenario is played",
 )
+parser.add_argument(
+    "--check_only", action="store_true", help="Check scenario syntax only"
+)
 parser.add_argument("-S", "--socket", action="store_true", help="Start in socket mode")
 
 

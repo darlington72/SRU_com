@@ -20,7 +20,7 @@ def parse_scenario(scenario_file):
         [list] -- Scenario that can be exploited by serial_com.play_scenario()
     """
 
-    KEYWORDS = ("send", "sleep", "//", "wait_tm")
+    KEYWORDS = ("send", "sleep", "//", "wait_tm", "app", "golden")
 
     ex = [
         {"keyword": "send", "argument": "TC-88"},
@@ -157,6 +157,12 @@ def parse_scenario(scenario_file):
                             "timeout": timeout,
                         }
                     )
+
+            elif keyword in ("app", "golden"):
+                if len(argument.split(" ")) != 1:
+                    raise ValueError(f'Need exactly one argument "{argument}"')
+
+                scenario.append({"keyword": keyword, "file": argument})
 
     return scenario
 

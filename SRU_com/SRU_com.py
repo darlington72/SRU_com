@@ -21,13 +21,6 @@ if __name__ == "__main__":
         update()
         sys.exit()
 
-    # If SRU_com is launched with the flag -f or --file
-    # we open a file and write every TM/TC into it
-    if args.file:
-        file_ = open(args.file + ".txt", mode="a")
-    else:
-        file_ = None
-
     # Serial
     if args.test:
         ser = lib.SerialTest()
@@ -53,7 +46,7 @@ if __name__ == "__main__":
             sys.exit(0)
 
     # Main UI instance
-    ui = UI_layout.UI(ser, lock, file_)
+    ui = UI_layout.UI(ser, lock)
 
     # Let's wrap serial's read & write to display raw TM/TC exchange
     # in the raw TM/TC window
@@ -77,5 +70,4 @@ if __name__ == "__main__":
     ui.run_app()
 
     # Closing the file
-    if args.file:
-        file_.close()
+    lib.close_file()

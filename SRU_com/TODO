@@ -24,10 +24,10 @@ Todo:
   ✔ quit at the end on demand @done(19-03-01 10:54)
   ✔ wait tm timeout @done(19-03-01 12:05)
   ✔ focus on scenario error @done(19-03-01 12:35)
-  ☐ step number don't count comment
-  ☐ write to file in insert line 
+  ✔ step number don't count comment @done(19-03-01 12:52)
+  ✔ write to file in insert line @done(19-03-01 13:30)
+  ✔ check scenario @done(19-03-01 13:35)
   ☐ upload auto 
-  ☐ check scenario 
   ☐ work on sockets
 
 

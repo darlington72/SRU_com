@@ -7,6 +7,8 @@
 // "send" -> used to send a TC 
 // "sleep" -> used to pause a scenario
 // "wait_tm" -> used to wait for a TM  
+// "app" -> used to upload an application in MRAM
+// "golden" -> used to upload golden
 
 
 // Syntax for comment is: 
@@ -44,3 +46,15 @@ send TC-01
 // Now we wait for the TM 
 // (in loop mode we wait for the TC we've just sent)
 wait_tm TC-01 5s
+
+
+// Syntax for uploading an application or the golden is:
+// app PATH_TO_FILE
+// or
+// golden PATH_TO_FILE
+// Example:
+
+app upload/appli.hex
+sleep 1
+golden upload/golden.hex
+

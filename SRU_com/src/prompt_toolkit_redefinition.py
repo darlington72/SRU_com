@@ -1,5 +1,7 @@
 import datetime
 import six
+import xml
+import re
 
 # Prompt_toolkit
 from prompt_toolkit.filters import to_filter
@@ -22,7 +24,9 @@ from prompt_toolkit.layout.processors import (
     ConditionalProcessor,
     BeforeInput,
 )
-import xml
+
+# Project
+import src.lib as lib
 
 
 class FormatText(Processor):
@@ -36,7 +40,18 @@ class FormatText(Processor):
 
 
 class Buffer_(Buffer):
-    def insert_line(self, data, with_time_tag=True, newline=True):
+    def __init__(self, read_only=False):
+        super().__init__(
+            read_only=read_only, completer=None, auto_suggest=None, history=None
+        )
+
+        self.clean_tag_re = re.compile("<.*?>")
+
+    def clean_tag(self, text):
+        cleantext = re.sub(self.clean_tag_re, "", text)
+        return cleantext
+
+    def insert_line(self, data, with_time_tag=True, newline=True, write_to_file=True):
         if with_time_tag:
             time_tag = (
                 "<grey>"
@@ -68,6 +83,9 @@ class Buffer_(Buffer):
 
             # One empty line and buggy:
             # self.cursor_position = len(self.text)
+
+        if write_to_file:
+            lib.write_to_file(self.clean_tag(time_tag + data))
 
     def auto_down_end(self):
         while self.document.cursor_position_row < self.document.line_count - 1:

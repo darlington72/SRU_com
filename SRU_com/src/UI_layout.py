@@ -51,13 +51,13 @@ import src.tools as tools
 
 
 class UI:
-    def __init__(self, ser, lock, file_):
+    def __init__(self, ser, lock):
 
         self.ser = ser
         self.lock = lock
         self.last_TM = queue.Queue(maxsize=1)
-        self.file_ = file_
         self.add_data_to_raw_window_enabled = True
+        self.done_uploading = False
 
         # TC list and sending
         TC_list = [
@@ -287,13 +287,19 @@ class UI:
 
         if type == "TC":
             self.raw_serial_buffer.insert_line(
-                "<TC>" + data + "</TC>", with_time_tag=False, newline=False
+                "<TC>" + data + "</TC>",
+                with_time_tag=False,
+                newline=False,
+                write_to_file=False,
             )
         else:
             data = "".join([format(_, "x").zfill(2) for _ in data]).upper()
 
             self.raw_serial_buffer.insert_line(
-                "<TM>" + data + "</TM>", with_time_tag=False, newline=False
+                "<TM>" + data + "</TM>",
+                with_time_tag=False,
+                newline=False,
+                write_to_file=False,
             )
 
         self.raw_serial_buffer.text_len += len(data)

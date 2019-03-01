@@ -246,15 +246,7 @@ def serial_com_TM(ui):
 
                     ui.buffer_layout.insert_line(buffer_feed)
                     # call_from_executor(lambda: ui.buffer_layout.insert_line(buffer_feed))
-                    lib.write_to_file(
-                        ui.file_,
-                        "".join(sync_word)
-                        + format(data_length, "x").zfill(2)
-                        + tag
-                        + "".join(data)
-                        + CRC,
-                        "TM",
-                    )
+
                     # if last tm was not read, we clear it
                     if not ui.last_TM.full():
                         ui.last_TM.put({"tag": tag, "data": data})
@@ -288,8 +280,6 @@ def serial_com_watchdog(ui):
 
             with ui.lock:
                 ui.ser.write(frame_to_be_sent_bytes)
-
-            lib.write_to_file(ui.file_, frame_to_be_sent_str, "TC")
 
             # UI
             ui.watchdog_cleared_buffer.text = "      Watchdog Cleared"
@@ -326,7 +316,6 @@ def send_TC(TC_id, TC_data, ui, resend_last_TC=False):
                         sleep(conf["COM"]["delay_inter_byte"])
 
                 ui.buffer_layout.insert_line(buffer_feed)
-                lib.write_to_file(ui.file_, frame_to_be_sent_str, "TC")
 
         last_TC_upload_hex = ui.last_TC_sent["hex_upload"]
         last_TC_hex = ui.last_TC_sent["hex_file"]
@@ -376,8 +365,6 @@ def send_TC(TC_id, TC_data, ui, resend_last_TC=False):
         ui.buffer_layout.insert_line(buffer_feed)
         # call_from_executor(lambda: ui.buffer_layout.insert_line(buffer_feed))
 
-        lib.write_to_file(ui.file_, frame_to_be_sent_str, "TC")
-
         # Let's save this TC in case user wants to resend it
         ui.last_TC_sent["frame_bytes"] = frame_to_be_sent_bytes
         ui.last_TC_sent["frame_str"] = frame_to_be_sent_str
@@ -396,7 +383,7 @@ def send_TC(TC_id, TC_data, ui, resend_last_TC=False):
         #     ui.last_TC_sent["hex_file"] = None
 
 
-async def upload_hex(ui, data, upload_type=None):
+async def upload_hex(ui, data, upload_type=None, from_scenario=False):
     """Upload a hex file to SRU
     Called by do_upload_hex()
     
@@ -407,6 +394,7 @@ async def upload_hex(ui, data, upload_type=None):
     """
 
     error = False
+    ui.done_uploading = False
 
     if upload_type == None:
         # if upload_hex was called by <ctrl> + R
@@ -648,7 +636,7 @@ async def upload_hex(ui, data, upload_type=None):
         info_message.remove_dialog_as_float(ui.root_container)
         get_app().invalidate()
 
-        if not error or ui.ser.test or args.loop:
+        if not from_scenario and (not error or ui.ser.test or args.loop):
             float_window.show_message(
                 f"{upload_type} Upload to SRU", "Upload done.", ui.root_container
             )
@@ -660,6 +648,8 @@ async def upload_hex(ui, data, upload_type=None):
         # Let's turn the watchdog back on
         if watchdog_value:
             ui.watchdog_radio.set_value(1)
+
+        ui.done_uploading = True if (not error or ui.ser.test or args.loop) else "error"
 
 
 def play_scenario(ui, scenario, on_startup):
@@ -677,7 +667,7 @@ def play_scenario(ui, scenario, on_startup):
         sleep(1)
         info_message.remove_dialog_as_float(ui.root_container)
 
-    step_count = len(scenario)
+    step_count = len([step for step in scenario if step["keyword"] != "//"])
     current_step = 1
     error = False
 
@@ -686,72 +676,102 @@ def play_scenario(ui, scenario, on_startup):
         if step["keyword"] == "//":
             # If step is a comment, we print it to the TM/TC feed
             ui.buffer_layout.insert_line(f"Scenario mode: {step['comment']}")
-
-        elif step["keyword"] == "sleep":
-            ui.buffer_layout.insert_line(
-                f"Scenario mode: sleeping <data>{step['argument']}s</data>"
-            )
-
-            info_message = float_window.InfoDialog(
-                "Scenario Mode",
-                f"Step {current_step}/{step_count}: \n    Type: sleep {step['argument']}s",
-                ui.root_container,
-            )
-            get_app().invalidate()
-
-            sleep(step["argument"])
-            info_message.remove_dialog_as_float(ui.root_container)
-
-        elif step["keyword"] == "send":
-            ui.buffer_layout.insert_line(
-                f"Scenario mode: sending <tc>{step['TC_tag']}</tc> with args <data>{step['TC_args']}</data>"
-            )
-
-            send_TC(step["TC_tag"], step["TC_args"], ui, resend_last_TC=False)
-
-        elif step["keyword"] == "wait_tm":
-            ui.clear_last_TM_buffer()
-            ui.buffer_layout.insert_line(
-                f"Scenario mode: waiting for <tm>{step['TM_tag']}</tm> for <data>{step['timeout']}s</data> max"
-            )
-            info_message = float_window.InfoDialog(
-                "Scenario Mode",
-                f"Step {current_step}/{step_count}: \n    Type: wait for {step['TM_tag']} for {step['timeout']}s",
-                ui.root_container,
-            )
-            get_app().invalidate()
-
-            TM_received = ui.wait_for_TM(timeout=step["timeout"])
-
-            info_message.remove_dialog_as_float(ui.root_container)
-
-
-            if not TM_received:
+        else:
+            if step["keyword"] == "sleep":
                 ui.buffer_layout.insert_line(
-                    f"<error>Error:</error> {step['TM_tag']} was not received."
+                    f"Scenario mode: sleeping <data>{step['argument']}s</data>"
                 )
-                error = True
-                break
 
-            elif TM_received['tag'] != step["TM_tag"].split("-")[1]:
+                info_message = float_window.InfoDialog(
+                    "Scenario Mode",
+                    f"Step {current_step}/{step_count}: \n    Type: sleep {step['argument']}s",
+                    ui.root_container,
+                )
+                get_app().invalidate()
+
+                sleep(step["argument"])
+                info_message.remove_dialog_as_float(ui.root_container)
+
+            elif step["keyword"] == "send":
                 ui.buffer_layout.insert_line(
-                    f"<error>Error:</error> Received {TM_received}. Was expecting {step['TM_tag']}"
+                    f"Scenario mode: sending <tc>{step['TC_tag']}</tc> with args <data>{step['TC_args']}</data>"
                 )
-                error = True
-                break
 
+                send_TC(step["TC_tag"], step["TC_args"], ui, resend_last_TC=False)
 
-        current_step += 1
+            elif step["keyword"] == "wait_tm":
+                ui.clear_last_TM_buffer()
+                ui.buffer_layout.insert_line(
+                    f"Scenario mode: waiting for <tm>{step['TM_tag']}</tm> for <data>{step['timeout']}s</data> max"
+                )
+                info_message = float_window.InfoDialog(
+                    "Scenario Mode",
+                    f"Step {current_step}/{step_count}: \n    Type: wait for {step['TM_tag']} for {step['timeout']}s",
+                    ui.root_container,
+                )
+                get_app().invalidate()
 
+                TM_received = ui.wait_for_TM(timeout=step["timeout"])
+
+                info_message.remove_dialog_as_float(ui.root_container)
+
+                if not TM_received:
+                    ui.buffer_layout.insert_line(
+                        f"<error>Error:</error> {step['TM_tag']} was not received."
+                    )
+                    error = True
+                    break
+
+                elif TM_received["tag"] != step["TM_tag"].split("-")[1]:
+                    ui.buffer_layout.insert_line(
+                        f"<error>Error:</error> Received {TM_received}. Was expecting {step['TM_tag']}"
+                    )
+                    error = True
+                    break
+
+            elif step["keyword"] in ("app", "golden"):
+                try:
+                    with open(step["file"], "rb", buffering=0) as f:
+                        data = f.readall()
+
+                        upload_type = (
+                            "Application" if step["keyword"] == "app" else "Golden"
+                        )
+                        call_from_executor(
+                            lambda: asyncio.ensure_future(
+                                upload_hex(ui, data, upload_type, from_scenario=True)
+                            )
+                        )
+                        while not ui.done_uploading:
+                            sleep(0.1)
+
+                        # ui.buffer_layout.insert_line(str(ui.done_uploading))
+                        if ui.done_uploading == "error":
+                            error = True
+                            break
+
+                        ui.done_uploading = False
+
+                except IOError as e:
+                    float_window.show_message(
+                        "Error", "{}".format(e), ui.root_container
+                    )
+                    get_app().invalidate()
+                    error = True
+                    break
+
+            current_step += 1
 
     if args.quit_after_scenario:
         ui.application.exit()
 
-
     if not error:
         float_window.show_message("Scenario Mode", "Scenario done.", ui.root_container)
+        
     else:
-        float_window.show_message("Scenario Mode", "Error in scenario !", ui.root_container)
-
-
+        float_window.show_message(
+            "Scenario Mode", "Error in scenario !", ui.root_container
+        )
+    
+    get_app().invalidate()
 

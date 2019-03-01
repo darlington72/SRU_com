@@ -21,6 +21,7 @@ from prompt_toolkit.eventloop import (
 import src.serial_com as serial_com
 import src.scenario as scenario
 from src.lib import BD_TM, BD_TC
+from src.args import args
 
 
 class TextInputDialog(object):
@@ -113,10 +114,17 @@ def open_scenario(ui, path, on_startup=False):
 
             scenario_parsed = scenario.parse_scenario(scenario_file)
 
-            run_in_executor(
-                lambda: serial_com.play_scenario(ui, scenario_parsed, on_startup),
-                _daemon=True,
-            )
+            if args.check_only:
+                show_message(
+                    "Scenario Mode", "Scenario's syntax is OK.", ui.root_container
+                )
+                get_app().invalidate()
+
+            else:
+                run_in_executor(
+                    lambda: serial_com.play_scenario(ui, scenario_parsed, on_startup),
+                    _daemon=True,
+                )
 
     except (ValueError, IOError) as e:
 

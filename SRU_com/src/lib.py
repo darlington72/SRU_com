@@ -31,6 +31,13 @@ except FileNotFoundError:
     print("BDTC file not found.")
     sys.exit()
 
+# If SRU_com is launched with the flag -f or --file
+# we open a file and write every TM/TC into it
+if args.file:
+    file_ = open(args.file + ".txt", mode="a")
+else:
+    file_ = None
+
 
 def compute_CRC(frame):
     crc_poly = 0xD5
@@ -74,15 +81,14 @@ def format_frame(*frame):
     return formatted_frame
 
 
-def write_to_file(file_, data, type):
+def write_to_file(text):
     if file_ is not None:
+        file_.write(text)
 
-        file_.write(
-            datetime.datetime.now().strftime("%H:%M:%S.%f")[:-4]
-            + f" ## {type} ## "
-            + data
-            + "\n"
-        )
+
+def close_file():
+    if file_ is not None:
+        file_.close()
 
 
 class SerialTest:
