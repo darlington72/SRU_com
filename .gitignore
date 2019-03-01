@@ -9,6 +9,7 @@ specs.txt
 *.code-workspace
 settings.json
 dev/
+test/
 # C extensions
 *.so
 *.dist
