@@ -15,9 +15,9 @@ except FileNotFoundError:
 
 try:
     if args.test or args.loop:
-        BD_TM_file = open("BD/BDTC.json", "r")
+        BD_TM_file = open(conf["BD_path"]["TC"], "r")
     else:
-        BD_TM_file = open("BD/BDTM.json", "r")
+        BD_TM_file = open(conf["BD_path"]["TM"], "r")
 
     BD_TM = json.load(BD_TM_file)
 except FileNotFoundError:
@@ -25,7 +25,7 @@ except FileNotFoundError:
     sys.exit()
 
 try:
-    BD_TC_file = open("BD/BDTC.json", "r")
+    BD_TC_file = open(conf["BD_path"]["TC"], "r")
     BD_TC = json.load(BD_TC_file)
 except FileNotFoundError:
     print("BDTC file not found.")

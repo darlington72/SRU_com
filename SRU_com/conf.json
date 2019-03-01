@@ -1,4 +1,8 @@
 {
+    "BD_path": {
+        "TC": "../BD/BDTC.json",
+        "TM": "../BD/BDTM.json"
+    },
     "COM": {
         "port": "ttyUSB0",
         "baudrate": "57600",
