@@ -713,3 +713,5 @@ def play_scenario(ui, scenario, on_startup):
 
     float_window.show_message("Scenario Mode", "Scenario done.", ui.root_container)
 
+    if args.quit_after_scenario:
+        ui.application.exit()

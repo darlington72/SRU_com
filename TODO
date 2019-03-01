@@ -20,9 +20,9 @@ Todo:
   ☐ work on sockets
   ✔ work on scenario @done(19-02-28 17:57)
   ✔ invalid keyword without arg @done(19-03-01 10:17)
-  ☐ add comment 
+  ✔ add comment @done(19-03-01 10:45)
   ☐ BD in ../
-  ☐ quit at the end on demand 
+  ✔ quit at the end on demand @done(19-03-01 10:54)
   ☐ wait tm timeout 
   ☐ upload auto 
   ☐ check scenario 
