@@ -76,7 +76,6 @@ def do_upload_hex(ui, upload_type):
                     # thread_upload = threading.Thread(
                     #     target=serial_com.upload_hex, args=(ui, data)
                     # )
-                    # thread_upload.start()
                     # serial_com.upload_hex(ui, data, upload_type)
                     asyncio.ensure_future(serial_com.upload_hex(ui, data, upload_type))
 
@@ -115,7 +114,8 @@ def open_scenario(ui, path, on_startup=False):
             scenario_parsed = scenario.parse_scenario(scenario_file)
 
             run_in_executor(
-                lambda: serial_com.play_scenario(ui, scenario_parsed, on_startup)
+                lambda: serial_com.play_scenario(ui, scenario_parsed, on_startup),
+                _daemon=True,
             )
 
     except (ValueError, IOError) as e:

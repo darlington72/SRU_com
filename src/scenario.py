@@ -39,89 +39,94 @@ def parse_scenario(scenario_file):
 
     scenario = []
     for element in scenario_list:
-        keyword, argument = element.split(" ", maxsplit=1)
+        try:
+            keyword, argument = element.split(" ", maxsplit=1)
+        except ValueError:
+            raise ValueError(f'Missing argument after keyword "{element}"')
 
         if keyword not in KEYWORDS:
             raise ValueError(f'Invalid keyword "{keyword}"')
 
-        elif keyword != "//":
-            # If line is not a comment
+        # If line is a comment
+        if keyword == "//":
+            scenario.append({"keyword": "//", "comment": argument})
 
-            #### Syntax verification
-            if keyword == "wait":
-                if len(argument.split(" ")) != 1:
-                    raise ValueError(f'Need exactly one argument "{argument}"')
-                else:
-                    argument = argument.strip("s")
+        #### Syntax verification
 
-                    try:
-                        argument = int(argument)
-                    except ValueError:
-                        raise ValueError(f'Argument must be an int "{argument}""')
+        elif keyword == "wait":
+            if len(argument.split(" ")) != 1:
+                raise ValueError(f'Need exactly one argument "{argument}"')
+            else:
+                argument = argument.strip("s")
 
-                scenario.append({"keyword": keyword, "argument": argument})
-
-            elif keyword == "send":
-                scenario_TC_tag, *scenario_TC_args = argument.split(" ", maxsplit=1)
-
-                if len(scenario_TC_args) > 0:
-                    scenario_TC_args = scenario_TC_args[0].split(",")
-                    scenario_TC_args = list(map(str.strip, scenario_TC_args))
-
-                    # Check if arguments are all hex
-                    try:
-                        list(map(lambda x: int(x, 16), scenario_TC_args))
-                    except ValueError:
-                        raise ValueError(
-                            f'Non hexadecimal value in args "{scenario_TC_args}"'
-                        )
-
-                # Check if the TC exits
                 try:
-                    TC = BD_TC[scenario_TC_tag]
-                except KeyError:
-                    raise ValueError(f'TC does not exist in BD "{scenario_TC_tag}"')
-                else:
+                    argument = int(argument)
+                except ValueError:
+                    raise ValueError(f'Argument must be an int "{argument}""')
 
-                    # Check if each TC_args has an argument in the scenario
-                    # Check also argument length
-                    argument_pointer = 0
-                    for BD_TC_args in TC["data"]:
-                        try:
-                            param_size = int(BD_TC_args[0])
-                            param_name = BD_TC_args[1]
-                            param_value = BD_TC_args[2]
-                        except (IndexError, ValueError):
-                            pass
-                        else:
+            scenario.append({"keyword": keyword, "argument": argument})
 
-                            if param_value == "?":
+        elif keyword == "send":
+            scenario_TC_tag, *scenario_TC_args = argument.split(" ", maxsplit=1)
 
-                                try:
-                                    scenario_TC_arg = (
-                                        scenario_TC_args[argument_pointer]
-                                        .zfill(2 * param_size)
-                                        .upper()
-                                    )
-                                except IndexError:
+            if len(scenario_TC_args) > 0:
+                scenario_TC_args = scenario_TC_args[0].split(",")
+                scenario_TC_args = list(map(str.strip, scenario_TC_args))
+
+                # Check if arguments are all hex
+                try:
+                    list(map(lambda x: int(x, 16), scenario_TC_args))
+                except ValueError:
+                    raise ValueError(
+                        f'Non hexadecimal value in args "{scenario_TC_args}"'
+                    )
+
+            # Check if the TC exits
+            try:
+                TC = BD_TC[scenario_TC_tag]
+            except KeyError:
+                raise ValueError(f'TC does not exist in BD "{scenario_TC_tag}"')
+            else:
+
+                # Check if each TC_args has an argument in the scenario
+                # Check also argument length
+                argument_pointer = 0
+                for BD_TC_args in TC["data"]:
+                    try:
+                        param_size = int(BD_TC_args[0])
+                        param_name = BD_TC_args[1]
+                        param_value = BD_TC_args[2]
+                    except (IndexError, ValueError):
+                        pass
+                    else:
+
+                        if param_value == "?":
+
+                            try:
+                                scenario_TC_arg = (
+                                    scenario_TC_args[argument_pointer]
+                                    .zfill(2 * param_size)
+                                    .upper()
+                                )
+                            except IndexError:
+                                raise ValueError(
+                                    f'Missing value for parameter "{param_name}" of {scenario_TC_tag}'
+                                )
+                            else:
+                                if len(scenario_TC_arg) > 2 * param_size:
                                     raise ValueError(
-                                        f'Missing value for parameter "{param_name}" of {scenario_TC_tag}'
+                                        f'Argument too long "{scenario_TC_arg}"'
                                     )
-                                else:
-                                    if len(scenario_TC_arg) > 2 * param_size:
-                                        raise ValueError(
-                                            f'Argument too long "{scenario_TC_arg}"'
-                                        )
 
-                            argument_pointer += 1
+                        argument_pointer += 1
 
-                scenario.append(
-                    {
-                        "keyword": keyword,
-                        "TC_tag": scenario_TC_tag,
-                        "TC_args": scenario_TC_args,
-                    }
-                )
+            scenario.append(
+                {
+                    "keyword": keyword,
+                    "TC_tag": scenario_TC_tag,
+                    "TC_args": scenario_TC_args,
+                }
+            )
 
     return scenario
 

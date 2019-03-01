@@ -9,11 +9,18 @@ import asyncio
 from queue import Empty
 import queue
 import datetime
+import sys
 
 # Prompt_toolkit
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit import HTML
-from prompt_toolkit.eventloop import Future, ensure_future, Return, From, call_from_executor
+from prompt_toolkit.eventloop import (
+    Future,
+    ensure_future,
+    Return,
+    From,
+    call_from_executor,
+)
 
 # Project
 import src.lib as lib
@@ -96,6 +103,7 @@ def serial_com_TM(ui):
     """
 
     first_frame = True
+
     while True:
 
         # Looking for sync word
@@ -236,7 +244,6 @@ def serial_com_TM(ui):
                                 )
                                 pointer = pointer + field_length
 
-
                     ui.buffer_layout.insert_line(buffer_feed)
                     # call_from_executor(lambda: ui.buffer_layout.insert_line(buffer_feed))
                     lib.write_to_file(
@@ -246,7 +253,7 @@ def serial_com_TM(ui):
                         + tag
                         + "".join(data)
                         + CRC,
-                        'TM'
+                        "TM",
                     )
                     # if last tm was not read, we clear it
                     if not ui.last_TM.full():
@@ -282,7 +289,7 @@ def serial_com_watchdog(ui):
             with ui.lock:
                 ui.ser.write(frame_to_be_sent_bytes)
 
-            lib.write_to_file(ui.file_, frame_to_be_sent_str, 'TC')
+            lib.write_to_file(ui.file_, frame_to_be_sent_str, "TC")
 
             # UI
             ui.watchdog_cleared_buffer.text = "      Watchdog Cleared"
@@ -319,7 +326,7 @@ def send_TC(TC_id, TC_data, ui, resend_last_TC=False):
                         sleep(conf["COM"]["delay_inter_byte"])
 
                 ui.buffer_layout.insert_line(buffer_feed)
-                lib.write_to_file(ui.file_, frame_to_be_sent_str, 'TC')
+                lib.write_to_file(ui.file_, frame_to_be_sent_str, "TC")
 
         last_TC_upload_hex = ui.last_TC_sent["hex_upload"]
         last_TC_hex = ui.last_TC_sent["hex_file"]
@@ -345,7 +352,7 @@ def send_TC(TC_id, TC_data, ui, resend_last_TC=False):
 
         with ui.lock:
             if conf["COM"]["delay_inter_byte"] == 0 or args.socket:
-                    ui.ser.write(frame_to_be_sent_bytes)
+                ui.ser.write(frame_to_be_sent_bytes)
             else:
                 for key, int_ in enumerate(frame_to_be_sent_bytes):
                     ui.ser.write([int_])
@@ -369,9 +376,7 @@ def send_TC(TC_id, TC_data, ui, resend_last_TC=False):
         ui.buffer_layout.insert_line(buffer_feed)
         # call_from_executor(lambda: ui.buffer_layout.insert_line(buffer_feed))
 
-        lib.write_to_file(
-            ui.file_, frame_to_be_sent_str, "TC"
-        )
+        lib.write_to_file(ui.file_, frame_to_be_sent_str, "TC")
 
         # Let's save this TC in case user wants to resend it
         ui.last_TC_sent["frame_bytes"] = frame_to_be_sent_bytes
@@ -488,7 +493,7 @@ async def upload_hex(ui, data, upload_type=None):
 
         await asyncio.sleep(0.005)
         data = data.split("\n")
-        
+
         ui.add_data_to_raw_window_enabled = False
         for line in data:
             if line:
@@ -520,8 +525,8 @@ async def upload_hex(ui, data, upload_type=None):
                     else:
                         sleep(conf["hex_upload"]["delay_inter_line"])
 
-        ui.add_data_to_raw_window_enabled = True 
-        
+        ui.add_data_to_raw_window_enabled = True
+
         # CRC calculation
         CRC_calculated = lib.compute_CRC_hex(data, ui).zfill(2)
         ui.buffer_layout.insert_line(
@@ -656,52 +661,55 @@ async def upload_hex(ui, data, upload_type=None):
         if watchdog_value:
             ui.watchdog_radio.set_value(1)
 
+
 def play_scenario(ui, scenario, on_startup):
     # ui.buffer_layout.insert_line(
     #     str(scenario)
     # )
 
-    # If scenario was called on startup, 
-    # let's wait for the UI to draw itself 
+    # If scenario was called on startup,
+    # let's wait for the UI to draw itself
+
     if on_startup:
         info_message = float_window.InfoDialog(
-                "Scenario Mode", 
-                f"Scenario mode launched on startup..", 
-                ui.root_container
-            )
+            "Scenario Mode", f"Scenario mode launched on startup..", ui.root_container
+        )
         get_app().invalidate()
         sleep(2)
         info_message.remove_dialog_as_float(ui.root_container)
-
-
 
     step_count = len(scenario)
     current_step = 1
 
     for step in scenario:
 
-        if step['keyword'] == "wait":
-            ui.buffer_layout.insert_line(f"Scenario mode: waiting <data>{step['argument']}s</data>")
+        if step["keyword"] == "//":
+            # If step is a comment, we print it to the TM/TC feed
+            ui.buffer_layout.insert_line(f"Scenario mode: {step['comment']}")
+
+        elif step["keyword"] == "wait":
+            ui.buffer_layout.insert_line(
+                f"Scenario mode: waiting <data>{step['argument']}s</data>"
+            )
 
             info_message = float_window.InfoDialog(
-                "Scenario Mode", 
-                f"Step {current_step}/{step_count}: \n    Type: wait {step['argument']}s", 
-                ui.root_container
+                "Scenario Mode",
+                f"Step {current_step}/{step_count}: \n    Type: wait {step['argument']}s",
+                ui.root_container,
             )
             get_app().invalidate()
 
-            sleep(step['argument'])
+            sleep(step["argument"])
             info_message.remove_dialog_as_float(ui.root_container)
 
+        elif step["keyword"] == "send":
+            ui.buffer_layout.insert_line(
+                f"Scenario mode: sending <tc>{step['TC_tag']}</tc> with args <data>{step['TC_args']}</data>"
+            )
 
-        elif step['keyword'] == "send":
-            ui.buffer_layout.insert_line(f"Scenario mode: sending <tc>{step['TC_tag']}</tc> with args <data>{step['TC_args']}</data>")
-            
-            send_TC(step['TC_tag'], step['TC_args'], ui, resend_last_TC=False)
+            send_TC(step["TC_tag"], step["TC_args"], ui, resend_last_TC=False)
 
         current_step += 1
-    
-    float_window.show_message(
-        "Scenario Mode", "Scenario done.", ui.root_container
-    )
+
+    float_window.show_message("Scenario Mode", "Scenario done.", ui.root_container)
 

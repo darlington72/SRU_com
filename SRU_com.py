@@ -73,6 +73,7 @@ if __name__ == "__main__":
     # thread2.start()
 
     # Finally, lets launch the UI
+
     ui.run_app()
 
     # Closing the file

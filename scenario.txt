@@ -1,5 +1,5 @@
 send TC-00
-// comment
+// I am a comment, don't mind me
 wait 1
 send TC-82
 wait 4s
