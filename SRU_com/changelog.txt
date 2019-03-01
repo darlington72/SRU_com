@@ -1,7 +1,8 @@
 Version 1.6.0 - 19-03-01
 - Added scenario mode
 - Fixed delay inter byte when it is equal to 0
-
+- Upgraded prompt-toolkit
+- Changed folder tree 
 
 
 ---------------------------------
