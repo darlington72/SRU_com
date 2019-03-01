@@ -3,7 +3,7 @@ import version
 
 # Args parser
 parser = argparse.ArgumentParser(
-    description="SRU Com " + version.__version__, prog="SRU_com"
+    description="SRU Communication Software V" + version.__version__, prog="SRU_com"
 )
 parser.add_argument(
     "--version", action="version", version="%(prog)s " + version.__version__
@@ -30,9 +30,9 @@ test_group.add_argument(
     "-t",
     "--test",
     action="store_true",
-    help="Start in test mode (serial loop simulation)",
+    help="Start in test mode (no UART nor SRU needed)",
 )
-test_group.add_argument("-l", "--loop", action="store_true", help="Serial loop mode")
+test_group.add_argument("-l", "--loop", action="store_true", help="Serial loop mode (TX -> RX: no SRU needed)")
 
 parser.add_argument(
     "-U", "--update", dest="update", action="store_true", help="Update SRU_com "

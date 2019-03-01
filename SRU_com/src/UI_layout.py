@@ -190,7 +190,7 @@ class UI:
                             credit,
                         ],
                         height=D(),
-                        width=30,
+                        width=35,
                     ),
                     verticalline1,
                     HSplit([TM_window, horizontal_line, self.raw_serial_window]),
