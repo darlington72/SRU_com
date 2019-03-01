@@ -1,5 +1,5 @@
 from distutils.dir_util import copy_tree
-
+from pathlib import Path
 import json
 import sys
 import tarfile
@@ -8,7 +8,7 @@ import os
 import shutil
 from tqdm import tqdm
 import requests
-
+import sys
 from version import __version__
 
 
@@ -23,7 +23,7 @@ COMMANDS = {
     "run": (97, "[~] "),
 }
 
-CURRENT_DIR = sys.path[0]
+CURRENT_DIR = Path(sys.path[0]).parent
 
 
 def print_c(string, message_type, endline=True):
