@@ -229,8 +229,8 @@ class UI:
 
         @self.bindings.add("c-p", eager=True)
         def clear_TMTC_feed(event):
-            self.buffer_layout.set_document(Document(text=""))
-            self.raw_serial_buffer.set_document(Document(text=""))
+            self.buffer_layout.set_document(Document(text=""), bypass_readonly=True)
+            self.raw_serial_buffer.set_document(Document(text=""), bypass_readonly=True)
 
         def after_render(_):
             if args.scenario:
@@ -278,7 +278,8 @@ class UI:
     def add_data_to_raw_window(self, data, type):
 
         window_size = (
-            self.raw_serial_window.current_width * self.raw_serial_window.height
+            self.raw_serial_window.render_info.window_width
+            * self.raw_serial_window.height
         )
 
         if self.raw_serial_buffer.text_len > window_size:

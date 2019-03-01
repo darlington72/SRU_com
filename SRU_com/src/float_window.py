@@ -263,7 +263,7 @@ class InfoDialog(object):
 
         app = get_app()
 
-        app.layout.focus(dialog)
+        # app.layout.focus(dialog)
 
     def remove_dialog_as_float(self, root_container):
         if self.float_ in root_container.floats:

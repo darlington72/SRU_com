@@ -71,7 +71,9 @@ class Buffer_(Buffer):
             time_tag = "\n" + time_tag
 
         # self.text += time_tag + data
-        self.set_document(self.document.insert_after(time_tag + data))
+        self.set_document(
+            self.document.insert_after(time_tag + data), bypass_readonly=True
+        )
 
         if not get_app().layout.has_focus(self):
             pass
