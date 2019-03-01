@@ -58,7 +58,7 @@ def update():
 
                 print_c("Backing up current version to tar file..", "run")
 
-                backup_dir = "backups"
+                backup_dir = "../backups"
                 if not os.path.exists(backup_dir):
                     os.makedirs(backup_dir)
                 current_date = datetime.now().strftime("%Y-%m-%d")
