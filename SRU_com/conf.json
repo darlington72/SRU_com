@@ -17,7 +17,7 @@
     "socket": {
         "host": "192.168.1.20",
         "client": "192.168.1.10",
-        "port_TC": 49153,
+        "port_TC": 11006,
         "port_TM": 11005
     },
     "debug": "True",
