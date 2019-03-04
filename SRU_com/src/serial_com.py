@@ -60,13 +60,16 @@ def look_for_sync_words(ui, first_frame):
 
     while True:
         first_byte = ui.ser.read(1).hex()
-        # ui.buffer_layout.insert_line(f"{first_byte} \n")
+        # ui.buffer_layout.insert_line(f"Premier {first_byte}")
 
         if first_byte in HEADER_DEF[0].keys():
+            # ui.buffer_layout.insert_line(f"En attente second")
+
             # We set the timeout for the frame
             ui.ser.timeout = conf["COM"]["timeout"]
 
             second_byte = ui.ser.read(1).hex()
+            # ui.buffer_layout.insert_line(f"Second {second_byte}")
 
             if len(str(second_byte)) < 1:
                 # Timeout occured after syncword reception

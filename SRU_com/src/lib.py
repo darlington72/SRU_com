@@ -129,6 +129,8 @@ class SerialSocket:
         self.socket_port = conf["socket"]["port"]
         self.socket_client = conf["socket"]["client"]
 
+        self.buffer = Queue()
+
         try:
             self.socket.bind((self.socket_host, self.socket_port))
         except socket.error:
@@ -142,11 +144,22 @@ class SerialSocket:
             self.socket.sendto(bytes([data]), (self.socket_client, self.socket_port))
         else:
             # for i in data:
-            print(f"sent {data}")
+            # print(f"sent {data}")
             self.socket.sendto(data, (self.socket_client, self.socket_port))
 
     def read(self, size=1) -> bytearray:
-        print(f"read called with size {size}")
-        data = self.socket.recv(size)
-        print(data)
+        # print(f"read called with size {size}")
+
+
+        if self.buffer.empty():
+        
+            data = self.socket.recv(4096)
+            for byte in data:
+                self.buffer.put(byte)
+
+
+        data = bytearray()
+        for _ in range(size):
+            data += bytearray([self.buffer.get()])
+
         return data

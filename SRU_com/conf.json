@@ -12,7 +12,7 @@
     "socket": {
         "host": "localhost",
         "client": "localhost",
-        "port": 11000
+        "port": 11005
     },
     "debug": "True",
     "TC_watchdog_tag": "01",
