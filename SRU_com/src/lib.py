@@ -124,15 +124,15 @@ class SerialSocket:
     def __init__(self):
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket_host = conf["socket"]["host"]
-        self.socket_port = conf["socket"]["port"]
+        self.socket_port_TC = conf["socket"]["port_TC"]
+        self.socket_port_TM = conf["socket"]["port_TM"]
         self.socket_client = conf["socket"]["client"]
 
         self.buffer = Queue()
 
         try:
-            self.socket.bind((self.socket_host, self.socket_port))
+            self.socket.bind((self.socket_host, self.socket_port_TM))
         except socket.error:
             print(
                 "Error while trying to launch socket server. Please check ethernet configuration"
@@ -141,15 +141,12 @@ class SerialSocket:
 
     def write(self, data):
         if isinstance(data, int):
-            self.socket.sendto(bytes([data]), (self.socket_client, self.socket_port))
+            self.socket.sendto(bytes([data]), (self.socket_client, self.socket_port_TC))
         else:
-            # for i in data:
-            # print(f"sent {data}")
-            self.socket.sendto(data, (self.socket_client, self.socket_port))
+            self.socket.sendto(data, (self.socket_client, self.socket_port_TC))
 
     def read(self, size=1) -> bytearray:
         # print(f"read called with size {size}")
-
 
         if self.buffer.empty():
         
