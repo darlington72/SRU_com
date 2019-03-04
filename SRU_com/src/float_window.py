@@ -76,8 +76,9 @@ def do_upload_hex(ui, upload_type):
                 with open(path, "rb", buffering=0) as f:
                     data = f.readall()
                     # thread_upload = threading.Thread(
-                    #     target=serial_com.upload_hex, args=(ui, data)
+                    #     target=serial_com.upload_hex, args=(ui, data, upload_type)
                     # )
+                    # thread_upload.start()
                     # serial_com.upload_hex(ui, data, upload_type)
                     asyncio.ensure_future(serial_com.upload_hex(ui, data, upload_type))
 
