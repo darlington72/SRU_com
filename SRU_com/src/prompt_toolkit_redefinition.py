@@ -70,7 +70,8 @@ class Buffer_(Buffer):
             time_tag = ""
 
         if newline:
-            time_tag = "\n" + time_tag
+            # time_tag = "\n" + time_tag
+            data += "\n"
 
         self.set_document(
             self.document.insert_after(time_tag + data), bypass_readonly=True
@@ -78,6 +79,7 @@ class Buffer_(Buffer):
 
         if not get_app().layout.has_focus(self):
             self.auto_down_end()
+            self.auto_up()
 
         if write_to_file:
             lib.file_logging.write(self.clean_tag(time_tag + data))

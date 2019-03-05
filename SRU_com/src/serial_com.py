@@ -112,8 +112,7 @@ def serial_com_TM(ui):
         if first_frame:
             ui.buffer_layout.insert_line(
                 "<waiting_sync>Waiting for sync word...</waiting_sync>",
-                with_time_tag=False,
-                newline=False,
+                with_time_tag=False
             )
 
         sync_word = look_for_sync_words(ui, first_frame)

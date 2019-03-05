@@ -4,7 +4,7 @@
 usage: SRU_com [-h] [--version] [-f [FILE_NAME]] [-w] [-v] [-t] [-l] [-U]
                [-s [FILE_NAME]] [-q] [--check_only] [-S]
 
-SRU Com 1.6.0
+SRU Communication Software V1.7.0
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -17,8 +17,8 @@ optional arguments:
   -S, --socket          Start in socket mode
 
 Test / Simulation:
-  -t, --test            Start in test mode (serial loop simulation)
-  -l, --loop            Serial loop mode
+  -t, --test            Start in test mode (no UART nor SRU needed)
+  -l, --loop            Serial loop mode (TX -> RX: no SRU needed)
 
 Scenario Mode:
   -s [FILE_NAME], --scenario [FILE_NAME]
@@ -26,7 +26,6 @@ Scenario Mode:
   -q, --quit_after_scenario
                         Quit SRU_com after scenario is played
   --check_only          Check scenario syntax only
-
 ```
 
 

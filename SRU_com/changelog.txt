@@ -1,5 +1,6 @@
 Version 1.7.0 - 19-03-05
 - Added socket mode
+- Code cleanning 
 
 ---------------------------------
 Version 1.6.0 - 19-03-01

@@ -29,16 +29,16 @@ Todo:
   ✔ check scenario @done(19-03-01 13:35)
   ✔ upload auto @done(19-03-01 14:43)
   ✔ work on sockets @done(19-03-04 13:12)
-  ☐ Fix \n in log 
+  ✔ Fix \n in log @done(19-03-05 16:09)
 
 
 
 
 
 Todo before new release: 
-  ✔ Update changelog @done(19-03-01 16:16)
+  ✔ Update changelog @done(19-03-05 16:11)
   ✔ Update version @done(19-03-01 16:17)
-  ✔ Update README @done(19-03-01 16:18)
+  ✔ Update README @done(19-03-05 16:11)
   ☐ Commit
   ☐ Create tag
   ☐ Push with tags
