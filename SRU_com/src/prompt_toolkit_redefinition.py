@@ -58,36 +58,21 @@ class Buffer_(Buffer):
                 + datetime.datetime.now().strftime("%H:%M:%S.%f")[:-4]
                 + "</grey>: "
             )
-            # datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-4]
         else:
             time_tag = ""
 
         if newline:
-            # cursor = self.cursor_position
-            # self.cursor_position = len(self.text)
-            # self.insert_line_below(copy_margin=False)
-            # self.cursor_position = cursor
-            # self.text += "\n"
             time_tag = "\n" + time_tag
 
-        # self.text += time_tag + data
         self.set_document(
             self.document.insert_after(time_tag + data), bypass_readonly=True
         )
 
         if not get_app().layout.has_focus(self):
-            pass
             self.auto_down_end()
-            # Buggy:
-            # self.cursor_position = len(self.text) - 1
-            # Also buggy:
-            # self.cursor_position = len(self.text) - len(time_tag + data)
-
-            # One empty line and buggy:
-            # self.cursor_position = len(self.text)
 
         if write_to_file:
-            lib.write_to_file(self.clean_tag(time_tag + data))
+            lib.file_logging.write(self.clean_tag(time_tag + data))
 
     def auto_down_end(self):
         while self.document.cursor_position_row < self.document.line_count - 1:
