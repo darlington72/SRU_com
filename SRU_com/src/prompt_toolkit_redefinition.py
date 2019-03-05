@@ -1,3 +1,11 @@
+""" prompt_toolkit_redefinition.py
+
+prompt-toolkit is the python library used for dealing 
+with SRU_com UI 
+
+Some of the method needed of that library to be rewritten to better suit 
+the need of SRU_com 
+"""
 import datetime
 import six
 import xml

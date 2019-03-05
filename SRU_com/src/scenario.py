@@ -1,3 +1,8 @@
+"""scenario.py
+
+Scenario parsing 
+"""
+
 from src.lib import BD_TC, BD_TM
 
 
@@ -22,10 +27,10 @@ def parse_scenario(scenario_file):
 
     KEYWORDS = ("send", "sleep", "//", "wait_tm", "app", "golden")
 
-    ex = [
-        {"keyword": "send", "argument": "TC-88"},
-        {"keyword": "send", "argument": "TC-88 FF, AA"},
-    ]
+    # example = [
+    #     {"keyword": "send", "argument": "TC-88"},
+    #     {"keyword": "send", "argument": "TC-88 FF, AA"},
+    # ]
 
     # Delete whitespace, trailing space etc
     scenario_file = scenario_file.strip()
@@ -37,15 +42,19 @@ def parse_scenario(scenario_file):
     # each element of the list this time
     scenario_list = list(map(str.strip, scenario_list))
 
+    # Hold the list that will be returned by the function 
     scenario = []
+
     for element in scenario_list:
         if element != "":
             try:
                 keyword, argument = element.split(" ", maxsplit=1)
             except ValueError:
+                # Case of a keyword without any arguments
                 keyword = element
             #     raise ValueError(f'Missing argument after keyword "{element}"')
 
+            # Invalid keyword 
             if keyword not in KEYWORDS:
                 raise ValueError(f'Invalid keyword "{keyword}"')
 
@@ -59,18 +68,22 @@ def parse_scenario(scenario_file):
                 if len(argument.split(" ")) != 1:
                     raise ValueError(f'Need exactly one argument "{argument}"')
                 else:
+                    # We remove the unit to only keep the sleep duration 
                     argument = argument.strip("s")
 
+                    # Let's check if the argument is a int and not a float for eg 
                     try:
                         argument = int(argument)
                     except ValueError:
                         raise ValueError(f'Argument must be an int "{argument}""')
 
+                # Everything is ok, we can add the line to the scenario list
                 scenario.append({"keyword": keyword, "argument": argument})
 
             elif keyword == "send":
                 scenario_TC_tag, *scenario_TC_args = argument.split(" ", maxsplit=1)
-
+                
+                # If there's more than one argument, we split them and remove any trailing space
                 if len(scenario_TC_args) > 0:
                     scenario_TC_args = scenario_TC_args[0].split(",")
                     scenario_TC_args = list(map(str.strip, scenario_TC_args))
@@ -149,7 +162,8 @@ def parse_scenario(scenario_file):
                 except KeyError:
                     raise ValueError(f'TM does not exist in BD "{scenario_TM_tag}"')
                 else:
-
+                
+                    # Everything is ok, we can add the line to the scenario list
                     scenario.append(
                         {
                             "keyword": keyword,
@@ -161,12 +175,14 @@ def parse_scenario(scenario_file):
             elif keyword in ("app", "golden"):
                 if len(argument.split(" ")) != 1:
                     raise ValueError(f'Need exactly one argument "{argument}"')
-
+                
+                # Everything is ok, we can add the line to the scenario list
                 scenario.append({"keyword": keyword, "file": argument})
 
     return scenario
 
 
+# Standalone test 
 if __name__ == "__main__":
     import json
     import sys

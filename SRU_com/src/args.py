@@ -1,3 +1,8 @@
+"""args.py
+
+Compute every flags passed to SRU_com on startup into the args object
+"""
+
 import argparse
 import version
 

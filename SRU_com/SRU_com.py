@@ -1,9 +1,14 @@
+""" SRU_com.py
+
+Entry file for SRU_com 
+"""
 import threading
 import sys
 import serial
 from prompt_toolkit import HTML
 
 # Custom lib
+import src.serial_replacement as serial_replacement
 import src.lib as lib
 import src.serial_com as serial_com
 import src.UI_layout as UI_layout
@@ -23,13 +28,13 @@ if __name__ == "__main__":
 
     # Serial
     if args.test:
-        ser = lib.SerialTest()
+        ser = serial_replacement.SerialTest()
         ser.test = True
         # !! Warning !!
         # When using serial test (or uart loop), if there's an error in the length of a TM/TC in the BD, SRU_com will be stuck in
         # a infinite loop because there's no timeout on reception
     elif args.socket:
-        ser = lib.SerialSocket()
+        ser = serial_replacement.SerialSocket()
         ser.test = False
     else:
 

@@ -1,6 +1,6 @@
 """serial_com.py
 
-Handles the serial communication with SRU.
+Handles the communication with SRU.
 """
 
 from time import sleep

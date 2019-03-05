@@ -1,3 +1,8 @@
+"""tools.py
+
+Tools definition
+"""
+
 from prompt_toolkit import print_formatted_text
 
 import src.float_window as float_window

@@ -1,3 +1,7 @@
+"""UI_layout.py
+
+In this file we define the UI layout of SRU_com 
+"""
 import binascii
 import sys
 import serial

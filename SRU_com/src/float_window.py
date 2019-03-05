@@ -1,3 +1,9 @@
+""" float_window.py
+
+This file defines all the function used to deal with floating window 
+like the one used in scenario and hex upload mode. 
+"""
+
 import threading
 import sys
 import asyncio
@@ -25,6 +31,11 @@ from src.args import args
 
 
 class TextInputDialog(object):
+    """Defines a floating window 
+    that accept text input 
+    
+    """
+
     def __init__(self, title="", label_text="", completer=None):
         self.future = Future()
 

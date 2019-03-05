@@ -1,3 +1,7 @@
+""" update.py
+
+Update routine of SRU_com 
+"""
 from distutils.dir_util import copy_tree
 from pathlib import Path
 import json
