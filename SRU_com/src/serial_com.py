@@ -51,7 +51,8 @@ def look_for_sync_words(ui, first_frame):
     of a new frame
     
     Arguments:
-        ser -- serial handler
+        ui -- UI instance
+        first_frame {bool} -- Whether it is the first frame or not 
 
     
     Returns:
@@ -101,8 +102,6 @@ def serial_com_TM(ui):
     
     Arguments:
         ui   -- UI instance
-        ser  -- Serial instance
-        lock -- Thread lock
     """
 
     first_frame = True
@@ -261,8 +260,6 @@ def serial_com_watchdog(ui):
     
     Arguments:
         ui   -- UI instance
-        ser  -- Serial instance
-        lock -- Thread lock
     """
 
     watchdog_TC_tag = conf["TC_watchdog_tag"]
@@ -284,7 +281,7 @@ def serial_com_watchdog(ui):
             with ui.lock:
                 ui.ser.write(frame_to_be_sent_bytes)
 
-            # UI
+            # Blinking text in the UI 
             ui.watchdog_cleared_buffer.text = "      Watchdog Cleared"
             sleep(0.500)
             ui.watchdog_cleared_buffer.text = ""
@@ -301,8 +298,6 @@ def send_TC(TC_id, TC_data, ui, resend_last_TC=False):
     Arguments:
         TC_data {list} -- List of string, each element is a TC parameter 
         ui   -- UI instance
-        ser  -- Serial instance
-        lock -- Thread lock
         resend_last_TC -- True if send_TC was called by <ctrl> + R
     """
 
@@ -391,9 +386,9 @@ async def upload_hex(ui, data, upload_type=None, from_scenario=False):
     Called by do_upload_hex()
     
     Arguments:
-        ui {[type]} -- [description]
-        ser {[type]} -- [description]
-        data {[type]} -- [description]
+        ui  -- UI instance
+        data {str} -- Data to be upload 
+        upload_type {"Golden" || "Application"} -- Whether it is a golden or app upload
     """
 
     error = False
@@ -656,6 +651,14 @@ async def upload_hex(ui, data, upload_type=None, from_scenario=False):
 
 
 def play_scenario(ui, scenario, on_startup):
+    """Play a scenario
+    
+    Arguments:
+        ui  -- UI instance
+        scenario {list} -- Scenario to be played
+        on_startup {bool} -- Whether it was called on startup or not 
+    """
+
 
     # If scenario was called on startup,
     # let's wait for the UI to draw itself
