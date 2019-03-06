@@ -4,7 +4,7 @@
 usage: SRU_com [-h] [--version] [-f [FILE_NAME]] [-w] [-v] [-t] [-l] [-U]
                [-s [FILE_NAME]] [-q] [--check_only] [-S]
 
-SRU Communication Software V1.7.1
+SRU Communication Software V1.7.2
 
 optional arguments:
   -h, --help            show this help message and exit
