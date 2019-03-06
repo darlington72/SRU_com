@@ -78,7 +78,7 @@ def look_for_sync_words(ui, first_frame):
                 buffer_feed += (
                     "<syncword>"
                     + "".join(first_byte)
-                    + "</syncword><error> Timeout error</error> \n"
+                    + "</syncword><error> Timeout error</error>"
                 )
                 ui.buffer_layout.insert_line(buffer_feed)
                 first_frame = True
@@ -90,7 +90,7 @@ def look_for_sync_words(ui, first_frame):
         else:
             if not first_frame:
                 ui.buffer_layout.insert_line(
-                    "".join(first_byte) + " <error>Too many bytes received</error> \n"
+                    "".join(first_byte) + " <error>Too many bytes received</error>"
                 )
 
     return first_byte, second_byte
@@ -367,6 +367,8 @@ def send_TC(TC_id, TC_data, ui, resend_last_TC=False):
         ui.last_TC_sent["frame_str"] = frame_to_be_sent_str
         ui.last_TC_sent["buffer_feed"] = buffer_feed
         ui.last_TC_sent["hex_upload"] = False
+        ui.last_TC_sent["bytes_only"] = False
+
 
         # try:
         #     if BD_TC[TC_id]["bootloader"] is True:
@@ -607,7 +609,7 @@ async def upload_hex(ui, data, upload_type=None, from_scenario=False):
                                     )
                                 else:
                                     ui.buffer_layout.insert_line(
-                                        'Sending TC "Reboot"\n'
+                                        'Sending TC "Reboot"'
                                     )
                                     send_TC(
                                         "TC-" + conf["hex_upload"]["TC_reboot_tag"],
@@ -641,6 +643,9 @@ async def upload_hex(ui, data, upload_type=None, from_scenario=False):
         ui.last_TC_sent["hex_upload"] = True
         ui.last_TC_sent["hex_file"] = data_backup
         ui.last_TC_sent["frame_bytes"] = False
+        ui.last_TC_sent["bytes_only"] = False
+
+        
 
         # Let's turn the watchdog back on
         if watchdog_value:
@@ -780,3 +785,30 @@ def play_scenario(ui, scenario, on_startup):
     
     get_app().invalidate()
 
+
+def send_bytes(ui, bytes_to_send):
+    """Send custom bytes over serial link
+    
+    Arguments:
+        ui  -- UI instance
+        bytes_to_send {hex str} -- Bytes to send 
+    """
+
+
+    bytes_to_send = bytes_to_send.upper()
+    bytes_to_send_bytearray = bytearray.fromhex(bytes_to_send)
+    
+    with ui.lock:
+        if conf["COM"]["delay_inter_byte"] == 0 or args.socket:
+            ui.ser.write(bytes_to_send_bytearray)
+        else:
+            for key, int_ in enumerate(bytes_to_send_bytearray):
+                ui.ser.write([int_])
+                if key != len(bytes_to_send_bytearray) - 1:
+                    sleep(conf["COM"]["delay_inter_byte"])
+        
+        ui.buffer_layout.insert_line(f'Sent: 0x<tc>{bytes_to_send}</tc>')
+
+    ui.last_TC_sent["bytes_only"] = True
+    ui.last_TC_sent["frame_str"] = bytes_to_send
+    ui.last_TC_sent['bytes'] = bytes_to_send

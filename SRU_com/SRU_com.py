@@ -30,10 +30,10 @@ if __name__ == "__main__":
     if args.test:
         ser = serial_replacement.SerialTest()
         ser.test = True
-        # !! Warning !!
-        # When using serial test (or uart loop), if there's an error in the length of a TM/TC in the BD, SRU_com will be stuck in
-        # a infinite loop because there's no timeout on reception
     elif args.socket:
+        # !! Warning !!
+        # When using socket mode, if there's an error in the length of a TM/TC in the BD, SRU_com will be stuck in
+        # a infinite loop because there's no timeout on reception
         ser = serial_replacement.SerialSocket()
         ser.test = False
     else:

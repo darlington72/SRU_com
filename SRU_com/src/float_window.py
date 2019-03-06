@@ -36,7 +36,7 @@ class TextInputDialog(object):
     
     """
 
-    def __init__(self, title="", label_text="", completer=None):
+    def __init__(self, title="", label_text="", completer=None, initial_text=""):
         self.future = Future()
 
         def accept_text(buf):
@@ -55,6 +55,7 @@ class TextInputDialog(object):
             multiline=False,
             width=D(preferred=40),
             accept_handler=accept_text,
+            text=initial_text
         )
 
         ok_button = Button(text="OK", handler=accept)
@@ -118,6 +119,30 @@ def do_load_scenario(ui):
             open_scenario(ui, path)
 
     ensure_future(coroutine())
+
+def do_send_bytes(ui):
+    def coroutine():
+        open_dialog = TextInputDialog(
+            title="Send bytes",
+            label_text="Enter the bytes to send in hexadecimal (without 0x):",
+            initial_text=ui.last_TC_sent['bytes']
+        )
+
+        bytes_to_send = yield From(show_dialog_as_float(open_dialog, ui.root_container))
+
+        try:
+            int(bytes_to_send, 16)
+        except ValueError:
+            show_message(
+                "Error", "Non hexadecimal value.", ui.root_container
+            )
+            get_app().invalidate()
+        else:
+            bytes_to_send = bytes_to_send.zfill(len(bytes_to_send) + len(bytes_to_send) % 2)
+            serial_com.send_bytes(ui, bytes_to_send)
+
+    ensure_future(coroutine())
+
 
 
 def open_scenario(ui, path, on_startup=False):

@@ -94,6 +94,8 @@ class UI:
             "buffer_feed": "",
             "hex_upload": False,
             "hex_file": "",
+            "bytes_only": False,
+            "bytes": ""
         }
 
         ######  WATCHDOG CLEAR ######
@@ -230,6 +232,8 @@ class UI:
                     self,
                     resend_last_TC=True,
                 )
+            elif self.last_TC_sent['bytes_only']:
+                serial_com.send_bytes(self, self.last_TC_sent['frame_str'])
 
         @self.bindings.add("c-p", eager=True)
         def clear_TMTC_feed(event):

@@ -13,7 +13,7 @@ The following classes act as a dropped-in replacement for the serial class
 """
 import socket
 import sys
-from queue import Queue
+from queue import Queue, Empty
 from src.lib import conf
 
 
@@ -31,6 +31,7 @@ class SerialTest:
     def __init__(self):
         # FIFO initialisation
         self.buffer = Queue()
+        self.timeout = None
 
     def write(self, data):
         if isinstance(data, int):
@@ -53,8 +54,11 @@ class SerialTest:
         """
 
         data = bytearray()
-        for _ in range(size):
-            data += bytearray([self.buffer.get()])
+        try:
+            for _ in range(size):
+                data += bytearray([self.buffer.get(timeout=self.timeout)])
+        except Empty:
+                data = bytearray()
 
         return data
 

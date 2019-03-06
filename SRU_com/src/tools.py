@@ -12,6 +12,7 @@ tools_list = [
     (0, "Reload App (MRAM)"),
     (1, "Load GOLDEN in boot mode"),
     (2, "Load a scenario"),
+    (3, "Send bytes")
 ]
 
 
@@ -22,6 +23,8 @@ def tools_handler(ui):
         load_GOLDEN_in_boot_mode(ui)
     elif ui.tools_selectable_list.current_value == 2:
         load_scenario(ui)
+    elif ui.tools_selectable_list.current_value == 3:
+        send_bytes(ui)
 
 
 def send_hex_to_MRAM(ui):
@@ -42,11 +45,12 @@ def send_hex_to_MRAM(ui):
 
 
 def load_GOLDEN_in_boot_mode(ui):
-
     float_window.do_upload_hex(ui, "Golden")
     ui.last_TC_sent["hex_upload"] = True
 
 
 def load_scenario(ui):
-
     float_window.do_load_scenario(ui)
+
+def send_bytes(ui):
+    float_window.do_send_bytes(ui)
