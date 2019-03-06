@@ -17,7 +17,7 @@ from version import __version__
 
 
 REPO = "https://api.github.com/repos/superlevure/SRU_com/releases/latest"
-
+FILE_TO_BACKUP = ('SRU_com/', 'README.md')
 COMMANDS = {
     # Labels
     "info": (33, "[!] "),
@@ -73,11 +73,12 @@ def update():
                 with tarfile.open(
                     backup_dir + "/" + backup_name, mode="w:gz"
                 ) as backup:
-                    backup.add(
-                        CURRENT_DIR,
-                        arcname=os.path.basename(CURRENT_DIR),
-                        recursive=True,
-                    )
+                    for file in FILE_TO_BACKUP:
+                        backup.add(
+                            file,
+                            arcname=os.path.basename(CURRENT_DIR),
+                            recursive=True,
+                        )
 
                 print_c(
                     f"SRU_com has been backed up to {backup_dir}/{backup_name}", "good"
