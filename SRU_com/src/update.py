@@ -17,7 +17,10 @@ from version import __version__
 
 
 REPO = "https://api.github.com/repos/superlevure/SRU_com/releases/latest"
-FILE_TO_BACKUP = ('SRU_com/', 'README.md')
+FILE_TO_BACKUP = [
+    {"name": "SRU_com/", "mandatory": True},
+    {"name": "README.md", "mandatory": False},
+]
 COMMANDS = {
     # Labels
     "info": (33, "[!] "),
@@ -28,7 +31,6 @@ COMMANDS = {
 }
 
 CURRENT_DIR = Path(sys.path[0]).parent
-
 
 
 def print_c(string, message_type, endline=True):
@@ -74,16 +76,28 @@ def update():
                     backup_dir + "/" + backup_name, mode="w:gz"
                 ) as backup:
                     for file in FILE_TO_BACKUP:
-                        print_c(f'Backinp up "{file}"..', "run")
-                        backup.add(
-                            str(CURRENT_DIR) + "/" + file,
-                            recursive=True,
-                            arcname=file
-                        )
+                        print_c(f"Backinp up \"{file['name']}\"..", "run")
+                        try:
+                            backup.add(
+                                str(CURRENT_DIR) + "/" + file["name"],
+                                recursive=True,
+                                arcname=file["name"],
+                            )
+                        except FileNotFoundError:
+                            if file["mandatory"]:
+                                print_c(
+                                    f"{file['name']} not found and mandatory: update aborted.",
+                                    "bad",
+                                )
+                                sys.exit()
+                            else:
+                                print_c(
+                                    f"{file['name']} not found but not mandatory: update can continue.",
+                                    "bad",
+                                )
                 print_c(
                     f"SRU_com has been backed up to {backup_dir}/{backup_name}", "good"
                 )
-
                 print_c(f"Downloading new version..", "run")
 
                 r = requests.get(
