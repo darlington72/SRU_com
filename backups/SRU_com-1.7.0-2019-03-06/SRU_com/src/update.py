@@ -80,6 +80,7 @@ def update():
                             recursive=True,
                             arcname=file
                         )
+                input()
                 print_c(
                     f"SRU_com has been backed up to {backup_dir}/{backup_name}", "good"
                 )

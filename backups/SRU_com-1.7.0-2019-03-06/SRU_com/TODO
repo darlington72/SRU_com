@@ -1,0 +1,48 @@
+
+Todo:
+  ✔ CRC for app ram too @done(19-02-12 14:29)
+  ✘ Loading bar for hex upload @cancelled(19-02-12 14:29)
+  ✔ What TC to send after golden upload ? -> nothing @done(19-02-12 16:21)
+  ✔ Why Load appli backup MRAM answer something weird ? @done(19-02-12 16:47)
+  ✔ Why TC dump has changed ? @done(19-02-12 18:34)
+  ✔ Why when i send it i get no error, just nothin ? @done(19-02-12 18:07)
+  ✔ add tag in conf @done(19-02-12 17:50)
+  ✔ check for TM content @done(19-02-12 17:50)
+  ✔ remettre le chargement @done(19-02-12 17:50)
+  ✔ fix update @done(19-02-27 18:17)
+  ✘ check for buffer len ? @cancelled(19-02-27 18:18)
+  ✔ Fix insert_line (cursor position) @done(19-02-24 16:04)
+  ✔ Fix scroll on osx @done(19-02-24 15:09)
+  ✔ Add time into logs @done(19-02-28 14:13)
+  ✔ fix raw window timing error @done(19-02-28 13:52)
+  ✘ Fix bug dump @cancelled(19-02-28 14:39)
+  ✘ fix /n @cancelled(19-02-28 14:14)
+  ✔ work on scenario @done(19-02-28 17:57)
+  ✔ invalid keyword without arg @done(19-03-01 10:17)
+  ✔ add comment @done(19-03-01 10:45)
+  ✔ BD in ../ @done(19-03-01 11:03)
+  ✔ quit at the end on demand @done(19-03-01 10:54)
+  ✔ wait tm timeout @done(19-03-01 12:05)
+  ✔ focus on scenario error @done(19-03-01 12:35)
+  ✔ step number don't count comment @done(19-03-01 12:52)
+  ✔ write to file in insert line @done(19-03-01 13:30)
+  ✔ check scenario @done(19-03-01 13:35)
+  ✔ upload auto @done(19-03-01 14:43)
+  ✔ work on sockets @done(19-03-04 13:12)
+  ✔ Fix \n in log @done(19-03-05 16:09)
+
+
+
+
+
+Todo before new release: 
+  ✔ Update changelog @done(19-03-06 10:33)
+  ✔ Update version @done(19-03-06 10:33)
+  ✔ Update README @done(19-03-06 10:33)
+  ☐ Commit
+  ☐ Create tag
+  ☐ Push with tags
+  ☐ Go to github and create release
+  
+
+
