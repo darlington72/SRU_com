@@ -77,7 +77,6 @@ def update():
                         print_c(f'Backinp up "{file}"..', "run")
                         backup.add(
                             "../" + file,
-                            arcname=os.path.basename(CURRENT_DIR),
                             recursive=True,
                         )
 
