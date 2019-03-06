@@ -30,6 +30,7 @@ COMMANDS = {
 CURRENT_DIR = Path(sys.path[0]).parent
 
 
+
 def print_c(string, message_type, endline=True):
     """print_colored
     """
@@ -43,6 +44,7 @@ def print_c(string, message_type, endline=True):
 
 def update():
     print_c("Welcome to SRU_com update.", "info")
+    print_c(f"Current dir: {CURRENT_DIR}", "info")
     print_c(f"Current version {__version__}, looking for update at {REPO}", "run")
 
     try:
@@ -78,7 +80,7 @@ def update():
                     )
 
                 print_c(
-                    f"SRU_com has been backed up to {backup_dir}\{backup_name}", "good"
+                    f"SRU_com has been backed up to {backup_dir}/{backup_name}", "good"
                 )
 
                 print_c(f"Downloading new version..", "run")
