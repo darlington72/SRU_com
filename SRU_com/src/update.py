@@ -74,6 +74,7 @@ def update():
                     backup_dir + "/" + backup_name, mode="w:gz"
                 ) as backup:
                     for file in FILE_TO_BACKUP:
+                        print_c(f'Backinp up "{file}"..', "run")
                         backup.add(
                             "../" + file,
                             arcname=os.path.basename(CURRENT_DIR),
