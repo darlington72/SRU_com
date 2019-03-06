@@ -75,7 +75,7 @@ def update():
                 ) as backup:
                     for file in FILE_TO_BACKUP:
                         backup.add(
-                            file,
+                            "../" + file,
                             arcname=os.path.basename(CURRENT_DIR),
                             recursive=True,
                         )
