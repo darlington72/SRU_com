@@ -6,7 +6,7 @@ the SRU board. Two others options are proposed:
     immediately available for read. No hardware is needed, everything happens in 
     SRU_com
 - Socket mode: used to communicate with the zynq over ethernet. In this mode, 
-    the zynq acts as a gateway or man in the middle between SRU_com and the SRU board 
+    the zynq acts as a man in the middle between SRU_com and the SRU board 
 
 The following classes act as a dropped-in replacement for the serial class
 
@@ -15,7 +15,7 @@ import socket
 import sys
 from queue import Queue, Empty
 from src.lib import conf
-
+from src.args import args
 
 class SerialTest:
     """Replace Serial() for simulation purpose
@@ -98,13 +98,20 @@ class SerialSocket:
         """ Send data over the socket link 
         
         Arguments:
-            data {int or bytearray} -- Data to be sent over the socket link 
+            data {bytearray} -- Data to be sent over the socket link 
         """
 
-        if isinstance(data, int):
-            self.socket.sendto(bytes([data]), (self.socket_client, self.socket_port_TC))
-        else:
-            self.socket.sendto(data, (self.socket_client, self.socket_port_TC))
+
+        # Data encapsulation:
+
+        size = len(data) + 16
+        size = size.to_bytes(2, 'little')
+        
+        service = bytearray.fromhex(conf['socket']['service_TC'])
+
+        frame = size + service + data 
+        
+        self.socket.sendto(frame, (self.socket_client, self.socket_port_TC))
 
     def read(self, size=1) -> bytearray:
         """Return n bytes from the socket 
@@ -125,15 +132,21 @@ class SerialSocket:
         # print(f"read called with size {size}")
 
         # If the FIFO is empty, let's read the data from the socket (blocking)
-        if self.buffer.empty():
+        while self.buffer.empty():
 
             # The following line will return even if less than 4096 bytes
             # are received
             data = self.socket.recv(4096)
 
-            # We then put every bytes received into the FIFO
-            for byte in data:
-                self.buffer.put(byte)
+            # if the third byte is equal to 0xA4 AND the 5 to 8 bytes are equal to 0x2E 55 52 53
+            if (data[2:3] == bytearray.fromhex(conf['socket']['service_TM_1']) and data[4:8] == bytearray.fromhex(conf['socket']['service_TM_2'])) or args.loop:
+                
+                # we skip the firt 20 bytes (16 bytes if in loop mode)
+                data = data[20::] if not args.loop else data[16::]
+
+                # We then put every bytes received into the FIFO
+                for byte in data:
+                    self.buffer.put(byte)
 
         # Now that we are sure the the FIFO is not empty, we can
         # retreive the data and return them
