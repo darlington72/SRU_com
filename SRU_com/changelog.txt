@@ -1,3 +1,7 @@
+Version 1.7.3 - 19-03-07
+- Fixed <ctrl> + R in socket mode
+
+---------------------------------
 Version 1.7.2 - 19-03-06
 - Fixed update
 

@@ -36,13 +36,10 @@ Todo:
 
 
 Todo before new release: 
-  ✔ Update changelog @done(19-03-06 15:22)
-  ✔ Update version @done(19-03-06 15:22)
-  ✔ Update README @done(19-03-06 15:22)
-  ✔ Commit @done(19-03-06 15:23)
-  ✔ Create tag @done(19-03-06 15:23)
-  ✔ Push with tags @done(19-03-06 15:23)
-  ✔ Go to github and create release @done(19-03-06 15:23)
-  
-
-
+  ✔ Update changelog @done(19-03-07 12:41)
+  ✔ Update version @done(19-03-07 12:41)
+  ✔ Update README @done(19-03-07 12:41)
+  ☐ Commit
+  ☐ Create tag
+  ☐ Push with tags
+  ☐ Go to github and create release
