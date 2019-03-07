@@ -290,7 +290,7 @@ def serial_com_watchdog(ui):
             sleep(1)
 
 
-def send_TC(TC_id, TC_data, ui, resend_last_TC=False):
+def send_TC(TC_id, TC_data, ui, resend_last_TC=True):
     """Sends a TC over the serial link
     Called by UI instance or hex_upload
     
@@ -300,86 +300,48 @@ def send_TC(TC_id, TC_data, ui, resend_last_TC=False):
         resend_last_TC -- True if send_TC was called by <ctrl> + R
     """
 
+    # We save the parameters in case the function is called later by <ctrl> + R
     if resend_last_TC:
-        if ui.last_TC_sent["frame_bytes"]:
-            frame_to_be_sent_bytes = ui.last_TC_sent["frame_bytes"]
-            frame_to_be_sent_str = ui.last_TC_sent["frame_str"]
-            buffer_feed = ui.last_TC_sent["buffer_feed"]
-
-            with ui.lock:
-                for key, int_ in enumerate(frame_to_be_sent_bytes):
-                    ui.ser.write([int_])
-                    if key != len(frame_to_be_sent_bytes) - 1:
-                        sleep(conf["COM"]["delay_inter_byte"])
-
-                ui.buffer_layout.insert_line(buffer_feed)
-
-        last_TC_upload_hex = ui.last_TC_sent["hex_upload"]
-        last_TC_hex = ui.last_TC_sent["hex_file"]
-
-        if last_TC_upload_hex:
-            if last_TC_hex:
-                asyncio.ensure_future(upload_hex(ui, last_TC_hex))
-
-            # else:
-            #     float_window.do_upload_hex(ui)
-
-    else:
-        frame_name = BD_TC[TC_id]["name"]
-        frame_header = BD_TC[TC_id]["header"]
-        frame_tag = BD_TC[TC_id]["tag"]
-        frame_data = "".join(TC_data)
-        frame_length = hex(int(len(frame_data) / 2))[2:].zfill(2)
-        frame_to_be_sent_str = frame_header + frame_length + frame_tag + frame_data
-        frame_to_be_sent_bytes = bytearray.fromhex(frame_to_be_sent_str)
-        CRC = lib.compute_CRC(frame_to_be_sent_bytes)
-        frame_to_be_sent_bytes.append(CRC)
-        frame_to_be_sent_str += format(CRC, "x").zfill(2).upper()
-
-        with ui.lock:
-            if conf["COM"]["delay_inter_byte"] == 0 or args.socket:
-                ui.ser.write(frame_to_be_sent_bytes)
-            else:
-                for key, int_ in enumerate(frame_to_be_sent_bytes):
-                    ui.ser.write([int_])
-                    if key != len(frame_to_be_sent_bytes) - 1:
-                        sleep(conf["COM"]["delay_inter_byte"])
-
-            buffer_feed = "<tc>TC</tc> - "  # Line to be printed to TMTC feed
-
-            if ui.verbose.checked:
-                buffer_feed += lib.format_frame(
-                    "<syncword>" + frame_header + "</syncword>",
-                    "<datalen>" + frame_length + "</datalen>",
-                    "<tag>" + frame_tag + "</tag>",
-                    "<data>" + frame_data + "</data>",
-                    "<crc>" + frame_to_be_sent_str[-2:] + "</crc>",
-                    frame_name,
-                )
-            else:
-                buffer_feed += frame_name
-
-        ui.buffer_layout.insert_line(buffer_feed)
-        # call_from_executor(lambda: ui.buffer_layout.insert_line(buffer_feed))
-
-        # Let's save this TC in case user wants to resend it
-        ui.last_TC_sent["frame_bytes"] = frame_to_be_sent_bytes
-        ui.last_TC_sent["frame_str"] = frame_to_be_sent_str
-        ui.last_TC_sent["buffer_feed"] = buffer_feed
-        ui.last_TC_sent["hex_upload"] = False
-        ui.last_TC_sent["bytes_only"] = False
+        ui.last_TC_sent['type'] = "send_TC"
+        ui.last_TC_sent["TC_id"] = TC_id
+        ui.last_TC_sent['TC_data'] = TC_data
 
 
-        # try:
-        #     if BD_TC[TC_id]["bootloader"] is True:
-        #         float_window.do_upload_hex(ui)
-        #         ui.last_TC_sent["hex_upload"] = True
-        #     else:
-        #         ui.last_TC_sent["hex_upload"] = False
-        #         ui.last_TC_sent["hex_file"] = None
-        # except KeyError:
-        #     ui.last_TC_sent["hex_upload"] = False
-        #     ui.last_TC_sent["hex_file"] = None
+    frame_name = BD_TC[TC_id]["name"]
+    frame_header = BD_TC[TC_id]["header"]
+    frame_tag = BD_TC[TC_id]["tag"]
+    frame_data = "".join(TC_data)
+    frame_length = hex(int(len(frame_data) / 2))[2:].zfill(2)
+    frame_to_be_sent_str = frame_header + frame_length + frame_tag + frame_data
+    frame_to_be_sent_bytes = bytearray.fromhex(frame_to_be_sent_str)
+    CRC = lib.compute_CRC(frame_to_be_sent_bytes)
+    frame_to_be_sent_bytes.append(CRC)
+    frame_to_be_sent_str += format(CRC, "x").zfill(2).upper()
+
+    with ui.lock:
+        if conf["COM"]["delay_inter_byte"] == 0 or args.socket:
+            ui.ser.write(frame_to_be_sent_bytes)
+        else:
+            for key, int_ in enumerate(frame_to_be_sent_bytes):
+                ui.ser.write([int_])
+                if key != len(frame_to_be_sent_bytes) - 1:
+                    sleep(conf["COM"]["delay_inter_byte"])
+
+        buffer_feed = "<tc>TC</tc> - "  # Line to be printed to TMTC feed
+
+        if ui.verbose.checked:
+            buffer_feed += lib.format_frame(
+                "<syncword>" + frame_header + "</syncword>",
+                "<datalen>" + frame_length + "</datalen>",
+                "<tag>" + frame_tag + "</tag>",
+                "<data>" + frame_data + "</data>",
+                "<crc>" + frame_to_be_sent_str[-2:] + "</crc>",
+                frame_name,
+            )
+        else:
+            buffer_feed += frame_name
+
+    ui.buffer_layout.insert_line(buffer_feed)
 
 
 async def upload_hex(ui, data, upload_type=None, from_scenario=False):
@@ -395,15 +357,11 @@ async def upload_hex(ui, data, upload_type=None, from_scenario=False):
     error = False
     ui.done_uploading = False
 
-    if upload_type == None:
-        # if upload_hex was called by <ctrl> + R
-        upload_type = ui.last_TC_sent["upload_type"]
-    else:
-        # if not, we save it for next <ctrl> + R
-        ui.last_TC_sent["upload_type"] = upload_type
+    # We save the parameters in case the function is called later by <ctrl> + R
+    ui.last_TC_sent['type'] = "upload_hex"
+    ui.last_TC_sent['data'] = data
+    ui.last_TC_sent['upload_type'] = upload_type
 
-    # Let's keep a backup of data for last TC resend shortcut
-    data_backup = data
 
     data = data.decode()
     info_message = float_window.InfoDialog(
@@ -640,11 +598,6 @@ async def upload_hex(ui, data, upload_type=None, from_scenario=False):
                 f"{upload_type} Upload to SRU", "Upload done.", ui.root_container
             )
 
-        ui.last_TC_sent["hex_upload"] = True
-        ui.last_TC_sent["hex_file"] = data_backup
-        ui.last_TC_sent["frame_bytes"] = False
-        ui.last_TC_sent["bytes_only"] = False
-
         
 
         # Let's turn the watchdog back on
@@ -752,8 +705,11 @@ def play_scenario(ui, scenario, on_startup):
                                 upload_hex(ui, data, upload_type, from_scenario=True)
                             )
                         )
+
                         while not ui.done_uploading:
                             sleep(0.1)
+
+                        ui.buffer_layout.insert_line("Scenario mode: done uploading.")
 
                         # ui.buffer_layout.insert_line(str(ui.done_uploading))
                         if ui.done_uploading == "error":
@@ -794,6 +750,9 @@ def send_bytes(ui, bytes_to_send):
         bytes_to_send {hex str} -- Bytes to send 
     """
 
+    # We save the parameters in case the function is called later by <ctrl> + R
+    ui.last_TC_sent['type'] = 'send_bytes'
+    ui.last_TC_sent['bytes_to_send'] = bytes_to_send
 
     bytes_to_send = bytes_to_send.upper()
     bytes_to_send_bytearray = bytearray.fromhex(bytes_to_send)
@@ -808,7 +767,3 @@ def send_bytes(ui, bytes_to_send):
                     sleep(conf["COM"]["delay_inter_byte"])
         
         ui.buffer_layout.insert_line(f'Sent: 0x<tc>{bytes_to_send}</tc>')
-
-    ui.last_TC_sent["bytes_only"] = True
-    ui.last_TC_sent["frame_str"] = bytes_to_send
-    ui.last_TC_sent['bytes'] = bytes_to_send

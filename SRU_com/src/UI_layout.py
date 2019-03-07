@@ -5,7 +5,7 @@ In this file we define the UI layout of SRU_com
 import binascii
 import sys
 import serial
-from asyncio import get_event_loop
+from asyncio import get_event_loop, ensure_future
 import queue
 from time import sleep
 
@@ -89,12 +89,7 @@ class UI:
             values=TC_list, handler=TC_send_handler
         )
         self.last_TC_sent = {
-            "frame_bytes": "",
-            "frame_str": "",
-            "buffer_feed": "",
-            "hex_upload": False,
-            "hex_file": "",
-            "bytes_only": False,
+            "type": "",
             "bytes": ""
         }
 
@@ -225,15 +220,16 @@ class UI:
 
         @self.bindings.add("c-r", eager=True)
         def send_last_TC_again(event):
-            if self.last_TC_sent["frame_bytes"] or self.last_TC_sent["hex_upload"]:
-                serial_com.send_TC(
-                    self.TC_selectable_list.current_value,
-                    None,
-                    self,
-                    resend_last_TC=True,
-                )
-            elif self.last_TC_sent['bytes_only']:
-                serial_com.send_bytes(self, self.last_TC_sent['frame_str'])
+            
+            if self.last_TC_sent['type'] == "send_TC":
+                serial_com.send_TC(self.last_TC_sent['TC_id'], self.last_TC_sent['TC_data'], self, resend_last_TC=True)
+
+            elif self.last_TC_sent['type'] == "upload_hex":
+                ensure_future(serial_com.upload_hex(self, self.last_TC_sent['data'], upload_type=self.last_TC_sent['upload_type'], from_scenario=False))
+
+            elif self.last_TC_sent['type'] == "send_bytes":
+                serial_com.send_bytes(self, self.last_TC_sent['bytes_to_send'])
+
 
         @self.bindings.add("c-p", eager=True)
         def clear_TMTC_feed(event):

@@ -139,6 +139,7 @@ def do_send_bytes(ui):
             get_app().invalidate()
         else:
             bytes_to_send = bytes_to_send.zfill(len(bytes_to_send) + len(bytes_to_send) % 2)
+            ui.last_TC_sent['bytes'] = bytes_to_send
             serial_com.send_bytes(ui, bytes_to_send)
 
     ensure_future(coroutine())

@@ -9,12 +9,13 @@
         "timeout": 0.1,
         "delay_inter_byte": 0
     },
-    "socket_test": {
+    "socket": {
         "host": "localhost",
         "client": "localhost",
-        "port": 11005
+        "port_TC": 11005,
+        "port_TM": 11005
     },
-    "socket": {
+    "socket_test": {
         "host": "192.168.1.20",
         "client": "192.168.1.10",
         "port_TC": 11006,

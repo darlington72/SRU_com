@@ -41,13 +41,9 @@ def send_hex_to_MRAM(ui):
     # To deal with <ctrl> + R
 
     # add pourcentage avec tqdm
-    ui.last_TC_sent["hex_upload"] = True
-
 
 def load_GOLDEN_in_boot_mode(ui):
     float_window.do_upload_hex(ui, "Golden")
-    ui.last_TC_sent["hex_upload"] = True
-
 
 def load_scenario(ui):
     float_window.do_load_scenario(ui)
