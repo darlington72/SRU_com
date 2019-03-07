@@ -34,7 +34,7 @@ Scenario Mode:
 python >= 3.6
 ```
 
-## Todo on first install: 
+## Todo on first install (**if not using docker**): 
 #### Clone the repo
 ```
 git clone https://github.com/superlevure/SRU_com
@@ -65,6 +65,7 @@ source .env/bin/activate (on Unix)
 ```
 #### Launch SRU_com
 ```
+cd SRU_com/
 python SRU_com.py
 ```
 

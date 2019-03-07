@@ -278,7 +278,14 @@ def serial_com_watchdog(ui):
             frame_to_be_sent_str += format(CRC, "x").zfill(2).upper()
 
             with ui.lock:
-                ui.ser.write(frame_to_be_sent_bytes)
+                if conf["COM"]["delay_inter_byte"] == 0 or args.socket:
+                            ui.ser.write(frame_to_be_sent_bytes)
+                else:
+                    for key, int_ in enumerate(frame_to_be_sent_bytes):
+                        ui.ser.write([int_])
+                        if key != len(frame_to_be_sent_bytes) - 1:
+                            sleep(conf["COM"]["delay_inter_byte"])
+
 
             # Blinking text in the UI 
             ui.watchdog_cleared_buffer.text = "      Watchdog Cleared"
