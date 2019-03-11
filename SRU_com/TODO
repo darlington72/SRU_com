@@ -36,9 +36,9 @@ Todo:
 
 
 Todo before new release: 
-  ✔ Update changelog @done(19-03-07 12:41)
-  ✔ Update version @done(19-03-07 12:41)
-  ✔ Update README @done(19-03-07 12:41)
+  ☐ Update changelog
+  ☐ Update version
+  ☐ Update README
   ☐ Commit
   ☐ Create tag
   ☐ Push with tags

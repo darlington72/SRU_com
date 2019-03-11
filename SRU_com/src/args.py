@@ -62,7 +62,14 @@ scenario_group.add_argument(
 scenario_group.add_argument(
     "--check_only", action="store_true", help="Check scenario syntax only"
 )
-parser.add_argument("-S", "--socket", action="store_true", help="Start in socket mode")
+
+socket_group = parser.add_argument_group("Socket Mode")
+
+socket_group.add_argument("-S", "--socket", action="store_true", help="Start in socket mode")
+socket_group.add_argument("--without_encapsulation", action="store_true", help="Don't encapsulate the data")
+socket_group.add_argument("--localhost", action="store_true", help="Start socket on localhost (test purpose)")
+
+
 
 
 args = parser.parse_args()

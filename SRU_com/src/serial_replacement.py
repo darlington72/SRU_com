@@ -76,10 +76,10 @@ class SerialSocket:
 
         # Socket init (UDP)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.socket_host = conf["socket"]["host"]
-        self.socket_port_TC = conf["socket"]["port_TC"]
-        self.socket_port_TM = conf["socket"]["port_TM"]
-        self.socket_client = conf["socket"]["client"]
+        self.socket_host = conf["socket"]["host"] if not args.localhost else "localhost"
+        self.socket_port_TC = conf["socket"]["port_TC"] 
+        self.socket_port_TM = conf["socket"]["port_TM"] if not args.localhost else conf["socket"]["port_TC"] 
+        self.socket_client = conf["socket"]["client"] if not args.localhost else "localhost"
 
         # A FIFO is also used to store the bytes unused returned by the recv() method
         # See the read() method for more details
@@ -101,15 +101,17 @@ class SerialSocket:
             data {bytearray} -- Data to be sent over the socket link 
         """
 
+        if not args.without_encapsulation:
+            # Data encapsulation:
 
-        # Data encapsulation:
+            size = len(data) + 16
+            size = size.to_bytes(2, 'little')
+            
+            service = bytearray.fromhex(conf['socket']['service_TC'])
 
-        size = len(data) + 16
-        size = size.to_bytes(2, 'little')
-        
-        service = bytearray.fromhex(conf['socket']['service_TC'])
-
-        frame = size + service + data 
+            frame = size + service + data 
+        else: 
+            frame = data
         
         self.socket.sendto(frame, (self.socket_client, self.socket_port_TC))
 
@@ -139,10 +141,11 @@ class SerialSocket:
             data = self.socket.recv(4096)
 
             # if the third byte is equal to 0xA4 AND the 5 to 8 bytes are equal to 0x2E 55 52 53
-            if (data[2:3] == bytearray.fromhex(conf['socket']['service_TM_1']) and data[4:8] == bytearray.fromhex(conf['socket']['service_TM_2'])) or args.loop:
+            if (data[2:3] == bytearray.fromhex(conf['socket']['service_TM_1']) and data[4:8] == bytearray.fromhex(conf['socket']['service_TM_2'])) or args.loop or args.without_encapsulation:
                 
-                # we skip the firt 20 bytes (16 bytes if in loop mode)
-                data = data[20::] if not args.loop else data[16::]
+                if not args.without_encapsulation:
+                    # we skip the firt 20 bytes (16 bytes if in loop mode)
+                    data = data[20::] if not args.loop else data[16::]
 
                 # We then put every bytes received into the FIFO
                 for byte in data:
